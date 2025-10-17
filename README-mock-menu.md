@@ -1,0 +1,1 @@
+Mock menu JSON: available at /routes/menu.json (served from the `public` folder). Images referenced under `/images/categories/*` and `/images/items/*` should be placed in `public/images/...` so the app can load them directly.
