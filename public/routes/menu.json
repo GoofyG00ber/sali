@@ -1,0 +1,1484 @@
+{
+  "categories": [
+    {
+      "id": 1,
+      "title": "Pizzák",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 2,
+          "title": "Nagyon finom pizza",
+          "description": "paradicsomszósz, mozzarella, sonka, olivabogyó, koktélparadicsom",
+          "prices": [
+            { "label": "26 cm", "price": 3290 },
+            { "label": "32 cm", "price": 3890 },
+            { "label": "45 cm", "price": 5890 }
+          ],
+          "badges": ["újdonság"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 3,
+          "title": "Pepperoni Special",
+          "description": "pepperoni, mozzarella, paradicsomszósz",
+          "prices": [
+            { "label": "26 cm", "price": 3390 },
+            { "label": "32 cm", "price": 3990 },
+            { "label": "45 cm", "price": 5990 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 4,
+          "title": "Vegetarian Delight",
+          "description": "paradicsom, mozzarella, paprika, gomba, olivabogyó",
+          "prices": [
+            { "label": "26 cm", "price": 3190 },
+            { "label": "32 cm", "price": 3790 },
+            { "label": "45 cm", "price": 5590 }
+          ],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 11,
+          "title": "Margherita",
+          "description": "paradicsomszósz, mozzarella",
+          "prices": [
+            { "label": "26 cm", "price": 2990 },
+            { "label": "32 cm", "price": 3590 },
+            { "label": "45 cm", "price": 5390 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 12,
+          "title": "Quattro Stagioni",
+          "description": "paradicsomszósz, mozzarella, sonka, gomba, paprika, olívabogyó",
+          "prices": [
+            { "label": "26 cm", "price": 3490 },
+            { "label": "32 cm", "price": 4090 },
+            { "label": "45 cm", "price": 6090 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 13,
+          "title": "Capricciosa",
+          "description": "paradicsomszósz, mozzarella, sonka, gomba, olívabogyó",
+          "prices": [
+            { "label": "26 cm", "price": 3390 },
+            { "label": "32 cm", "price": 3990 },
+            { "label": "45 cm", "price": 5990 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 14,
+          "title": "Hawaii",
+          "description": "paradicsomszósz, mozzarella, sonka, ananász",
+          "prices": [
+            { "label": "26 cm", "price": 3290 },
+            { "label": "32 cm", "price": 3890 },
+            { "label": "45 cm", "price": 5890 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 15,
+          "title": "Diavola",
+          "description": "paradicsomszósz, mozzarella, pepperoni, chili",
+          "prices": [
+            { "label": "26 cm", "price": 3490 },
+            { "label": "32 cm", "price": 4090 },
+            { "label": "45 cm", "price": 6090 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 16,
+          "title": "Funghi",
+          "description": "paradicsomszósz, mozzarella, gomba",
+          "prices": [
+            { "label": "26 cm", "price": 3190 },
+            { "label": "32 cm", "price": 3790 },
+            { "label": "45 cm", "price": 5790 }
+          ],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 17,
+          "title": "Prosciutto",
+          "description": "paradicsomszósz, mozzarella, prosciutto",
+          "prices": [
+            { "label": "26 cm", "price": 3390 },
+            { "label": "32 cm", "price": 3990 },
+            { "label": "45 cm", "price": 5990 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 18,
+          "title": "Tonno",
+          "description": "paradicsomszósz, mozzarella, tonhal, vöröshagyma",
+          "prices": [
+            { "label": "26 cm", "price": 3490 },
+            { "label": "32 cm", "price": 4090 },
+            { "label": "45 cm", "price": 6090 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 19,
+          "title": "Calzone",
+          "description": "paradicsomszósz, mozzarella, sonka, gomba, töltve",
+          "prices": [
+            { "label": "26 cm", "price": 3590 },
+            { "label": "32 cm", "price": 4190 },
+            { "label": "45 cm", "price": 6190 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 20,
+          "title": "Spinaci",
+          "description": "paradicsomszósz, mozzarella, spenót, feta",
+          "prices": [
+            { "label": "26 cm", "price": 3290 },
+            { "label": "32 cm", "price": 3890 },
+            { "label": "45 cm", "price": 5890 }
+          ],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 21,
+          "title": "Bolognese",
+          "description": "paradicsomszósz, mozzarella, bolognai szósz",
+          "prices": [
+            { "label": "26 cm", "price": 3490 },
+            { "label": "32 cm", "price": 4090 },
+            { "label": "45 cm", "price": 6090 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 22,
+          "title": "Carbonara",
+          "description": "paradicsomszósz, mozzarella, bacon, tojás",
+          "prices": [
+            { "label": "26 cm", "price": 3590 },
+            { "label": "32 cm", "price": 4190 },
+            { "label": "45 cm", "price": 6190 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 23,
+          "title": "Mexicana",
+          "description": "paradicsomszósz, mozzarella, chili, kukorica, bab",
+          "prices": [
+            { "label": "26 cm", "price": 3390 },
+            { "label": "32 cm", "price": 3990 },
+            { "label": "45 cm", "price": 5990 }
+          ],
+          "badges": ["újdonság"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 24,
+          "title": "Frutti di Mare",
+          "description": "paradicsomszósz, mozzarella, tengeri gyümölcsök",
+          "prices": [
+            { "label": "26 cm", "price": 3690 },
+            { "label": "32 cm", "price": 4290 },
+            { "label": "45 cm", "price": 6290 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 25,
+          "title": "Rustica",
+          "description": "paradicsomszósz, mozzarella, szalámi, paprika",
+          "prices": [
+            { "label": "26 cm", "price": 3390 },
+            { "label": "32 cm", "price": 3990 },
+            { "label": "45 cm", "price": 5990 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 26,
+          "title": "Vegetariana",
+          "description": "paradicsomszósz, mozzarella, zöldségek",
+          "prices": [
+            { "label": "26 cm", "price": 3190 },
+            { "label": "32 cm", "price": 3790 },
+            { "label": "45 cm", "price": 5790 }
+          ],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 27,
+          "title": "Pesto",
+          "description": "paradicsomszósz, mozzarella, pesto, bazsalikom",
+          "prices": [
+            { "label": "26 cm", "price": 3490 },
+            { "label": "32 cm", "price": 4090 },
+            { "label": "45 cm", "price": 6090 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 28,
+          "title": "Bufala",
+          "description": "paradicsomszósz, bufala mozzarella, bazsalikom",
+          "prices": [
+            { "label": "26 cm", "price": 3590 },
+            { "label": "32 cm", "price": 4190 },
+            { "label": "45 cm", "price": 6190 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 29,
+          "title": "Salsiccia",
+          "description": "paradicsomszósz, mozzarella, olasz kolbász",
+          "prices": [
+            { "label": "26 cm", "price": 3490 },
+            { "label": "32 cm", "price": 4090 },
+            { "label": "45 cm", "price": 6090 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 30,
+          "title": "Ortolana",
+          "description": "paradicsomszósz, mozzarella, grillezett zöldségek",
+          "prices": [
+            { "label": "26 cm", "price": 3290 },
+            { "label": "32 cm", "price": 3890 },
+            { "label": "45 cm", "price": 5890 }
+          ],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Levesek",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 6,
+          "title": "Gyömbéres paradicsomleves",
+          "description": "friss paradicsom, bazsalikom, gyömbér",
+          "prices": [ { "label": "adag", "price": 1200 } ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 31,
+          "title": "Húsleves",
+          "description": "marhahús, zöldségek, tészta",
+          "prices": [{ "label": "adag", "price": 1300 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 32,
+          "title": "Gulyásleves",
+          "description": "marhahús, paprika, burgonya",
+          "prices": [{ "label": "adag", "price": 1400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 33,
+          "title": "Bableves",
+          "description": "bab, kolbász, paprika",
+          "prices": [{ "label": "adag", "price": 1200 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 34,
+          "title": "Zöldségleves",
+          "description": "kevert zöldségek, kruton",
+          "prices": [{ "label": "adag", "price": 1100 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 35,
+          "title": "Halászlé",
+          "description": "hal, paprika, burgonya",
+          "prices": [{ "label": "adag", "price": 1500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 36,
+          "title": "Krumplileves",
+          "description": "burgonya, tejföl, kolbász",
+          "prices": [{ "label": "adag", "price": 1250 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 37,
+          "title": "Lencseleves",
+          "description": "lencse, zöldségek, füstölt hús",
+          "prices": [{ "label": "adag", "price": 1300 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 38,
+          "title": "Májgombócleves",
+          "description": "májgombóc, zöldségek",
+          "prices": [{ "label": "adag", "price": 1350 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 39,
+          "title": "Tejfölös uborkaleves",
+          "description": "uborka, tejföl, zöldségek",
+          "prices": [{ "label": "adag", "price": 1150 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 40,
+          "title": "Csontleves",
+          "description": "csont, zöldségek, tészta",
+          "prices": [{ "label": "adag", "price": 1400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 41,
+          "title": "Zöldbableves",
+          "description": "zöldbab, kolbász, paprika",
+          "prices": [{ "label": "adag", "price": 1250 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 42,
+          "title": "Sárgaborsóleves",
+          "description": "sárgaborsó, zöldségek",
+          "prices": [{ "label": "adag", "price": 1200 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 43,
+          "title": "Káposztaleves",
+          "description": "káposzta, kolbász, burgonya",
+          "prices": [{ "label": "adag", "price": 1300 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 44,
+          "title": "Hideg meggyleves",
+          "description": "meggy, tejföl, zsemle",
+          "prices": [{ "label": "adag", "price": 1100 }],
+          "badges": ["újdonság"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 45,
+          "title": "Spárgaleves",
+          "description": "spárga, krém, zöldségek",
+          "prices": [{ "label": "adag", "price": 1350 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 46,
+          "title": "Gombaleves",
+          "description": "gomba, tejföl, zöldségek",
+          "prices": [{ "label": "adag", "price": 1250 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 47,
+          "title": "Tökleves",
+          "description": "tök, krém, fahéj",
+          "prices": [{ "label": "adag", "price": 1200 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 48,
+          "title": "Rántott leves",
+          "description": "rántott leves, zöldségek",
+          "prices": [{ "label": "adag", "price": 1150 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 49,
+          "title": "Savanyú káposztaleves",
+          "description": "savanyú káposzta, kolbász",
+          "prices": [{ "label": "adag", "price": 1400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 50,
+          "title": "Zellerleves",
+          "description": "zeller, krém, zöldségek",
+          "prices": [{ "label": "adag", "price": 1250 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Desszert",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 8,
+          "title": "Tiramisu",
+          "description": "kávé, mascarpone, keksz",
+          "prices": [
+            { "label": "adag", "price": 1500 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 51,
+          "title": "Panna Cotta",
+          "description": "vanília, gyümölcsöntet",
+          "prices": [{ "label": "adag", "price": 1400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 52,
+          "title": "Sacher Torta",
+          "description": "csokoládé, meggy",
+          "prices": [{ "label": "szelet", "price": 1600 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 53,
+          "title": "Somlói Galuska",
+          "description": "piskóta, vanília, csokoládé",
+          "prices": [{ "label": "adag", "price": 1500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 54,
+          "title": "Gundel Palacsinta",
+          "description": "dió, rum, csokoládé",
+          "prices": [{ "label": "adag", "price": 1300 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 55,
+          "title": "Mákos Guba",
+          "description": "mák, zsemle, vanília",
+          "prices": [{ "label": "adag", "price": 1200 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 56,
+          "title": "Rákóczi Túró",
+          "description": "túró, mazsola, vanília",
+          "prices": [{ "label": "adag", "price": 1250 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 57,
+          "title": "Dobostorta",
+          "description": "piskóta, karamell",
+          "prices": [{ "label": "szelet", "price": 1700 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 58,
+          "title": "Krémes",
+          "description": "piskóta, vanília krém",
+          "prices": [{ "label": "szelet", "price": 1400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 59,
+          "title": "Zserbó",
+          "description": "piskóta, dió, lekvár",
+          "prices": [{ "label": "szelet", "price": 1500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 60,
+          "title": "Flódni",
+          "description": "rétes, dió, mák, alma",
+          "prices": [{ "label": "szelet", "price": 1600 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 61,
+          "title": "Eszterházy Torta",
+          "description": "dió, csokoládé, vanília",
+          "prices": [{ "label": "szelet", "price": 1800 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 62,
+          "title": "Linzer Torta",
+          "description": "mogyoró, ribizli",
+          "prices": [{ "label": "szelet", "price": 1550 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 63,
+          "title": "Muffin",
+          "description": "csokoládé, áfonya",
+          "prices": [{ "label": "db", "price": 800 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 64,
+          "title": "Fagylalt",
+          "description": "vanília, eper, csokoládé",
+          "prices": [{ "label": "gombóc", "price": 600 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 65,
+          "title": "Puding",
+          "description": "csokoládé, vanília",
+          "prices": [{ "label": "adag", "price": 1100 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 66,
+          "title": "Joghurt",
+          "description": "görög joghurt, gyümölcs",
+          "prices": [{ "label": "adag", "price": 1000 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 67,
+          "title": "Sütemény",
+          "description": "kevert sütemény",
+          "prices": [{ "label": "db", "price": 700 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 68,
+          "title": "Keksz",
+          "description": "csokoládés keksz",
+          "prices": [{ "label": "db", "price": 500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 69,
+          "title": "Habcsók",
+          "description": "habcsók, krém",
+          "prices": [{ "label": "db", "price": 400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 70,
+          "title": "Túrós Táska",
+          "description": "túró, lekvár",
+          "prices": [{ "label": "db", "price": 900 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Italok",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 10,
+          "title": "Cola",
+          "description": "klasszikus üdítőital",
+          "prices": [
+            { "label": "0.33 l", "price": 500 }
+          ],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 71,
+          "title": "Sprite",
+          "description": "citrusos üdítő",
+          "prices": [{ "label": "0.33 l", "price": 500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 72,
+          "title": "Fanta",
+          "description": "narancs üdítő",
+          "prices": [{ "label": "0.33 l", "price": 500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 73,
+          "title": "Ásványvíz",
+          "description": "szénsavas ásványvíz",
+          "prices": [{ "label": "0.5 l", "price": 400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 74,
+          "title": "Narancslé",
+          "description": "friss narancslé",
+          "prices": [{ "label": "0.25 l", "price": 600 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 75,
+          "title": "Almalé",
+          "description": "friss almalé",
+          "prices": [{ "label": "0.25 l", "price": 550 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 76,
+          "title": "Kávé",
+          "description": "espresso, cappuccino",
+          "prices": [{ "label": "csésze", "price": 450 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 77,
+          "title": "Tea",
+          "description": "fekete tea, zöld tea",
+          "prices": [{ "label": "csésze", "price": 400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 78,
+          "title": "Sör",
+          "description": "világos sör",
+          "prices": [{ "label": "0.5 l", "price": 700 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 79,
+          "title": "Bor",
+          "description": "vörösbor, fehérbor",
+          "prices": [{ "label": "0.1 l", "price": 800 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 80,
+          "title": "Pálinka",
+          "description": "szilva pálinka",
+          "prices": [{ "label": "0.04 l", "price": 900 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 81,
+          "title": "Energiaital",
+          "description": "energiaital",
+          "prices": [{ "label": "0.25 l", "price": 650 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 82,
+          "title": "Smoothie",
+          "description": "gyümölcs smoothie",
+          "prices": [{ "label": "0.3 l", "price": 750 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 83,
+          "title": "Jegestea",
+          "description": "jégtea",
+          "prices": [{ "label": "0.5 l", "price": 550 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 84,
+          "title": "Kakaó",
+          "description": "forró kakaó",
+          "prices": [{ "label": "csésze", "price": 500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 85,
+          "title": "Limonádé",
+          "description": "házilimonádé",
+          "prices": [{ "label": "0.3 l", "price": 600 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 86,
+          "title": "Víz",
+          "description": "szénsavmentes víz",
+          "prices": [{ "label": "0.5 l", "price": 300 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 87,
+          "title": "Gyümölcslé",
+          "description": "kevert gyümölcslé",
+          "prices": [{ "label": "0.25 l", "price": 650 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 88,
+          "title": "Koktél",
+          "description": "alkoholos koktél",
+          "prices": [{ "label": "0.2 l", "price": 1200 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 89,
+          "title": "Shake",
+          "description": "tejshake",
+          "prices": [{ "label": "0.3 l", "price": 800 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 90,
+          "title": "Frissítő",
+          "description": "frissítő ital",
+          "prices": [{ "label": "0.33 l", "price": 550 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        }
+      ]
+    },
+    {
+      "id": 91,
+      "title": "Saláták",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 92,
+          "title": "Cézár Saláta",
+          "description": "saláta, csirkemell, parmezán, kruton",
+          "prices": [{ "label": "adag", "price": 1800 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 93,
+          "title": "Görög Saláta",
+          "description": "paradicsom, uborka, feta, olívabogyó",
+          "prices": [{ "label": "adag", "price": 1600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 94,
+          "title": "Caprese Saláta",
+          "description": "paradicsom, mozzarella, bazsalikom",
+          "prices": [{ "label": "adag", "price": 1700 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 95,
+          "title": "Kevert Saláta",
+          "description": "kevert zöldségek, dressing",
+          "prices": [{ "label": "adag", "price": 1400 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 96,
+          "title": "Tonhalas Saláta",
+          "description": "tonhal, saláta, kukorica",
+          "prices": [{ "label": "adag", "price": 1750 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 97,
+          "title": "Spenótos Saláta",
+          "description": "spenót, gomba, feta",
+          "prices": [{ "label": "adag", "price": 1650 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 98,
+          "title": "Quinoa Saláta",
+          "description": "quinoa, zöldségek, citrom",
+          "prices": [{ "label": "adag", "price": 1550 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 99,
+          "title": "Avokádós Saláta",
+          "description": "avokádó, saláta, paradicsom",
+          "prices": [{ "label": "adag", "price": 1850 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 100,
+          "title": "Káposztás Saláta",
+          "description": "káposzta, sárgarépa, dressing",
+          "prices": [{ "label": "adag", "price": 1300 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 101,
+          "title": "Rukkolas Saláta",
+          "description": "rukkolla, parmezán, balzsamecet",
+          "prices": [{ "label": "adag", "price": 1700 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 102,
+          "title": "Lazacos Saláta",
+          "description": "lazac, saláta, uborka",
+          "prices": [{ "label": "adag", "price": 2000 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 103,
+          "title": "Zöld Saláta",
+          "description": "zöld zöldségek, olívaolaj",
+          "prices": [{ "label": "adag", "price": 1450 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 104,
+          "title": "Paradicsomos Saláta",
+          "description": "paradicsom, mozzarella, bazsalikom",
+          "prices": [{ "label": "adag", "price": 1600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 105,
+          "title": "Kukoricás Saláta",
+          "description": "kukorica, paprika, saláta",
+          "prices": [{ "label": "adag", "price": 1500 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 106,
+          "title": "Feta Saláta",
+          "description": "feta, olívabogyó, paprika",
+          "prices": [{ "label": "adag", "price": 1650 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 107,
+          "title": "Brokkolis Saláta",
+          "description": "brokkoli, saláta, dressing",
+          "prices": [{ "label": "adag", "price": 1550 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 108,
+          "title": "Szezámos Saláta",
+          "description": "zöldségek, szezám, citrom",
+          "prices": [{ "label": "adag", "price": 1600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 109,
+          "title": "Mangós Saláta",
+          "description": "mangó, saláta, lime",
+          "prices": [{ "label": "adag", "price": 1750 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 110,
+          "title": "Retkes Saláta",
+          "description": "répa, saláta, dió",
+          "prices": [{ "label": "adag", "price": 1500 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 111,
+          "title": "Tengeri Saláta",
+          "description": "tengeri gyümölcsök, saláta",
+          "prices": [{ "label": "adag", "price": 1900 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        }
+      ]
+    },
+    {
+      "id": 112,
+      "title": "Főételek",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 113,
+          "title": "Schnitzel",
+          "description": "borjúhús, rántva, burgonya",
+          "prices": [{ "label": "adag", "price": 2500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 114,
+          "title": "Gulyás",
+          "description": "marhahús, paprika, burgonya",
+          "prices": [{ "label": "adag", "price": 2200 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 115,
+          "title": "Rántott Hús",
+          "description": "sertés, rántva, rizs",
+          "prices": [{ "label": "adag", "price": 2300 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 116,
+          "title": "Csirkepörkölt",
+          "description": "csirkehús, paprika, tészta",
+          "prices": [{ "label": "adag", "price": 2100 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 117,
+          "title": "Halászlé",
+          "description": "hal, paprika, burgonya",
+          "prices": [{ "label": "adag", "price": 2400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 118,
+          "title": "Bécsi Szelet",
+          "description": "borjúhús, rántva, saláta",
+          "prices": [{ "label": "adag", "price": 2600 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 119,
+          "title": "Paprikás Csirke",
+          "description": "csirkehús, tejföl, nokedli",
+          "prices": [{ "label": "adag", "price": 2200 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 120,
+          "title": "Sertéssült",
+          "description": "sertés, sült, köret",
+          "prices": [{ "label": "adag", "price": 2350 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 121,
+          "title": "Marhapörkölt",
+          "description": "marhahús, paprika, burgonya",
+          "prices": [{ "label": "adag", "price": 2250 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 122,
+          "title": "Lazac Steak",
+          "description": "lazac, grillezett, zöldség",
+          "prices": [{ "label": "adag", "price": 2800 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 123,
+          "title": "Töltött Paprika",
+          "description": "paprika, hús, rizs",
+          "prices": [{ "label": "adag", "price": 2150 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 124,
+          "title": "Rakott Krumpli",
+          "description": "krumpli, kolbász, sajt",
+          "prices": [{ "label": "adag", "price": 2000 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 125,
+          "title": "Zöldbabfőzelék",
+          "description": "zöldbab, tejföl, kolbász",
+          "prices": [{ "label": "adag", "price": 1900 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 126,
+          "title": "Káposztás Hús",
+          "description": "káposzta, hús, burgonya",
+          "prices": [{ "label": "adag", "price": 2100 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 127,
+          "title": "Bogrács Gulyás",
+          "description": "marhahús, zöldségek, paprika",
+          "prices": [{ "label": "adag", "price": 2300 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 128,
+          "title": "Csirkemell",
+          "description": "grillezett csirkemell, saláta",
+          "prices": [{ "label": "adag", "price": 2400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 129,
+          "title": "Tenger gyümölcsei",
+          "description": "kevert tengeri gyümölcsök, rizs",
+          "prices": [{ "label": "adag", "price": 2700 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 130,
+          "title": "Vadas Hús",
+          "description": "vadhús, mártás, burgonya",
+          "prices": [{ "label": "adag", "price": 2500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 131,
+          "title": "Székelykáposzta",
+          "description": "káposzta, kolbász, tejföl",
+          "prices": [{ "label": "adag", "price": 2050 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 132,
+          "title": "Libamáj",
+          "description": "libamáj, áfonya, kenyér",
+          "prices": [{ "label": "adag", "price": 3000 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        }
+      ]
+    },
+    {
+      "id": 133,
+      "title": "Köretek",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 134,
+          "title": "Hasábburgonya",
+          "description": "sült burgonya hasáb",
+          "prices": [{ "label": "adag", "price": 800 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 135,
+          "title": "Sült Zöldség",
+          "description": "grillezett zöldségek",
+          "prices": [{ "label": "adag", "price": 900 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 136,
+          "title": "Rizs",
+          "description": "fehér rizs",
+          "prices": [{ "label": "adag", "price": 600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 137,
+          "title": "Tészta",
+          "description": "spagetti, paradicsomszósz",
+          "prices": [{ "label": "adag", "price": 700 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 138,
+          "title": "Krumpli Püré",
+          "description": "burgonyapüré",
+          "prices": [{ "label": "adag", "price": 650 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 139,
+          "title": "Saláta",
+          "description": "kevert saláta",
+          "prices": [{ "label": "adag", "price": 500 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 140,
+          "title": "Nokedli",
+          "description": "házilagos nokedli",
+          "prices": [{ "label": "adag", "price": 550 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 141,
+          "title": "Káposzta",
+          "description": "párolt káposzta",
+          "prices": [{ "label": "adag", "price": 600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 142,
+          "title": "Zöldbab",
+          "description": "főtt zöldbab",
+          "prices": [{ "label": "adag", "price": 650 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 143,
+          "title": "Spenót",
+          "description": "párolt spenót",
+          "prices": [{ "label": "adag", "price": 700 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 144,
+          "title": "Brokkoli",
+          "description": "főtt brokkoli",
+          "prices": [{ "label": "adag", "price": 750 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 145,
+          "title": "Répa",
+          "description": "párolt répa",
+          "prices": [{ "label": "adag", "price": 600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 146,
+          "title": "Kukorica",
+          "description": "főtt kukorica",
+          "prices": [{ "label": "adag", "price": 550 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 147,
+          "title": "Quinoa",
+          "description": "főtt quinoa",
+          "prices": [{ "label": "adag", "price": 800 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 148,
+          "title": "Lencse",
+          "description": "főtt lencse",
+          "prices": [{ "label": "adag", "price": 650 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 149,
+          "title": "Borsó",
+          "description": "főtt borsó",
+          "prices": [{ "label": "adag", "price": 600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 150,
+          "title": "Tök",
+          "description": "párolt tök",
+          "prices": [{ "label": "adag", "price": 700 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 151,
+          "title": "Gomba",
+          "description": "sült gomba",
+          "prices": [{ "label": "adag", "price": 850 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 152,
+          "title": "Avokádó",
+          "description": "avokádó szeletek",
+          "prices": [{ "label": "adag", "price": 900 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 153,
+          "title": "Paradicsom",
+          "description": "grillezett paradicsom",
+          "prices": [{ "label": "adag", "price": 650 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        }
+      ]
+    },
+    {
+      "id": 154,
+      "title": "Reggelik",
+      "image": "/placeholder.png",
+      "items": [
+        {
+          "id": 155,
+          "title": "Tojásrántotta",
+          "description": "tojás, kenyér",
+          "prices": [{ "label": "adag", "price": 1200 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 156,
+          "title": "Palacsinta",
+          "description": "palacsinta, lekvár",
+          "prices": [{ "label": "adag", "price": 1000 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 157,
+          "title": "Omlett",
+          "description": "tojás, sajt, sonka",
+          "prices": [{ "label": "adag", "price": 1400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 158,
+          "title": "Kenyér",
+          "description": "pirított kenyér, vaj",
+          "prices": [{ "label": "szelet", "price": 300 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 159,
+          "title": "Zabpehely",
+          "description": "zabpehely, tej, gyümölcs",
+          "prices": [{ "label": "adag", "price": 900 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 160,
+          "title": "Joghurt",
+          "description": "joghurt, müzli",
+          "prices": [{ "label": "adag", "price": 800 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 161,
+          "title": "Smoothie",
+          "description": "gyümölcs smoothie",
+          "prices": [{ "label": "0.3 l", "price": 750 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 162,
+          "title": "Kávé",
+          "description": "kávé, tej",
+          "prices": [{ "label": "csésze", "price": 450 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 163,
+          "title": "Tea",
+          "description": "tea, citrom",
+          "prices": [{ "label": "csésze", "price": 400 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 164,
+          "title": "Szendvics",
+          "description": "szendvics, sonka, sajt",
+          "prices": [{ "label": "db", "price": 1100 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 165,
+          "title": "Fánk",
+          "description": "fánk, porcukor",
+          "prices": [{ "label": "db", "price": 600 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 166,
+          "title": "Keksz",
+          "description": "keksz, tea",
+          "prices": [{ "label": "db", "price": 400 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 167,
+          "title": "Muffin",
+          "description": "muffin, kávé",
+          "prices": [{ "label": "db", "price": 700 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 168,
+          "title": "Tojás",
+          "description": "lágy tojás, kenyér",
+          "prices": [{ "label": "db", "price": 500 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 169,
+          "title": "Puding",
+          "description": "tej puding",
+          "prices": [{ "label": "adag", "price": 850 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 170,
+          "title": "Gyümölcs",
+          "description": "gyümölcs saláta",
+          "prices": [{ "label": "adag", "price": 950 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 171,
+          "title": "Sajt",
+          "description": "sajt, kenyér",
+          "prices": [{ "label": "szelet", "price": 600 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 172,
+          "title": "Sonka",
+          "description": "sonka, kenyér",
+          "prices": [{ "label": "szelet", "price": 700 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 173,
+          "title": "Vaj",
+          "description": "vaj, kenyér",
+          "prices": [{ "label": "szelet", "price": 350 }],
+          "badges": ["veggie"],
+          "image": "/placeholder.png"
+        },
+        {
+          "id": 174,
+          "title": "Mézeskalács",
+          "description": "mézeskalács, tea",
+          "prices": [{ "label": "db", "price": 550 }],
+          "badges": [],
+          "image": "/placeholder.png"
+        }
+      ]
+    }
+  ]
+}
