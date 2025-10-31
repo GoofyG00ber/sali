@@ -33,3 +33,6 @@ test-results/
 playwright-report/
 
 .env
+
+# Admin credentials
+config/admin-credentials.ts

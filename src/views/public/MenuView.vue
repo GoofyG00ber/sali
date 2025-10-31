@@ -10,16 +10,18 @@
     </main>
 
     <div class="right">
-      <KosarWidget :cart="cart" @increment="incQty" @decrement="decQty" />
+      <KosarWidget />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
-import CategoryList from '../components/CategoryList.vue'
-import FoodCards from '../components/FoodCards.vue'
-import KosarWidget from '../components/KosarWidget.vue'
+import CategoryList from '@/components/CategoryList.vue'
+import FoodCards from '@/components/FoodCards.vue'
+import KosarWidget from '@/components/KosarWidget.vue'
+import { useCartStore } from '@/stores/cart'
+import type { Food } from '@/stores/foods'
 
 type Price = { label: string; price: number }
 type Item = { id:number; title:string; description?:string; prices: Price[]; image?:string }
@@ -27,7 +29,7 @@ type Category = { id:number; title:string; items: Item[] }
 
 const menu = ref<{ categories: Category[] }>({ categories: [] })
 const selectedCategoryId = ref<number | undefined>(undefined)
-const cart = ref<Array<{ item: Item; price: Price; qty:number }>>([])
+const cartStore = useCartStore()
 
 function selectCategory(id:number){ selectedCategoryId.value = id }
 
@@ -45,13 +47,17 @@ async function loadMenu(){
 
 function handleAddToCart(payload: { item: Item; price: Price }){
   const { item, price } = payload
-  const idx = cart.value.findIndex((c) => c.item.id===item.id && c.price.label===price.label)
-  if(idx>=0){ cart.value[idx].qty = (cart.value[idx].qty ?? 0) + 1 }
-  else { cart.value.push({ item, price, qty: 1 }) }
+  // Convert the item to Food type for cart store
+  const food: Food = {
+    id: item.id,
+    title: item.title,
+    description: item.description || '',
+    prices: item.prices,
+    image: item.image || '/placeholder.png',
+    badges: []
+  }
+  cartStore.addItem(food, price, 1)
 }
-
-function incQty(idx:number){ if(cart.value[idx]) cart.value[idx]!.qty = (cart.value[idx]!.qty ?? 0) + 1 }
-function decQty(idx:number){ if(cart.value[idx]){ if(cart.value[idx]!.qty>1) cart.value[idx]!.qty--; else cart.value.splice(idx,1) } }
 
 onMounted(()=> loadMenu())
 </script>

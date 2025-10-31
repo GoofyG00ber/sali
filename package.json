@@ -8,6 +8,8 @@
   },
   "scripts": {
     "dev": "vite",
+    "dev:all": "run-p dev food-server",
+    "food-server": "node server/food-server.js",
     "build": "run-p type-check \"build-only {@}\" --",
     "preview": "vite preview",
     "test:unit": "vitest",
@@ -20,11 +22,15 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
+    "@vueup/vue-quill": "^1.2.0",
+    "axios": "^1.13.1",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
+    "leaflet": "^1.9.4",
     "nodemailer": "^7.0.9",
     "pinia": "^3.0.3",
+    "quill": "^2.0.3",
     "tailwindcss": "^4.1.14",
     "vue": "^3.5.22",
     "vue-router": "^4.5.1"

@@ -1,44 +1,42 @@
 <template>
   <aside class="kosar">
-    <h3>Kosár</h3>
-    <div v-if="cart.length===0" class="empty">Üres</div>
+    <h3>Kosár ({{ cartStore.itemCount }})</h3>
+    <div v-if="cartStore.isEmpty" class="empty">Üres a kosár</div>
     <div v-else class="items">
-      <div v-for="(ci, idx) in cart" :key="ci.item.id + '-' + ci.price.label" class="ci">
+      <div v-for="item in cartStore.items" :key="`${item.food.id}-${item.selectedPrice.label}`" class="ci">
         <div class="left">
-          <div class="title">{{ ci.item.title }}</div>
-          <div class="meta">{{ ci.price.label }} — {{ formatPrice(ci.price.price) }} Ft</div>
+          <div class="title">{{ item.food.title }}</div>
+          <div class="meta">{{ item.selectedPrice.label }} — {{ formatPrice(item.selectedPrice.price) }} Ft</div>
         </div>
         <div class="right">
           <div class="qty">
-            <button @click="$emit('decrement', idx)">-</button>
-            <span>{{ ci.qty }}</span>
-            <button @click="$emit('increment', idx)">+</button>
+            <button @click="cartStore.updateQuantity(item.food.id, item.selectedPrice.label, item.quantity - 1)">-</button>
+            <span>{{ item.quantity }}</span>
+            <button @click="cartStore.updateQuantity(item.food.id, item.selectedPrice.label, item.quantity + 1)">+</button>
           </div>
-          <div class="lineprice">{{ formatPrice(ci.price.price * ci.qty) }} Ft</div>
+          <div class="lineprice">{{ formatPrice(item.selectedPrice.price * item.quantity) }} Ft</div>
         </div>
       </div>
 
       <div class="total">
         <div>Végösszeg:</div>
-        <div class="sum">{{ formatPrice(total) }} Ft</div>
+        <div class="sum">{{ formatPrice(cartStore.totalPrice) }} Ft</div>
       </div>
-      <button class="checkout">Tovább</button>
+      <div class="mt-5">
+        <router-link to="/order" class="checkout">Rendelés leadása</router-link>
+      </div>
     </div>
   </aside>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-import type { PropType } from 'vue'
+import { useCartStore } from '@/stores/cart'
 
-type CartItem = { item: { id:number; title:string }, price: { price:number; label:string }, qty:number }
+const cartStore = useCartStore()
 
-const props = defineProps({ cart: { type: Array as PropType<CartItem[]>, required: true } })
-const emit = defineEmits<{ (e: 'increment', idx:number): void; (e: 'decrement', idx:number): void }>()
-
-const total = computed(() => props.cart.reduce((s, c) => s + c.price.price * c.qty, 0))
-
-function formatPrice(n:number){ return n.toLocaleString() }
+function formatPrice(n: number) {
+  return n.toLocaleString()
+}
 </script>
 
 <style scoped>
