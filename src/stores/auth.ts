@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { ADMIN_CONFIG } from '@/../config/admin-credentials'
+import { ADMIN_CONFIG } from "../config/admin-credentials";
 
 export const useAuthStore = defineStore('auth', () => {
   const isAuthenticated = ref(false)

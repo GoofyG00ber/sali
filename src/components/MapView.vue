@@ -8,7 +8,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 onMounted(() => {
-  const position = [47.59937506255122, 19.356952245169225];
+  const position = [47.67204465176636, 19.534340000000004];
 
   // Térkép inicializálása
   const map = L.map("map").setView(position, 15);
@@ -18,11 +18,16 @@ onMounted(() => {
     attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>',
   }).addTo(map);
 
-  // Marker (pointer)
-  const marker = L.marker(position).addTo(map);
+   const redIcon = L.icon({
+    iconUrl: "https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-red.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    shadowSize: [41, 41],
+  });
 
-  // Popup szöveg
-  marker.bindPopup("Itt vagyunk 📍").openPopup();
+    L.marker(position, { icon: redIcon }).addTo(map);
 });
 </script>
 
