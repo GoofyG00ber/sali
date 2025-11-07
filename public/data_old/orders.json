@@ -311,6 +311,60 @@
       "status": "pending",
       "createdAt": "2025-10-31T00:28:47.464Z",
       "updatedAt": "2025-10-31T00:28:47.464Z"
+    },
+    {
+      "id": "ORD-1762161343367-sls3pxgm4",
+      "items": [
+        {
+          "foodId": 2,
+          "foodTitle": "Nagyon finom pizza",
+          "priceLabel": "45 cm",
+          "price": 5890,
+          "quantity": 3
+        }
+      ],
+      "deliveryType": "pickup",
+      "deliveryInfo": {
+        "name": "Gergely Boglári",
+        "email": "ii.gregorburglar@gmail.com",
+        "phone": "06307025942",
+        "address": "",
+        "city": "",
+        "zip": "",
+        "note": "teszt"
+      },
+      "totalPrice": 17670,
+      "paymentMethod": "cash",
+      "status": "pending",
+      "createdAt": "2025-11-03T09:15:43.367Z",
+      "updatedAt": "2025-11-03T09:15:43.367Z"
+    },
+    {
+      "id": "ORD-1762161535586-f20j8o3x9",
+      "items": [
+        {
+          "foodId": 2,
+          "foodTitle": "Nagyon finom pizza",
+          "priceLabel": "26 cm",
+          "price": 3290,
+          "quantity": 2
+        }
+      ],
+      "deliveryType": "pickup",
+      "deliveryInfo": {
+        "name": "Gergely Boglári",
+        "email": "ii.gregorburglar@gmail.com",
+        "phone": "06307025942",
+        "address": "",
+        "city": "",
+        "zip": "",
+        "note": ""
+      },
+      "totalPrice": 6580,
+      "paymentMethod": "barion",
+      "status": "pending",
+      "createdAt": "2025-11-03T09:18:55.586Z",
+      "updatedAt": "2025-11-03T09:18:55.586Z"
     }
   ]
 }
