@@ -55,20 +55,35 @@ app.delete('/api/categories/:id', async (req, res) => {
   }
 })
 
-// menu items
 app.get('/api/foods', async (req, res) => {
   try {
-    const [rows] = await pool.query(`
-      SELECT m.*, c.title AS categoryTitle
-      FROM menu_items m
-      LEFT JOIN categories c ON m.categoryId = c.id
+    const [foods] = await pool.query(`
+      SELECT menu_items.*, categories.title AS categoryTitle
+      FROM menu_items
+      LEFT JOIN categories ON menu_items.category_Id = categories.id
     `)
-    res.json(rows)
+    const [prices] = await pool.query('SELECT * FROM item_prices')
+    const fullFoods = foods.map(food => {
+      const foodPrices = prices
+        .filter(p => p.item_id === food.id)
+        .map(p => ({
+          label: p.label,
+          price: p.price
+        }))
+
+      return {
+        ...food,
+        prices: foodPrices
+      }
+    })
+
+    res.json(fullFoods)
   } catch (err) {
-    console.error(err)
+    console.error('Error fetching foods:', err)
     res.status(500).json({ error: 'Failed to fetch foods' })
   }
 })
+
 
 app.get('/api/foods/:id', async (req, res) => {
   try {
@@ -83,7 +98,7 @@ app.post('/api/foods', async (req, res) => {
   const { title, description, image, categoryId, active } = req.body
   try {
     const [result] = await pool.query(
-      'INSERT INTO menu_items (title, description, image, categoryId, active) VALUES (?, ?, ?, ?, ?)',
+      'INSERT INTO menu_items (title, description, image, category_id, active) VALUES (?, ?, ?, ?, ?)',
       [title, description, image, categoryId, active ?? 1]
     )
     res.json({ id: result.insertId, title, description, image, categoryId, active })
@@ -96,7 +111,7 @@ app.put('/api/foods/:id', async (req, res) => {
   const { title, description, image, categoryId, active } = req.body
   try {
     await pool.query(
-      'UPDATE menu_items SET title=?, description=?, image=?, categoryId=?, active=? WHERE id=?',
+      'UPDATE menu_items SET title=?, description=?, image=?, category_id=?, active=? WHERE id=?',
       [title, description, image, categoryId, active, req.params.id]
     )
     res.json({ id: req.params.id, title, description, image, categoryId, active })
@@ -126,7 +141,7 @@ app.patch('/api/foods/:id/toggle-active', async (req, res) => {
 // item prices
 app.get('/api/item-prices/:foodId', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM item_prices WHERE foodId=?', [req.params.foodId])
+    const [rows] = await pool.query('SELECT * FROM item_prices WHERE item_id=?', [req.params.foodId])
     res.json(rows)
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch item prices' })
@@ -136,7 +151,7 @@ app.get('/api/item-prices/:foodId', async (req, res) => {
 app.post('/api/item-prices', async (req, res) => {
   const { foodId, label, price } = req.body
   try {
-    const [result] = await pool.query('INSERT INTO item_prices (foodId, label, price) VALUES (?, ?, ?)', [foodId, label, price])
+    const [result] = await pool.query('INSERT INTO item_prices (item_id, label, price) VALUES (?, ?, ?)', [foodId, label, price])
     res.json({ id: result.insertId, foodId, label, price })
   } catch (err) {
     res.status(500).json({ error: 'Failed to create price' })
@@ -146,7 +161,7 @@ app.post('/api/item-prices', async (req, res) => {
 // item badges
 app.get('/api/item-badges/:foodId', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM item_badges WHERE foodId=?', [req.params.foodId])
+    const [rows] = await pool.query('SELECT * FROM item_badges WHERE item_id=?', [req.params.foodId])
     res.json(rows)
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch badges' })
@@ -156,7 +171,7 @@ app.get('/api/item-badges/:foodId', async (req, res) => {
 app.post('/api/item-badges', async (req, res) => {
   const { foodId, badge } = req.body
   try {
-    const [result] = await pool.query('INSERT INTO item_badges (foodId, badge) VALUES (?, ?)', [foodId, badge])
+    const [result] = await pool.query('INSERT INTO item_badges (item_id, badge) VALUES (?, ?)', [foodId, badge])
     res.json({ id: result.insertId, foodId, badge })
   } catch (err) {
     res.status(500).json({ error: 'Failed to create badge' })
@@ -166,8 +181,22 @@ app.post('/api/item-badges', async (req, res) => {
 // orders
 app.get('/api/orders', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM orders ORDER BY created_at DESC')
-    res.json(rows)
+    const [orders] = await pool.query('SELECT * FROM orders ORDER BY created_at DESC')
+    // Fetch all order items
+    const [items] = await pool.query('SELECT * FROM order_items')
+    // Map items to orders
+    const fullOrders = orders.map(order => {
+      const orderItems = items.filter(item => item.order_id === order.id)
+      return {
+        ...order,
+        items: orderItems,
+        deliveryInfo: {
+          name: order.customer_name,
+          // Add more fields if present in your DB
+        }
+      }
+    })
+    res.json(fullOrders)
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch orders' })
   }
@@ -189,7 +218,7 @@ app.post('/api/orders', async (req, res) => {
 // order items
 app.get('/api/order-items/:orderId', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT * FROM order_items WHERE orderId=?', [req.params.orderId])
+    const [rows] = await pool.query('SELECT * FROM order_items WHERE order_id=?', [req.params.orderId])
     res.json(rows)
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch order items' })
@@ -200,7 +229,7 @@ app.post('/api/order-items', async (req, res) => {
   const { orderId, foodId, quantity, price } = req.body
   try {
     const [result] = await pool.query(
-      'INSERT INTO order_items (orderId, foodId, quantity, price) VALUES (?, ?, ?, ?)',
+      'INSERT INTO order_items (order_id, item_id, quantity, price) VALUES (?, ?, ?, ?)',
       [orderId, foodId, quantity, price]
     )
     res.json({ id: result.insertId, orderId, foodId, quantity, price })
