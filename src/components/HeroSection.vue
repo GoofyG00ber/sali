@@ -1,8 +1,8 @@
 <template>
   <div class="hero w-full h-screen relative">
-    <img src="/static_images/hero_dots.svg" class="absolute right-1/15 top-20 z-2"/>
-    <img src="/static_images/Sali_.svg" class="absolute left-1/2 top-40 -translate-x-1/2 -translate-y-1/3 z-5"/>
-    <img src="/static_images/Sali-2.svg" class="absolute left-1/2 top-40 -translate-x-1/2 -translate-y-1/3 z-15"/>
+    <img src="/public/static_images/hero_dots.svg" class="absolute right-1/15 top-20 z-2"/>
+    <img src="/public/static_images/Sali_.svg" class="absolute left-1/2 top-40 -translate-x-1/2 -translate-y-1/3 z-5"/>
+    <img src="/public/static_images/Sali-2.svg" class="absolute left-1/2 top-40 -translate-x-1/2 -translate-y-1/3 z-15"/>
   </div>
 </template>
 <style scoped>
