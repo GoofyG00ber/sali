@@ -1,32 +1,19 @@
 <template>
-  <div class="hero">
-    <p>Hero component</p>
+  <div class="hero w-full h-screen relative">
+    <img src="/static_images/hero_dots.svg" class="absolute right-1/15 top-20 z-2"/>
+    <img src="/static_images/Sali_.svg" class="absolute left-1/2 top-40 -translate-x-1/2 -translate-y-1/3 z-5"/>
+    <img src="/static_images/Sali-2.svg" class="absolute left-1/2 top-40 -translate-x-1/2 -translate-y-1/3 z-15"/>
   </div>
 </template>
 <style scoped>
-.hero {
-  margin: 4rem auto; /* centered with vertical spacing */
-  width: 80%;
-  max-width: 900px;
-  min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 2px dashed #cfcfcf; /* placeholder rectangle look */
-  background: #fafafa;
-  color: #333;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  font-weight: 600;
-  font-size: 1.125rem;
-  text-align: center;
-  padding: 1rem;
+.pacifico-regular {
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-style: normal;
 }
-@media (min-width: 1024px) {
-  .hero {
-    min-height: 240px;
-  }
+.outlined {
+  color: transparent;
+  -webkit-text-stroke: 5px oklch(98.5% 0 0); /* Zinc-50 */
 }
+
 </style>

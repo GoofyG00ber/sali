@@ -4,10 +4,10 @@ import TopPizzak from '@/components/TopPizzak.vue'
 </script>
 
 <template>
-  <div class="homeview">
-  <div>
-    <p class="text-xl font-bold">home view</p>
-  </div>
+  <div class="homeview overflow-x-hidden relative">
+    <img src="/static_images/top-view-delicious-pizza.png"
+       alt="Delicious pizza"
+       class="w-2/3 h-auto z-10 absolute right-0 translate-x-1/4 top-15" />
   <HeroSection />
   <TopPizzak />
   </div>
@@ -16,7 +16,7 @@ import TopPizzak from '@/components/TopPizzak.vue'
 <style>
 /* HomeViewra vonatkozik csak */
 .homeview {
-  background-color: #f5ac3f;
+  background-color: oklch(85.2% 0.199 91.936); /* Yellow-400 */
 }
 /* globális háttér */
 body {

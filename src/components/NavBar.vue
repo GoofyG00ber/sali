@@ -1,5 +1,5 @@
 <template>
-  <nav class="nav">
+  <nav class="nav fixed top-0 right-0 left-0 z-50">
     <div class="container">
       <router-link to="/" class="logo">Sali</router-link>
       <ul class="links">
