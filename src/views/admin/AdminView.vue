@@ -518,25 +518,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
-import { useAuthStore } from '@/stores/auth'
-import { useFoodsStore, type Food } from '@/stores/foods'
-import { usePoliciesStore } from '@/stores/policies'
-import { useOrdersStore, type Order } from '@/stores/orders'
-import { QuillEditor } from '@vueup/vue-quill'
-import '@vueup/vue-quill/dist/vue-quill.snow.css'
-
-const authStore = useAuthStore()
-const foodsStore = useFoodsStore()
-const policiesStore = usePoliciesStore()
-const ordersStore = useOrdersStore()
-
-// Login state
-const password = ref('')
-const loginError = ref('')
-
-// Current view state
-const currentView = ref<'dashboard' | 'foods' | 'password' | 'aszf' | 'privacy' | 'orders'>('dashboard')
+// Food modal state
+const showFoodModal = ref(false)
+const editingFood = ref<Food | null>(null)
+const foodForm = ref({
+  title: '',
+  description: '',
+  categoryId: 1,
+  prices: [{ label: '26 cm', price: 0 }],
+  badgesString: '',
+  image: '/placeholder.png'
+})
 
 // Password change state
 const passwordForm = ref({
@@ -551,8 +543,13 @@ const passwordSuccess = ref('')
 const aszfContent = ref('')
 const privacyContent = ref('')
 const saveSuccess = ref(false)
+import { ref, computed, onMounted } from 'vue'
+// Computed property for active foods count
+const activeFoodsCount = computed(() => {
+  return foodsStore.foods.filter(food => food.active !== false).length
+})
 
-// Quill toolbar options
+// Toolbar options for Quill editor
 const toolbarOptions = [
   [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
   ['bold', 'italic', 'underline', 'strike'],
@@ -563,24 +560,7 @@ const toolbarOptions = [
   ['clean']
 ]
 
-// Food modal state
-const showFoodModal = ref(false)
-const editingFood = ref<Food | null>(null)
-const foodForm = ref({
-  title: '',
-  description: '',
-  categoryId: 1,
-  prices: [{ label: '26 cm', price: 0 }],
-  badgesString: '',
-  image: '/placeholder.png'
-})
-
-// Computed
-const activeFoodsCount = computed(() => {
-  return foodsStore.foods.filter(food => food.active !== false).length
-})
-
-// Methods
+// Login method
 const handleLogin = async () => {
   loginError.value = ''
   const success = await authStore.login(password.value)
@@ -598,11 +578,13 @@ const handleLogin = async () => {
   }
 }
 
+// Logout method
 const handleLogout = () => {
   authStore.logout()
   currentView.value = 'dashboard'
 }
 
+// Password change method
 const handlePasswordChange = async () => {
   passwordError.value = ''
   passwordSuccess.value = ''
@@ -629,6 +611,26 @@ const handlePasswordChange = async () => {
     passwordError.value = 'Current password is incorrect'
   }
 }
+import { useAuthStore } from '@/stores/auth'
+import { useFoodsStore, type Food } from '@/stores/foods'
+import { usePoliciesStore } from '@/stores/policies'
+import { useOrdersStore, type Order } from '@/stores/orders'
+import { QuillEditor } from '@vueup/vue-quill'
+import '@vueup/vue-quill/dist/vue-quill.snow.css'
+
+const authStore = useAuthStore()
+const foodsStore = useFoodsStore()
+const policiesStore = usePoliciesStore()
+const ordersStore = useOrdersStore()
+
+// Login state
+const password = ref('')
+const loginError = ref('')
+
+// Current view state
+const currentView = ref<'dashboard' | 'foods' | 'password' | 'aszf' | 'privacy' | 'orders'>('dashboard')
+
+// Password change state
 
 const openAddFoodModal = () => {
   editingFood.value = null
