@@ -53,10 +53,14 @@ export const useAuthStore = defineStore('auth', () => {
   const changePassword = async (oldPassword: string, newPassword: string): Promise<boolean> => {
     const isValid = await ADMIN_CONFIG.verifyPassword(oldPassword)
     if (isValid) {
-      // In production, this would update the password in a secure backend
-      console.log('Password would be changed to:', newPassword)
-      // You'd need to implement actual password change logic
-      return true
+      // Persist password locally (development only). In production update backend.
+      try {
+        await ADMIN_CONFIG.setPassword(newPassword)
+        return true
+      } catch (e) {
+        console.error('Failed to set new admin password', e)
+        return false
+      }
     }
     return false
   }
