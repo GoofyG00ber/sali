@@ -3,18 +3,35 @@
     <h3>Kosár ({{ cartStore.itemCount }})</h3>
     <div v-if="cartStore.isEmpty" class="empty">Üres a kosár</div>
     <div v-else class="items">
-      <div v-for="item in cartStore.items" :key="`${item.food.id}-${item.selectedPrice.label}`" class="ci">
+      <div
+        v-for="item in cartStore.items"
+        :key="`${item.food?.id ?? 'x'}-${item.selectedPrice?.label ?? 'default'}`"
+        class="ci"
+      >
         <div class="left">
-          <div class="title">{{ item.food.title }}</div>
-          <div class="meta">{{ item.selectedPrice.label }} — {{ formatPrice(item.selectedPrice.price) }} Ft</div>
+          <div class="title">{{ item.food?.title }}</div>
+          <div class="meta">
+            {{ item.selectedPrice?.label ?? 'Alap' }} —
+            {{ formatPrice(item.selectedPrice?.price ?? 0) }} Ft
+          </div>
         </div>
         <div class="right">
           <div class="qty">
-            <button @click="cartStore.updateQuantity(item.food.id, item.selectedPrice.label, item.quantity - 1)">-</button>
+            <button
+              @click="cartStore.updateQuantity(item.food.id, item.selectedPrice?.label ?? '', item.quantity - 1)"
+            >
+              -
+            </button>
             <span>{{ item.quantity }}</span>
-            <button @click="cartStore.updateQuantity(item.food.id, item.selectedPrice.label, item.quantity + 1)">+</button>
+            <button
+              @click="cartStore.updateQuantity(item.food.id, item.selectedPrice?.label ?? '', item.quantity + 1)"
+            >
+              +
+            </button>
           </div>
-          <div class="lineprice">{{ formatPrice(item.selectedPrice.price * item.quantity) }} Ft</div>
+          <div class="lineprice">
+            {{ formatPrice((item.selectedPrice?.price ?? 0) * item.quantity) }} Ft
+          </div>
         </div>
       </div>
 

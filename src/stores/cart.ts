@@ -19,7 +19,33 @@ export const useCartStore = defineStore('cart', () => {
     const saved = sessionStorage.getItem('cart')
     if (saved) {
       try {
-        items.value = JSON.parse(saved)
+        const parsed: unknown = JSON.parse(saved)
+        if (Array.isArray(parsed)) {
+          // migrate legacy entries that might miss selectedPrice
+          items.value = parsed
+            .map((rawEntry) => {
+              const raw = rawEntry as {
+                food?: Partial<Food> & { id?: number }
+                selectedPrice?: { label?: unknown; price?: unknown }
+                quantity?: unknown
+              }
+              const food = raw.food
+              const selected = raw.selectedPrice
+              if (!food || typeof food.id !== 'number') return null
+              if (!selected || typeof selected.label !== 'string' || typeof selected.price !== 'number') {
+                return null
+              }
+              const qty = typeof raw.quantity === 'number' && raw.quantity > 0 ? raw.quantity : 1
+              return {
+                food: food as Food,
+                selectedPrice: { label: selected.label, price: selected.price },
+                quantity: qty
+              } satisfies CartItem
+            })
+            .filter((x): x is CartItem => x !== null)
+        } else {
+          items.value = []
+        }
       } catch (e) {
         console.error('Failed to load cart:', e)
         items.value = []
