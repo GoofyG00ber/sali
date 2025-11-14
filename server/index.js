@@ -22,6 +22,7 @@ app.get('/api/categories/:id', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM categories WHERE id=?', [req.params.id])
     res.json(rows[0] || null)
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to fetch category' })
   }
 })
@@ -32,6 +33,7 @@ app.post('/api/categories', async (req, res) => {
     const [result] = await pool.query('INSERT INTO categories (title, image) VALUES (?, ?)', [title, image])
     res.json({ id: result.insertId, title, image })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to create category' })
   }
 })
@@ -42,6 +44,7 @@ app.put('/api/categories/:id', async (req, res) => {
     await pool.query('UPDATE categories SET title=?, image=? WHERE id=?', [title, image, req.params.id])
     res.json({ id: req.params.id, title, image })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to update category' })
   }
 })
@@ -51,6 +54,7 @@ app.delete('/api/categories/:id', async (req, res) => {
     await pool.query('DELETE FROM categories WHERE id=?', [req.params.id])
     res.json({ success: true })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to delete category' })
   }
 })
@@ -97,6 +101,7 @@ app.get('/api/foods/:id', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM menu_items WHERE id=?', [req.params.id])
     res.json(rows[0] || null)
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to fetch food' })
   }
 })
@@ -182,6 +187,7 @@ app.delete('/api/foods/:id', async (req, res) => {
     await pool.query('DELETE FROM menu_items WHERE id=?', [req.params.id])
     res.json({ success: true })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to delete food' })
   }
 })
@@ -191,6 +197,7 @@ app.patch('/api/foods/:id/toggle-active', async (req, res) => {
     await pool.query('UPDATE menu_items SET active = NOT active WHERE id=?', [req.params.id])
     res.json({ success: true })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to toggle food' })
   }
 })
@@ -201,6 +208,7 @@ app.get('/api/item-prices/:foodId', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM item_prices WHERE food_id=?', [req.params.foodId])
     res.json(rows)
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to fetch item prices' })
   }
 })
@@ -211,6 +219,7 @@ app.post('/api/item-prices', async (req, res) => {
     const [result] = await pool.query('INSERT INTO item_prices (food_id, label, price) VALUES (?, ?, ?)', [foodId, label, price])
     res.json({ id: result.insertId, foodId, label, price })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to create price' })
   }
 })
@@ -221,6 +230,7 @@ app.get('/api/item-badges/:foodId', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM item_badges WHERE food_id=?', [req.params.foodId])
     res.json(rows)
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to fetch badges' })
   }
 })
@@ -231,6 +241,7 @@ app.post('/api/item-badges', async (req, res) => {
     const [result] = await pool.query('INSERT INTO item_badges (food_id, badge) VALUES (?, ?)', [foodId, badge])
     res.json({ id: result.insertId, foodId, badge })
   } catch (err) {
+    console.error(err)
     res.status(500).json({ error: 'Failed to create badge' })
   }
 })
@@ -238,7 +249,8 @@ app.post('/api/item-badges', async (req, res) => {
 // orders
 app.get('/api/orders', async (req, res) => {
   try {
-    const [orders] = await pool.query('SELECT * FROM orders ORDER BY created_at DESC')
+    // Only show cash orders immediately, and show Barion (online) orders only after they've been confirmed
+    const [orders] = await pool.query("SELECT * FROM orders WHERE payment_method='cash' OR (payment_method='barion' AND status <> 'pending') ORDER BY created_at DESC")
     // Fetch all order items with food details
     const [items] = await pool.query(`
       SELECT oi.*, mi.title as foodTitle
@@ -249,6 +261,11 @@ app.get('/api/orders', async (req, res) => {
     // Map items to orders
     const fullOrders = orders.map(order => {
       const orderItems = items.filter(item => item.order_id === order.id)
+      // derive paymentStatus from payment_method and status
+      const paymentStatus = (order.payment_method === 'barion')
+        ? (order.status === 'confirmed' ? 'paid' : (order.status === 'cancelled' ? 'failed' : 'pending'))
+        : 'pending'
+
       return {
         id: order.id.toString(),
         items: orderItems.map(item => ({
@@ -270,7 +287,7 @@ app.get('/api/orders', async (req, res) => {
         },
         totalPrice: order.total_price,
         status: order.status || 'pending',
-        paymentStatus: 'pending',
+        paymentStatus,
         paymentMethod: order.payment_method || 'cash',
         barionPaymentId: null,
         createdAt: order.created_at,
@@ -320,7 +337,9 @@ app.get('/api/orders/:id', async (req, res) => {
       },
       totalPrice: order.total_price,
       status: order.status || 'pending',
-      paymentStatus: 'pending',
+      paymentStatus: (order.payment_method === 'barion')
+        ? (order.status === 'confirmed' ? 'paid' : (order.status === 'cancelled' ? 'failed' : 'pending'))
+        : 'pending',
       paymentMethod: order.payment_method || 'cash',
       barionPaymentId: null,
       createdAt: order.created_at,
@@ -500,7 +519,9 @@ app.get('/api/orders/:id', async (req, res) => {
       },
       totalPrice: order.total_price,
       status: order.status || 'pending',
-        paymentStatus: 'pending',
+        paymentStatus: (order.payment_method === 'barion')
+          ? (order.status === 'confirmed' ? 'paid' : (order.status === 'cancelled' ? 'failed' : 'pending'))
+          : 'pending',
       paymentMethod: order.payment_method || 'cash',
       createdAt: order.created_at,
       updatedAt: order.updated_at
@@ -512,14 +533,24 @@ app.get('/api/orders/:id', async (req, res) => {
 })
 
 app.patch('/api/orders/:id', async (req, res) => {
-  const { status } = req.body
+  const { status, paymentStatus } = req.body
   try {
     const updates = []
     const values = []
 
-    if (status !== undefined) {
+    // paymentStatus can be provided by frontend (paid/failed/pending) and will be mapped to internal order status
+    let finalStatus
+    if (paymentStatus !== undefined) {
+      if (paymentStatus === 'paid') finalStatus = 'confirmed'
+      else if (paymentStatus === 'failed') finalStatus = 'cancelled'
+      else if (paymentStatus === 'pending') finalStatus = 'pending'
+    } else if (status !== undefined) {
+      finalStatus = status
+    }
+
+    if (finalStatus !== undefined) {
       updates.push('status = ?')
-      values.push(status)
+      values.push(finalStatus)
     }
 
     if (updates.length === 0) {
@@ -585,6 +616,7 @@ app.get('/api/order-items/:orderId', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM order_items WHERE order_id=?', [req.params.orderId])
     res.json(rows)
   } catch (err) {
+    console.error('Error fetching order items:', err)
     res.status(500).json({ error: 'Failed to fetch order items' })
   }
 })
@@ -598,6 +630,7 @@ app.post('/api/order-items', async (req, res) => {
     )
     res.json({ id: result.insertId, orderId, foodId, quantity, price })
   } catch (err) {
+    console.error('Error creating order item:', err)
     res.status(500).json({ error: 'Failed to create order item' })
   }
 })
@@ -608,6 +641,7 @@ app.get('/api/policies', async (req, res) => {
     const [rows] = await pool.query('SELECT * FROM policies')
     res.json(rows)
   } catch (err) {
+    console.error('Error fetching policies:', err)
     res.status(500).json({ error: 'Failed to fetch policies' })
   }
 })
@@ -618,6 +652,7 @@ app.put('/api/policies/:id', async (req, res) => {
     await pool.query('UPDATE policies SET content=? WHERE id=?', [content, req.params.id])
     res.json({ id: req.params.id, content })
   } catch (err) {
+    console.error('Error updating policy:', err)
     res.status(500).json({ error: 'Failed to update policy' })
   }
 })
@@ -628,7 +663,47 @@ app.get('/api/test', async (req, res) => {
     const [rows] = await pool.query('SHOW TABLES')
     res.json(rows)
   } catch (err) {
+    console.error('DB connection failed:', err)
     res.status(500).json({ error: 'DB connection failed' })
+  }
+})
+
+// Barion callback endpoint - Barion will call this after payment state changes
+app.post('/api/barion/callback', async (req, res) => {
+  try {
+    const payload = req.body || {}
+    const PaymentId = payload.PaymentId || payload.paymentId || payload.paymentID || null
+    const PaymentRequestId = payload.PaymentRequestId || payload.paymentRequestId || payload.PaymentRequestID || payload.PaymentRequest || payload.PaymentRequestExternalId || payload.PaymentRequestExternalId || null
+    const State = payload.State || payload.state || payload.Status || payload.status || payload.PaymentStatus || payload.PaymentState || null
+
+    if (!PaymentRequestId) {
+      return res.status(400).json({ error: 'Missing PaymentRequestId' })
+    }
+
+    const stateStr = (State || '').toString().toLowerCase()
+    const success = stateStr.includes('succ') || stateStr.includes('ok') || stateStr.includes('succeed') || stateStr.includes('completed')
+
+    if (success) {
+      // mark order as confirmed
+      await pool.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?', ['confirmed', PaymentRequestId])
+      // if orders table has barion_payment_id column, store PaymentId
+      try {
+        const [cols] = await pool.query("SHOW COLUMNS FROM orders LIKE 'barion_payment_id'")
+        if (cols && cols.length) {
+          await pool.query('UPDATE orders SET barion_payment_id = ? WHERE id = ?', [PaymentId, PaymentRequestId])
+        }
+      } catch {
+        // ignore if column doesn't exist
+      }
+    } else {
+      // mark as cancelled/failed
+      await pool.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?', ['cancelled', PaymentRequestId])
+    }
+
+    res.json({ ok: true })
+  } catch (err) {
+    console.error('Error handling Barion callback:', err)
+    res.status(500).json({ error: 'Failed to process Barion callback' })
   }
 })
 
