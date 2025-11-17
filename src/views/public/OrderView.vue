@@ -257,8 +257,7 @@ const handleSubmitOrder = async () => {
       quantity: item.quantity
     }))
 
-    // Create order
-    const order = await ordersStore.createOrder({
+    const orderData = {
       items,
       deliveryType: deliveryType.value,
       deliveryInfo: {
@@ -272,19 +271,34 @@ const handleSubmitOrder = async () => {
       },
       totalPrice: finalTotal.value,
       paymentMethod: paymentMethod.value
-    })
-
-    if (!order) {
-      errorMessage.value = 'Failed to create order. Please try again.'
-      return
     }
 
     // Handle payment
     if (paymentMethod.value === 'barion') {
-      // Integrate Barion payment
-      await initiateBarionPayment(order.id, finalTotal.value)
+      // For Barion: create order with pending status BEFORE payment
+      // The backend callback will update it to 'confirmed' or 'cancelled'
+      const order = await ordersStore.createOrder({
+        ...orderData,
+        paymentMethod: 'barion',
+        status: 'pending'
+      })
+
+      if (!order) {
+        errorMessage.value = 'Failed to create order. Please try again.'
+        return
+      }
+
+      // Initiate Barion payment using order.id as PaymentRequestId
+      await initiateBarionPayment(finalTotal.value, items, order.id)
     } else {
-      // Cash payment - order is complete
+      // Cash payment - create order immediately
+      const order = await ordersStore.createOrder(orderData)
+
+      if (!order) {
+        errorMessage.value = 'Failed to create order. Please try again.'
+        return
+      }
+
       cartStore.clearCart()
       router.push(`/order-success?orderId=${order.id}`)
     }
@@ -296,32 +310,42 @@ const handleSubmitOrder = async () => {
   }
 }
 
-const initiateBarionPayment = async (orderId: string, amount: number) => {
+const initiateBarionPayment = async (amount: number, items: OrderItem[], orderId: string) => {
   try {
+    // Use the actual order ID for Barion payment request
+    const tempOrderId = orderId
+
+    // Validate and prepare items
+    const barionItems = items.map(item => {
+      const name = (item.foodTitle || 'Food Item').substring(0, 250) // Max 250 chars
+      const description = (item.priceLabel || item.foodTitle || 'Item').substring(0, 500) // Max 500 chars
+      return {
+        Name: name,
+        Description: description,
+        Quantity: item.quantity,
+        Unit: 'piece',
+        UnitPrice: Math.round(item.price), // Ensure integer for HUF
+        ItemTotal: Math.round(item.price * item.quantity) // Ensure integer for HUF
+      }
+    })
+
     // Barion Sandbox integration
     const barionData = {
-      POSKey: '4926b2ca-633f-420a-b1dc-c2d03e669fdf', // Replace with actual Barion POS key
+      POSKey: '4926b2ca-633f-420a-b1dc-c2d03e669fdf',
       PaymentType: 'Immediate',
       GuestCheckOut: true,
       FundingSources: ['All'],
-      PaymentRequestId: orderId,
+      PaymentRequestId: tempOrderId,
       Locale: 'hu-HU',
       Currency: 'HUF',
       Transactions: [{
-        POSTransactionId: `${orderId}-1`,
-        Payee: 'czanik.csanad@gmail.com', // Replace with your email
-        Total: amount,
-        Items: cartStore.items.map(item => ({
-          Name: item.food.title,
-          Description: item.selectedPrice.label,
-          Quantity: item.quantity,
-          Unit: 'piece',
-          UnitPrice: item.selectedPrice.price,
-          ItemTotal: item.selectedPrice.price * item.quantity
-        }))
+        POSTransactionId: `${tempOrderId}-1`,
+        Payee: 'czanik.csanad@gmail.com',
+        Total: Math.round(amount), // Ensure integer for HUF
+        Items: barionItems
       }],
-      RedirectUrl: `${window.location.origin}/order-success?orderId=${orderId}`,
-      CallbackUrl: `${window.location.origin}/api/barion/callback`
+      RedirectUrl: `${window.location.origin}/order-success?orderId=${tempOrderId}`,
+      CallbackUrl: 'https://webhook.site/unique-url-here'
     }
 
     console.log('Barion Payment Request:', barionData)
@@ -340,7 +364,9 @@ const initiateBarionPayment = async (orderId: string, amount: number) => {
 
     // Check for errors
     if (result.Errors && result.Errors.length > 0) {
-      const errorMsg = result.Errors.map((err: any) =>
+      // Log full error details for debugging
+      console.error('Barion Full Error Details:', JSON.stringify(result.Errors, null, 2))
+      const errorMsg = result.Errors.map((err: { ErrorCode?: string; Title?: string; Description?: string }) =>
         `${err.ErrorCode || 'Unknown'}: ${err.Title || err.Description || 'Unknown error'}`
       ).join(', ')
       errorMessage.value = 'Payment initialization failed: ' + errorMsg
@@ -355,10 +381,15 @@ const initiateBarionPayment = async (orderId: string, amount: number) => {
       return
     }
 
-    // Success - redirect to Barion
-    console.log('Redirecting to Barion:', result.GatewayUrl)
-    cartStore.clearCart() // Clear cart before redirecting
-    window.location.href = result.GatewayUrl
+  // Success - redirect to Barion
+  console.log('Redirecting to Barion:', result.GatewayUrl)
+  // Store PaymentId and order ID in sessionStorage
+  sessionStorage.setItem('barionPaymentId', result.PaymentId)
+  sessionStorage.setItem('barionOrderId', orderId)
+
+  // Clear cart only after Barion payment has been successfully initialized
+  cartStore.clearCart()
+  window.location.href = result.GatewayUrl
 
   } catch (error) {
     console.error('Barion payment error:', error)

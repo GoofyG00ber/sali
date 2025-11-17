@@ -48,6 +48,7 @@ export const useOrdersStore = defineStore('orders', () => {
     deliveryInfo: DeliveryInfo
     totalPrice: number
     paymentMethod: 'barion' | 'cash'
+    status?: string
   }): Promise<Order | null> => {
     loading.value = true
     error.value = null
