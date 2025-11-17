@@ -34,6 +34,7 @@ import TopPizzaCard from './TopPizzaCard.vue'
 .toppizzak {
   width: 100%;
   min-height: 180px;
+  background-color: #ff0000b7;
 }
 .pacifico-regular {
   font-family: "Pacifico", cursive;
