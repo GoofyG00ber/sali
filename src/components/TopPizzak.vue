@@ -1,33 +1,75 @@
+<script setup lang="ts">
+import TopPizzaCard from './TopPizzaCard.vue'
+</script>
+
 <template>
-  <div class="toppizzak">
-    <p>TopPizzak component</p>
-    <router-link to="/menu" class="text-blue-400">Tovább az étlapra</router-link>
+  <div class="toppizzak py-10 relative">
+    <h1 class="pacifico-regular md:pl-10 text-center md:text-left mb-10 text-gray-50 text-4xl md:text-5xl">Legnépszerűbb pizzáink</h1>
+
+    <div class="flex justify-center px-4 sm:px-6 lg:px-10">
+      <div
+        class="grid grid-cols-1 md:grid-cols-3
+               gap-y-[30px] md:gap-y-[30px]
+               md:gap-x-[60px]"
+      >
+        <TopPizzaCard class="mx-auto" />
+        <TopPizzaCard class="mx-auto" />
+        <TopPizzaCard class="mx-auto" />
+      </div>
+    </div>
+    <img src="/public/static_images/toppizzak_dots.svg" class="absolute top-3/5 right-0 z-2 rotate-90 " />
+    <div class="w-full text-center mt-10">
+      <router-link
+        to="/menu"
+        class="text-amber-300 text-xl work-sans-semibold hover:underline"
+      >
+        Tovább az étlapra >
+      </router-link>
+    </div>
+
   </div>
 </template>
+
 <style scoped>
 .toppizzak {
-  margin: 4rem auto; /* centered with vertical spacing */
-  width: 80%;
-  max-width: 900px;
+  width: 100%;
   min-height: 180px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  border: 2px dashed #cfcfcf; /* placeholder rectangle look */
-  background: #fafafa;
-  color: #333;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
-  font-weight: 600;
-  font-size: 1.125rem;
-  text-align: center;
-  padding: 1rem;
 }
-@media (min-width: 1024px) {
-  .toppizzak {
-    min-height: 240px;
-  }
+.pacifico-regular {
+  font-family: "Pacifico", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.work-sans-light {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
+.work-sans-regular {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+.work-sans-medium {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+}
+.work-sans-semibold {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+.work-sans-bold {
+  font-family: "Work Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 700;
+  font-style: normal;
 }
 </style>
+
