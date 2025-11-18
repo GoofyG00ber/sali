@@ -17,7 +17,7 @@ import TopPizzaCard from './TopPizzaCard.vue'
         <TopPizzaCard class="mx-auto" />
       </div>
     </div>
-    <img src="/public/static_images/toppizzak_dots.svg" class="absolute top-3/5 right-0 z-2 rotate-90 " />
+  <img src="/static_images/toppizzak_dots.svg?url" class="absolute top-3/5 right-0 z-2 rotate-90 " />
     <div class="w-full text-center mt-10">
       <router-link
         to="/menu"

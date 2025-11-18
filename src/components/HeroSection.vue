@@ -1,9 +1,9 @@
 <template>
   <div class="hero w-full h-[calc(50vh-80px)] md:h-[calc(100vh-80px)] relative">
     <div class="relative">
-      <img src="/public/static_images/hero_dots.svg" class="absolute left-0 md:left-1/3 z-2 w-screen md:w-3/5 rotate-180 md:rotate-0" />
-      <img src="/public/static_images/Sali_.svg" class="absolute left-1/2 -translate-x-1/2 -translate-y-1/3 z-5 w-screen md:w-[80%] pt-[100px]"/>
-      <img src="/public/static_images/Sali-2.svg" class="absolute left-1/2 -translate-x-1/2 -translate-y-1/3 z-15 w-screen md:w-[80%] pt-[100px]"/>
+  <img src="/static_images/hero_dots.svg?url" class="absolute left-0 md:left-1/3 z-2 w-screen md:w-3/5 rotate-180 md:rotate-0" />
+  <img src="/static_images/Sali_.svg?url" class="absolute left-1/2 -translate-x-1/2 -translate-y-1/3 z-5 w-screen md:w-[80%] pt-[100px]"/>
+  <img src="/static_images/Sali-2.svg?url" class="absolute left-1/2 -translate-x-1/2 -translate-y-1/3 z-15 w-screen md:w-[80%] pt-[100px]"/>
     </div>
     <div class="relative w-[80%] mx-auto flex flex-col justify-end h-[60vh] md:h-full z-20 text-left pb-30 md:pb-[120px]">
       <p class="work-sans-regular text-gray-50 text-xl md:text-2xl hidden md:inline">Rendelj házhoz, vagy kérd elvitelre!</p>
