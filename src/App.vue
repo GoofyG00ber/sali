@@ -10,7 +10,7 @@ import Footer from './components/Footer.vue'
 
   <div id="app" class="work-sans-regular">
     <NavBar />
-    <main>
+    <main class="pt-[80px]">
       <router-view />
     </main>
     <Footer />
