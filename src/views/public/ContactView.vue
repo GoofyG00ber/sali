@@ -5,8 +5,6 @@ import SendMessage from '@/components/SendMessage.vue';
 
 <template>
   <div>
-    <p class="text-xl font-bold">Kapcsolat</p>
   </div>
       <FoglalosSection />
-      <SendMessage />
 </template>

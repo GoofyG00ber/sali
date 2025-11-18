@@ -58,10 +58,18 @@ export const useOrdersStore = defineStore('orders', () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData)
       })
-      if (!response.ok) throw new Error('Failed to create order')
-      const newOrder = await response.json()
-      currentOrder.value = newOrder
-      return newOrder
+      const responseText = await response.text()
+      let parsed: unknown = null
+      try { parsed = responseText ? JSON.parse(responseText) : null } catch { /* not JSON */ }
+      if (!response.ok) {
+        const p = parsed as Record<string, unknown> | null
+        const serverMsg = (p && (p.error || p.details)) ? String(p.error ?? p.details) : response.statusText || 'Failed to create order'
+        throw new Error(serverMsg)
+      }
+  const newOrderUnknown = (parsed as unknown) || (responseText ? JSON.parse(responseText) : null)
+  const newOrder = newOrderUnknown as Order
+  currentOrder.value = newOrder
+  return newOrder
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Unknown error'
       console.error('Error creating order:', e)

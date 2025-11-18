@@ -6,6 +6,17 @@
 
     <main class="center">
       <h2 class="heading">{{ currentCategory?.title || 'Menü' }}</h2>
+
+      <!-- Pizza Builder Card (shown only in pizza category) -->
+      <div v-if="isPizzaCategory" class="pizza-builder-card" @click="goToPizzaBuilder">
+        <div class="builder-icon">🍕</div>
+        <div class="builder-content">
+          <h3 class="builder-title">Készítsd el saját pizzádat!</h3>
+          <p class="builder-description">Válassz alapot, szószt, feltéteket és készítsd el a tökéletes pizzát.</p>
+          <button class="builder-button">Induljon a varázs! ✨</button>
+        </div>
+      </div>
+
       <FoodCards :items="currentPageItems" @add="handleAddToCart" />
 
       <div class="pagination mt-4">
@@ -23,11 +34,14 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
 import CategoryList from '@/components/CategoryList.vue'
 import FoodCards from '@/components/FoodCards.vue'
 import KosarWidget from '@/components/KosarWidget.vue'
 import { useCartStore } from '@/stores/cart'
 import type { Food } from '@/stores/foods'
+
+const router = useRouter()
 
 type Price = { label: string; price: number }
 type Item = { id:number; title:string; description?:string; prices?: Price[]; image?:string }
@@ -109,6 +123,18 @@ function selectCategory(id:number){
 
 const currentCategory = computed(() => menu.value.categories.find((c) => c.id === selectedCategoryId.value))
 
+// Normalize string (remove diacritics) and check common pizza name variants
+function normalizeStr(s: string) {
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+}
+
+const isPizzaCategory = computed(() => {
+  const rawTitle = currentCategory.value?.title || ''
+  const title = normalizeStr(rawTitle)
+  // match 'pizza' and small variants like 'pizzak' (covers 'pizzák' when diacritics removed)
+  return title.includes('pizza') || title.includes('pizzak')
+})
+
 const totalPages = computed(() => {
   const items = currentCategory.value?.items || []
   return Math.max(1, Math.ceil(items.length / pageSize.value))
@@ -168,6 +194,10 @@ function handleAddToCart(payload: { item: Item; price: Price }){
   cartStore.addItem(food, price, 1)
 }
 
+function goToPizzaBuilder() {
+  router.push('/pizza-builder')
+}
+
 onMounted(()=> loadMenu())
 </script>
 
@@ -180,5 +210,100 @@ body{ background:#cccccc;}
 .center{ padding-bottom:16px }
 .right{ padding-left:8px }
 
-@media (max-width:1000px){ .menu-page{ grid-template-columns:1fr; } .right{ order:3 } }
+/* Pizza Builder Card */
+.pizza-builder-card {
+  background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-shadow: 0 8px 24px rgba(255, 107, 53, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.pizza-builder-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+  animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { transform: translate(-50%, -50%) rotate(0deg); }
+  50% { transform: translate(-30%, -30%) rotate(180deg); }
+}
+
+.pizza-builder-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(255, 107, 53, 0.4);
+}
+
+.builder-icon {
+  font-size: 80px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.builder-content {
+  flex: 1;
+  color: white;
+}
+
+.builder-title {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 0 8px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.builder-description {
+  font-size: 16px;
+  margin: 0 0 16px 0;
+  opacity: 0.95;
+}
+
+.builder-button {
+  background: white;
+  color: #ff6b35;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.builder-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+}
+
+@media (max-width:1000px){
+  .menu-page{ grid-template-columns:1fr; }
+  .right{ order:3 }
+
+  .pizza-builder-card {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .builder-icon {
+    font-size: 60px;
+  }
+}
 </style>

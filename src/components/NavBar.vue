@@ -129,15 +129,23 @@ watchEffect(async ()=>{
 .links {
   list-style: none;
   display: flex;
-  gap: 1rem;
+  gap: 0; /* remove gap so hover highlights touch */
   margin: 0;
   padding: 0;
 }
 .links a {
   color: inherit;
   text-decoration: none;
-  padding: 0.25rem 0.5rem;
-  height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem; /* horizontal spacing */
+  height: 80px; /* fill navbar height */
+  transition: background-color 0.12s ease, color 0.12s ease;
+}
+.links a:hover {
+  /* subtle filled hover that touches adjacent items */
+  background: rgba(255,97,6,0.12);
+  color: white;
 }
 .links a.router-link-active {
   background: #FF6106;
