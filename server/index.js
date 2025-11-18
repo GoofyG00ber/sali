@@ -1,5 +1,6 @@
 import express from 'express'
 import cors from 'cors'
+import nodemailer from 'nodemailer'
 import { pool } from './db.js'
 
 const app = express()
@@ -302,7 +303,7 @@ app.get('/api/orders', async (req, res) => {
     const [items] = await pool.query(`
       SELECT oi.*, mi.title as foodTitle
       FROM order_items oi
-      LEFT JOIN menu_items mi ON oi.item_id = mi.id
+      LEFT JOIN menu_items mi ON oi.food_id = mi.id
     `)
 
     // Map items to orders
@@ -316,9 +317,9 @@ app.get('/api/orders', async (req, res) => {
       return {
         id: order.id.toString(),
         items: orderItems.map(item => ({
-          foodId: item.item_id,
-          foodTitle: item.foodTitle || 'Unknown Item',
-          priceLabel: item.priceLabel || '',
+          foodId: item.food_id,
+          foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
+          priceLabel: item.price_label || '',
           price: item.price,
           quantity: item.quantity
         })),
@@ -359,16 +360,16 @@ app.get('/api/orders/:id', async (req, res) => {
     const [items] = await pool.query(`
       SELECT oi.*, mi.title as foodTitle
       FROM order_items oi
-      LEFT JOIN menu_items mi ON oi.item_id = mi.id
+      LEFT JOIN menu_items mi ON oi.food_id = mi.id
       WHERE oi.order_id = ?
     `, [order.id])
 
     res.json({
       id: order.id.toString(),
       items: items.map(item => ({
-        foodId: item.item_id,
-        foodTitle: item.foodTitle || 'Unknown Item',
-        priceLabel: item.priceLabel || '',
+        foodId: item.food_id,
+        foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
+        priceLabel: item.price_label || '',
         price: item.price,
         quantity: item.quantity
       })),
@@ -536,11 +537,11 @@ app.put('/api/orders/:id/status', async (req, res) => {
       )
     }
 
-    // Insert order items — fill all available columns
+    // Insert order items — fill all available columns (use food_id to match schema)
     if (items && Array.isArray(items) && items.length > 0) {
       for (const item of items) {
         await pool.query(
-          'INSERT INTO order_items (order_id, item_id, item_title, price_label, price, quantity) VALUES (?, ?, ?, ?, ?, ?)',
+          'INSERT INTO order_items (order_id, food_id, food_title, price_label, price, quantity) VALUES (?, ?, ?, ?, ?, ?)',
           [
             orderId,
             item.foodId ?? item.itemId ?? null,
@@ -563,16 +564,16 @@ app.put('/api/orders/:id/status', async (req, res) => {
     const [orderItems] = await pool.query(`
       SELECT oi.*, mi.title as foodTitle
       FROM order_items oi
-      LEFT JOIN menu_items mi ON oi.item_id = mi.id
+      LEFT JOIN menu_items mi ON oi.food_id = mi.id
       WHERE oi.order_id = ?
     `, [orderId])
 
     res.json({
       id: orderId.toString(),
       items: orderItems.map(item => ({
-        foodId: item.item_id,
-        foodTitle: item.foodTitle || 'Unknown Item',
-        priceLabel: item.priceLabel || '',
+        foodId: item.food_id,
+        foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
+        priceLabel: item.price_label || '',
         price: item.price,
         quantity: item.quantity
       })),
@@ -596,8 +597,10 @@ app.put('/api/orders/:id/status', async (req, res) => {
       updatedAt: order.updated_at
     })
   } catch (err) {
-    console.error('Error creating order:', err)
-    res.status(500).json({ error: 'Failed to create order' })
+    console.error('Error creating order:', err && err.stack ? err.stack : err)
+    // In development return the error message for easier debugging. In production avoid leaking internals.
+    const message = err && err.message ? err.message : 'Failed to create order'
+    res.status(500).json({ error: 'Failed to create order', details: message })
   }
 })
 
@@ -650,9 +653,9 @@ app.patch('/api/orders/:id', async (req, res) => {
     res.json({
       id: order.id.toString(),
       items: items.map(item => ({
-        foodId: item.item_id,
-        foodTitle: item.foodTitle || 'Unknown Item',
-        priceLabel: item.priceLabel || '',
+        foodId: item.food_id,
+        foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
+        priceLabel: item.price_label || '',
         price: item.price,
         quantity: item.quantity
       })),
@@ -694,7 +697,7 @@ app.post('/api/order-items', async (req, res) => {
   const { orderId, foodId, quantity, price } = req.body
   try {
     const [result] = await pool.query(
-      'INSERT INTO order_items (order_id, item_id, quantity, price) VALUES (?, ?, ?, ?)',
+      'INSERT INTO order_items (order_id, food_id, quantity, price) VALUES (?, ?, ?, ?)',
       [orderId, foodId, quantity, price]
     )
     res.json({ id: result.insertId, orderId, foodId, quantity, price })
@@ -818,6 +821,50 @@ app.post('/api/barion/callback', async (req, res) => {
   } catch (err) {
     console.error('Error handling Barion callback:', err)
     res.status(500).json({ error: 'Failed to process Barion callback' })
+  }
+})
+
+// Email sending endpoint
+app.post('/send-email', async (req, res) => {
+  try {
+    const { name, email, message } = req.body
+    if (!message || !email) {
+      return res.status(400).json({ error: 'Missing required fields' })
+    }
+
+    // Check if SMTP is configured
+    if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+      console.warn('SMTP not configured, logging message instead')
+      console.log('Message from:', name || email, `<${email}>`)
+      console.log('Message:', message)
+      return res.json({ ok: true, message: 'Üzenet elküldve (dev mode)' })
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT || 587),
+      secure: process.env.SMTP_SECURE === 'true',
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    })
+
+    const recipient = process.env.SEND_TO_EMAIL || 'orders@example.com'
+    const subject = `Website message from ${name || email}`
+    const text = `From: ${name || 'N/A'} <${email}>\n\n${message}`
+
+    await transporter.sendMail({
+      from: process.env.FROM_EMAIL || email,
+      to: recipient,
+      subject,
+      text
+    })
+
+    res.json({ ok: true, message: 'Üzenet elküldve' })
+  } catch (err) {
+    console.error('Email send error:', err)
+    res.status(500).json({ error: 'Failed to send email' })
   }
 })
 

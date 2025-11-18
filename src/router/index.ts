@@ -5,6 +5,7 @@ import ContactView from '@/views/public/ContactView.vue'
 import MenuView from '@/views/public/MenuView.vue'
 import OrderView from '@/views/public/OrderView.vue'
 import OrderSuccessView from '@/views/public/OrderSuccessView.vue'
+import PizzaBuilderView from '@/views/public/PizzaBuilderView.vue'
 import AdminView from '@/views/admin/AdminView.vue'
 
 const routes = [
@@ -12,6 +13,7 @@ const routes = [
   { path: '/about', name: 'About', component: AboutView },
   { path: '/contact', name: 'Contact', component: ContactView },
   { path: '/menu', name: 'Menu', component: MenuView },
+  { path: '/pizza-builder', name: 'PizzaBuilder', component: PizzaBuilderView },
   { path: '/order', name: 'Order', component: OrderView },
   { path: '/order-success', name: 'OrderSuccess', component: OrderSuccessView },
   {

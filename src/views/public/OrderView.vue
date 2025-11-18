@@ -1,15 +1,15 @@
 <template>
   <div class="order-page min-h-screen bg-gray-50 py-8">
     <div class="container mx-auto px-4 max-w-4xl">
-      <h1 class="text-4xl font-bold mb-8">Complete Your Order</h1>
+  <h1 class="text-4xl font-bold mb-8">Rendelés leadása</h1>
 
       <!-- Cart Summary -->
       <div class="bg-white rounded-lg shadow p-6 mb-6">
-        <h2 class="text-2xl font-bold mb-4">Order Summary</h2>
-        <div v-if="cartStore.isEmpty" class="text-center py-8">
-          <p class="text-gray-500">Your cart is empty</p>
+  <h2 class="text-2xl font-bold mb-4">Rendelés összefoglaló</h2>
+          <div v-if="cartStore.isEmpty" class="text-center py-8">
+          <p class="text-gray-500">A kosarad üres</p>
           <router-link to="/menu" class="mt-4 inline-block bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700">
-            Go to Menu
+            Menühöz
           </router-link>
         </div>
         <div v-else>
@@ -33,7 +33,7 @@
         <form @submit.prevent="handleSubmitOrder">
           <!-- Delivery Type -->
           <div class="mb-6">
-            <label class="block text-lg font-medium mb-3">Delivery Method</label>
+            <label class="block text-lg font-medium mb-3">Szállítás típusa</label>
             <div class="grid grid-cols-2 gap-4">
               <button
                 type="button"
@@ -41,8 +41,8 @@
                 :class="['p-4 border-2 rounded-lg transition', deliveryType === 'pickup' ? 'border-blue-600 bg-blue-50' : 'border-gray-300 hover:border-gray-400']"
               >
                 <div class="text-2xl mb-2">🏪</div>
-                <div class="font-medium">Pickup</div>
-                <div class="text-sm text-gray-500">Free</div>
+                <div class="font-medium">Elvitel</div>
+                <div class="text-sm text-gray-500">Ingyenes</div>
               </button>
               <button
                 type="button"
@@ -50,18 +50,18 @@
                 :class="['p-4 border-2 rounded-lg transition', deliveryType === 'delivery' ? 'border-blue-600 bg-blue-50' : 'border-gray-300 hover:border-gray-400']"
               >
                 <div class="text-2xl mb-2">🚚</div>
-                <div class="font-medium">Delivery</div>
-                <div class="text-sm text-gray-500">+ 500 Ft</div>
+                <div class="font-medium">Szállítás</div>
+                <div class="text-sm text-gray-500">0–500 Ft között</div>
               </button>
             </div>
           </div>
 
           <!-- Customer Information -->
           <div class="space-y-4 mb-6">
-            <h3 class="text-lg font-medium">Contact Information</h3>
+            <h3 class="text-lg font-medium">Kapcsolattartó adatai</h3>
 
             <div>
-              <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
+              <label for="name" class="block text-sm font-medium text-gray-700 mb-2">Teljes név *</label>
               <input
                 id="name"
                 v-model="orderForm.name"
@@ -72,7 +72,7 @@
             </div>
 
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">E-mail *</label>
               <input
                 id="email"
                 v-model="orderForm.email"
@@ -83,7 +83,7 @@
             </div>
 
             <div>
-              <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
+              <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Telefonszám *</label>
               <input
                 id="phone"
                 v-model="orderForm.phone"
@@ -96,10 +96,10 @@
 
           <!-- Delivery Address (if delivery selected) -->
           <div v-if="deliveryType === 'delivery'" class="space-y-4 mb-6">
-            <h3 class="text-lg font-medium">Delivery Address</h3>
+            <h3 class="text-lg font-medium">Szállítási cím</h3>
 
             <div>
-              <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Street Address *</label>
+              <label for="address" class="block text-sm font-medium text-gray-700 mb-2">Utca, házszám *</label>
               <input
                 id="address"
                 v-model="orderForm.address"
@@ -111,23 +111,30 @@
 
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label for="city" class="block text-sm font-medium text-gray-700 mb-2">City *</label>
-                <input
+                <label for="city" class="block text-sm font-medium text-gray-700 mb-2">Település *</label>
+                <select
                   id="city"
                   v-model="orderForm.city"
-                  type="text"
+                  @change="handleCityChange"
                   :required="deliveryType === 'delivery'"
                   class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                />
+                >
+                  <option value="">Válassz települést</option>
+                  <option v-for="city in deliveryCities" :key="city.name" :value="city.name">
+                    {{ city.name }} ({{ city.fee === 0 ? 'Free' : `${city.fee} Ft` }})
+                  </option>
+                </select>
               </div>
               <div>
-                <label for="zip" class="block text-sm font-medium text-gray-700 mb-2">ZIP Code *</label>
+                <label for="zip" class="block text-sm font-medium text-gray-700 mb-2">Irányítószám *</label>
                 <input
                   id="zip"
                   v-model="orderForm.zip"
                   type="text"
                   :required="deliveryType === 'delivery'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  readonly
+                  class="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 focus:ring-2 focus:ring-blue-500"
+                  placeholder="Automatikusan kitöltve"
                 />
               </div>
             </div>
@@ -135,19 +142,19 @@
 
           <!-- Additional Notes -->
           <div class="mb-6">
-            <label for="note" class="block text-sm font-medium text-gray-700 mb-2">Order Notes (Optional)</label>
+            <label for="note" class="block text-sm font-medium text-gray-700 mb-2">Megjegyzés (opcionális)</label>
             <textarea
               id="note"
               v-model="orderForm.note"
               rows="3"
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              placeholder="Special instructions, allergies, etc."
+              placeholder="Különleges kérés, allergia, stb."
             ></textarea>
           </div>
 
           <!-- Payment Method -->
           <div class="mb-6">
-            <label class="block text-lg font-medium mb-3">Payment Method</label>
+            <label class="block text-lg font-medium mb-3">Fizetés módja</label>
             <div class="space-y-3">
               <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition"
                 :class="paymentMethod === 'barion' ? 'border-blue-600 bg-blue-50' : 'border-gray-300'">
@@ -158,8 +165,8 @@
                   class="mr-3"
                 />
                 <div class="flex-1">
-                  <div class="font-medium">💳 Online Payment (Barion)</div>
-                  <div class="text-sm text-gray-500">Pay securely with credit card</div>
+                  <div class="font-medium">💳 Online fizetés (Barion)</div>
+                  <div class="text-sm text-gray-500">Biztonságos bankkártyás fizetés</div>
                 </div>
               </label>
               <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition"
@@ -171,8 +178,8 @@
                   class="mr-3"
                 />
                 <div class="flex-1">
-                  <div class="font-medium">💵 Cash on {{ deliveryType === 'delivery' ? 'Delivery' : 'Pickup' }}</div>
-                  <div class="text-sm text-gray-500">Pay when you receive your order</div>
+                  <div class="font-medium">💵 Készpénz átvételkor ({{ deliveryType === 'delivery' ? 'szállítás' : 'elvitel' }})</div>
+                  <div class="text-sm text-gray-500">Fizetés átvételkor</div>
                 </div>
               </label>
             </div>
@@ -181,15 +188,15 @@
           <!-- Total with Delivery -->
           <div class="bg-gray-50 rounded-lg p-4 mb-6">
             <div class="flex justify-between mb-2">
-              <span>Subtotal:</span>
+              <span>Részösszeg:</span>
               <span>{{ cartStore.totalPrice }} Ft</span>
             </div>
             <div class="flex justify-between mb-2">
-              <span>Delivery Fee:</span>
-              <span>{{ deliveryType === 'delivery' ? '500' : '0' }} Ft</span>
+              <span>Szállítási díj:</span>
+              <span>{{ deliveryFee }} Ft</span>
             </div>
             <div class="flex justify-between text-xl font-bold pt-2 border-t">
-              <span>Total:</span>
+              <span>Végösszeg:</span>
               <span>{{ finalTotal }} Ft</span>
             </div>
           </div>
@@ -204,7 +211,7 @@
             :disabled="submitting"
             class="w-full bg-green-600 text-white py-3 px-6 rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition text-lg font-medium"
           >
-            {{ submitting ? 'Processing...' : paymentMethod === 'barion' ? 'Proceed to Payment' : 'Place Order' }}
+            {{ submitting ? 'Feldolgozás...' : paymentMethod === 'barion' ? 'Tovább a fizetéshez' : 'Rendelés leadása' }}
           </button>
         </form>
       </div>
@@ -228,6 +235,14 @@ const paymentMethod = ref<'barion' | 'cash'>('cash')
 const submitting = ref(false)
 const errorMessage = ref('')
 
+// City delivery configuration
+const deliveryCities = [
+  { name: 'Aszód', zip: '2170', fee: 300 },
+  { name: 'Verseg', zip: '2174', fee: 400 },
+  { name: 'Iklad', zip: '2181', fee: 500 },
+  { name: 'Kartal', zip: '2173', fee: 0 }
+]
+
 const orderForm = ref({
   name: '',
   email: '',
@@ -238,10 +253,26 @@ const orderForm = ref({
   note: ''
 })
 
-const finalTotal = computed(() => {
-  const deliveryFee = deliveryType.value === 'delivery' ? 500 : 0
-  return cartStore.totalPrice + deliveryFee
+// Watch for city changes to auto-fill ZIP and update delivery fee
+const selectedCityData = computed(() => {
+  return deliveryCities.find(c => c.name === orderForm.value.city)
 })
+
+const deliveryFee = computed(() => {
+  if (deliveryType.value === 'pickup') return 0
+  return selectedCityData.value?.fee ?? 0
+})
+
+const finalTotal = computed(() => {
+  return cartStore.totalPrice + deliveryFee.value
+})
+
+// Auto-fill ZIP when city is selected
+const handleCityChange = () => {
+  if (selectedCityData.value) {
+    orderForm.value.zip = selectedCityData.value.zip
+  }
+}
 
 const handleSubmitOrder = async () => {
   errorMessage.value = ''
@@ -284,7 +315,7 @@ const handleSubmitOrder = async () => {
       })
 
       if (!order) {
-        errorMessage.value = 'Failed to create order. Please try again.'
+        errorMessage.value = 'A rendelés létrehozása sikertelen. Kérjük próbáld újra.'
         return
       }
 
@@ -295,16 +326,16 @@ const handleSubmitOrder = async () => {
       const order = await ordersStore.createOrder(orderData)
 
       if (!order) {
-        errorMessage.value = 'Failed to create order. Please try again.'
+        errorMessage.value = 'A rendelés létrehozása sikertelen. Kérjük próbáld újra.'
         return
       }
 
       cartStore.clearCart()
       router.push(`/order-success?orderId=${order.id}`)
     }
-  } catch (error) {
+    } catch (error) {
     console.error('Error submitting order:', error)
-    errorMessage.value = 'An error occurred while processing your order.'
+    errorMessage.value = 'Hiba történt a rendelés feldolgozása közben.'
   } finally {
     submitting.value = false
   }
@@ -367,16 +398,16 @@ const initiateBarionPayment = async (amount: number, items: OrderItem[], orderId
       // Log full error details for debugging
       console.error('Barion Full Error Details:', JSON.stringify(result.Errors, null, 2))
       const errorMsg = result.Errors.map((err: { ErrorCode?: string; Title?: string; Description?: string }) =>
-        `${err.ErrorCode || 'Unknown'}: ${err.Title || err.Description || 'Unknown error'}`
+        `${err.ErrorCode || 'Ismeretlen'}: ${err.Title || err.Description || 'Ismeretlen hiba'}`
       ).join(', ')
-      errorMessage.value = 'Payment initialization failed: ' + errorMsg
+      errorMessage.value = 'A fizetés inicializálása sikertelen: ' + errorMsg
       console.error('Barion Errors:', result.Errors)
       return
     }
 
     // Check if payment was successful
     if (!result.PaymentId || !result.GatewayUrl) {
-      errorMessage.value = 'Payment gateway URL not received. Please try cash payment instead.'
+      errorMessage.value = 'Nem érkezett fizetési átjáró URL. Kérjük, válassz készpénzes fizetést.'
       console.error('Missing PaymentId or GatewayUrl:', result)
       return
     }
@@ -393,7 +424,7 @@ const initiateBarionPayment = async (amount: number, items: OrderItem[], orderId
 
   } catch (error) {
     console.error('Barion payment error:', error)
-    errorMessage.value = 'Failed to initialize payment. Please try cash payment or contact support.'
+    errorMessage.value = 'A fizetés inicializálása sikertelen. Próbálj készpénzes fizetést vagy lépj kapcsolatba az ügyfélszolgálattal.'
   }
 }
 </script>
