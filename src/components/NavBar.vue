@@ -1,5 +1,6 @@
 <template>
-  <nav class="nav fixed top-0 right-0 left-0 z-50 h-[80px] shadow-md flex items-center">
+  <!-- Desktop NavBar (top) -->
+  <nav class="nav hidden md:flex fixed top-0 right-0 left-0 z-50 h-[80px] shadow-md items-center">
     <div class="container worker-sans-regular text-white flex justify-between">
       <router-link to="/" class="logo">
         <img src="/static_images/logo.png" class="h-[60px]" />
@@ -33,23 +34,96 @@
       </teleport>
     </div>
   </nav>
+
+  <!-- Mobile NavBar (bottom with icons) -->
+  <nav class="mobile-nav md:hidden fixed bottom-0 right-0 left-0 z-50 bg-white shadow-lg">
+    <ul class="mobile-links flex justify-around items-stretch h-20">
+      <li class="flex-1">
+        <router-link to="/" class="mobile-link" :class="{ active: route.path === '/' }" aria-label="Főoldal">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+        </router-link>
+      </li>
+      <li class="flex-1">
+        <router-link to="/menu" class="mobile-link" :class="{ active: route.path === '/menu' }" aria-label="Rendelés">
+          <!-- Pizza slice icon -->
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(45deg)">
+            <path d="M12 2L2 22h20L12 2z"></path>
+            <circle cx="9" cy="15" r="1.5" fill="currentColor"></circle>
+            <circle cx="15" cy="15" r="1.5" fill="currentColor"></circle>
+            <circle cx="12" cy="10" r="1.5" fill="currentColor"></circle>
+          </svg>
+        </router-link>
+      </li>
+      <li class="flex-1">
+        <button class="mobile-link cart-btn" :class="{ active: showMobileCart }" @click.stop="toggleMobileCart" aria-label="Kosár">
+          <div style="position: relative; display: flex; align-items: center; justify-content: center;">
+            <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1"></circle>
+              <circle cx="20" cy="21" r="1"></circle>
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+            </svg>
+            <span v-if="itemCount" class="mobile-cart-badge">{{ itemCount }}</span>
+          </div>
+        </button>
+      </li>
+      <li class="flex-1">
+        <router-link to="/contact" class="mobile-link" :class="{ active: route.path === '/contact' }" aria-label="Kapcsolat">
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="M22 4l-10 7L2 4"></path>
+          </svg>
+        </router-link>
+      </li>
+      <li class="flex-1">
+        <router-link to="/about" class="mobile-link" :class="{ active: route.path === '/about' }" aria-label="Rólunk">
+          <!-- Info/About icon -->
+          <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M12 16v-4"></path>
+            <path d="M12 8h.01"></path>
+          </svg>
+        </router-link>
+      </li>
+    </ul>
+
+    <!-- Teleported dropdown for mobile cart -->
+    <teleport to="body">
+      <div v-if="showMobileCart" class="mobile-cart-dropdown fixed z-50" ref="mobileDropdownEl" role="dialog" aria-label="Kosár">
+        <div class="flex justify-between items-center p-4 border-b">
+          <h2 class="text-lg font-semibold">Kosár ({{ itemCount }})</h2>
+          <button @click="toggleMobileCart" class="text-gray-500 hover:text-gray-700 text-2xl leading-none" aria-label="Bezárás">×</button>
+        </div>
+        <div class="flex-1 overflow-y-auto">
+          <KosarWidget :cart="kosarCart" @increment="onIncrement" @decrement="onDecrement" />
+        </div>
+      </div>
+    </teleport>
+  </nav>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import KosarWidget from './KosarWidget.vue'
 
+const route = useRoute()
 const cartStore = useCartStore()
 const showCart = ref(false)
+const showMobileCart = ref(false)
 const cartLi = ref<HTMLElement | null>(null)
 const dropdownEl = ref<HTMLElement | null>(null)
+const mobileDropdownEl = ref<HTMLElement | null>(null)
 
 const itemCount = computed(() => cartStore.itemCount)
 
 const kosarCart = computed(() => cartStore.items.map(i => ({ item: i.food, price: { label: i.selectedPrice.label, price: i.selectedPrice.price }, qty: i.quantity })))
 
 function toggleCart(){ showCart.value = !showCart.value }
+function toggleMobileCart(){ showMobileCart.value = !showMobileCart.value }
 
 function onIncrement(idx:number){
   // prefer direct index, fallback by matching id+label
@@ -86,10 +160,18 @@ function updateDropdownPosition(){
 
 function onDocClick(e: MouseEvent){
   const target = e.target as Node | null
-  if(!showCart.value) return
-  if(cartLi.value && cartLi.value.contains(target)) return
-  if(dropdownEl.value && dropdownEl.value.contains(target)) return
-  showCart.value = false
+  // Handle desktop cart
+  if(showCart.value) {
+    if(cartLi.value && cartLi.value.contains(target)) return
+    if(dropdownEl.value && dropdownEl.value.contains(target)) return
+    showCart.value = false
+  }
+  // Handle mobile cart
+  if(showMobileCart.value) {
+    if(e.target === document.querySelector('.mobile-link.cart-btn')) return
+    if(mobileDropdownEl.value && mobileDropdownEl.value.contains(target)) return
+    showMobileCart.value = false
+  }
 }
 
 onMounted(()=>{
@@ -151,6 +233,92 @@ watchEffect(async ()=>{
   background: #FF6106;
   color: white;
 }
+
+/* Mobile navbar styles */
+.mobile-nav {
+  height: 80px;
+  box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.1);
+  overflow: visible;
+}
+
+.mobile-links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow: visible;
+}
+
+.mobile-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: color 0.2s ease, background-color 0.2s ease, border-top 0.2s ease;
+  position: relative;
+  padding: 0;
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  border-top: 3px solid transparent;
+}
+
+.mobile-link.cart-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-link:hover {
+  color: #333;
+}
+
+.mobile-link.active,
+.mobile-link.router-link-active {
+  color: #FF6106;
+  border-top: 3px solid #FF6106;
+}
+
+.mobile-cart-badge {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #FF6106;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0 6px;
+  font-size: 12px;
+  min-width: 20px;
+  text-align: center;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-cart-dropdown {
+  top: 12px;
+  bottom: 100px;
+  left: 12px;
+  right: 12px;
+  width: auto;
+  height: auto;
+  max-width: none;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .work-sans-light {
   font-family: "Work Sans", sans-serif;
   font-optical-sizing: auto;
