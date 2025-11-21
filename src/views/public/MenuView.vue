@@ -5,8 +5,6 @@
     </div>
 
     <main class="center">
-      <h2 class="heading">{{ currentCategory?.title || 'Menü' }}</h2>
-
       <!-- Pizza Builder Card (shown only in pizza category) -->
       <div v-if="isPizzaCategory" class="pizza-builder-card" @click="goToPizzaBuilder">
         <div class="builder-icon">🍕</div>
@@ -19,21 +17,42 @@
 
       <FoodCards :items="currentPageItems" @add="handleAddToCart" />
 
-      <div class="pagination mt-4">
-        <button :disabled="page<=1" @click="page = Math.max(1, page-1)">← Előző</button>
-        <span class="mx-2">Oldal {{ page }} / {{ totalPages }}</span>
-        <button :disabled="page>=totalPages" @click="page = Math.min(totalPages, page+1)">Következő →</button>
+      <div v-if="totalPages > 1" class="pagination mt-4">
+        <button
+          v-if="page > 1"
+          class="pagination-nav"
+          @click="page = Math.max(1, page - 1)"
+          title="Previous page"
+        >
+          ‹
+        </button>
+        <button
+          v-for="pageNum in totalPages"
+          :key="pageNum"
+          :class="{ active: page === pageNum }"
+          @click="page = pageNum"
+        >
+          {{ pageNum }}
+        </button>
+        <button
+          v-if="page < totalPages"
+          class="pagination-nav"
+          @click="page = Math.min(totalPages, page + 1)"
+          title="Next page"
+        >
+          ›
+        </button>
       </div>
     </main>
 
-    <div class="right">
+    <div class="right" ref="rightContainer">
       <KosarWidget />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
 import CategoryList from '@/components/CategoryList.vue'
 import FoodCards from '@/components/FoodCards.vue'
@@ -54,6 +73,48 @@ const selectedCategoryId = ref<number | undefined>(undefined)
 const page = ref(1)
 const pageSize = ref(8)
 const cartStore = useCartStore()
+const rightContainer = ref<HTMLElement | null>(null)
+
+function handleScroll() {
+  if (!rightContainer.value || window.innerWidth < 1000) return
+
+  const centerContent = document.querySelector('.center')
+  if (!centerContent) return
+
+  const containerHeight = rightContainer.value.offsetHeight
+  const gap = 20
+
+  // Get the bottom of the center content (where menu items end) in viewport coordinates
+  const centerRect = centerContent.getBoundingClientRect()
+  const centerBottomAbsolute = centerRect.bottom + window.scrollY
+
+  // Calculate the point where we should stop scrolling the Kosár
+  // This is: center bottom - container height - gap
+  const stopScrollAt = centerBottomAbsolute - containerHeight - gap
+
+  // Current scroll position
+  const scrollPosition = window.scrollY
+
+  // If we've scrolled past the stop point, switch to absolute positioning
+  if (scrollPosition + 120 > stopScrollAt) {
+    rightContainer.value.style.position = 'absolute'
+    rightContainer.value.style.top = (stopScrollAt - 120) + 'px'
+  } else {
+    // Otherwise keep it fixed at the normal position
+    rightContainer.value.style.position = 'fixed'
+    rightContainer.value.style.top = '120px'
+  }
+}
+
+function handleResize() {
+  handleScroll()
+
+  // Reset inline styles on mobile so CSS media queries take over
+  if (window.innerWidth < 1000 && rightContainer.value) {
+    rightContainer.value.style.position = ''
+    rightContainer.value.style.top = ''
+  }
+}
 
 function normalizePrices(raw: unknown): Price[] {
   if (!raw) return []
@@ -198,17 +259,34 @@ function goToPizzaBuilder() {
   router.push('/pizza-builder')
 }
 
-onMounted(()=> loadMenu())
+onMounted(()=> {
+  loadMenu()
+  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('resize', handleResize)
+})
 </script>
 
 <style scoped>
-body{ background:#cccccc;}
+.menu-page {
+  display: grid;
+  grid-template-columns: 220px 1fr 320px;
+  gap: 20px;
+  padding: 20px;
+  margin-top: 40px;
+  background: #f5f5f5;
+  position: relative;
+  min-height: calc(100vh - 80px);
+}
 
-.menu-page{ display:grid; grid-template-columns:240px 1fr 320px; gap:20px; padding:20px }
-.heading{ margin:0 0 12px }
-.left{ padding-right:8px }
-.center{ padding-bottom:16px }
-.right{ padding-left:8px }
+.heading { margin: 0 0 12px; }
+.left { padding-right: 8px; position: static; width: auto; z-index: 2; }
+.center { padding-bottom: 16px; margin-top: 12px; z-index: 2; }
+.right { padding-left: 8px; position: fixed; right: 20px; top: 120px; width: 320px; max-height: calc(100vh - 140px); overflow-y: auto; z-index: 10; }
 
 /* Pizza Builder Card */
 .pizza-builder-card {
@@ -294,8 +372,38 @@ body{ background:#cccccc;}
 }
 
 @media (max-width:1000px){
-  .menu-page{ grid-template-columns:1fr; }
-  .right{ order:3 }
+  .menu-page {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 0;
+  }
+  .left {
+    order: 1;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: white;
+    border-bottom: 1px solid #eee;
+    z-index: 40;
+    padding: 0;
+    margin: 0;
+  }
+  .center {
+    order: 2;
+    margin-top: 12px;
+    padding: 20px;
+  }
+  .right {
+    order: 3;
+    position: static;
+    right: auto;
+    top: auto;
+    width: 100%;
+    max-height: none;
+    display: none;
+  }
 
   .pizza-builder-card {
     flex-direction: column;
@@ -304,6 +412,65 @@ body{ background:#cccccc;}
 
   .builder-icon {
     font-size: 60px;
+  }
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  padding: 12px 0;
+}
+
+.pagination button {
+  background: #fff;
+  border: 1px solid #ddd;
+  color: #666;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  min-width: 40px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.pagination button:hover:not(.active) {
+  border-color: #ff6106;
+  color: #ff6106;
+}
+
+.pagination button.active {
+  background: #fff4e6;
+  border-color: #ff6106;
+  color: #ff6106;
+}
+
+.pagination-nav {
+  font-size: 18px;
+  padding: 6px 10px !important;
+  min-width: 38px !important;
+}
+
+@media (max-width: 768px) {
+  .pagination {
+    gap: 6px;
+  }
+
+  .pagination button {
+    padding: 6px 10px;
+    font-size: 13px;
+    min-width: 36px;
+  }
+
+  .pagination-nav {
+    font-size: 16px;
+    padding: 5px 8px !important;
+    min-width: 34px !important;
   }
 }
 </style>

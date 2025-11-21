@@ -1,7 +1,9 @@
 <template>
   <footer class="footer">
-    <DottedPanel :left="0" :bottom="100" :zIndex="5" :opacity="100" :width="400" :color="'#f4ac3e'"/>
-    <DottedPanel :right="0" :bottom="220" :zIndex="5" :opacity="100" :width="200" :height="300"/>
+    <DottedPanel :left="0" :top="500" :zIndex="5" :opacity="100" :width="400" :color="'#f4ac3e'" class="md:hidden"/>
+    <DottedPanel :right="0" :top="700" :zIndex="5" :opacity="100" :width="200" :height="300" class="md:hidden"/>
+    <DottedPanel :left="0" :top="300" :zIndex="5" :opacity="100" :width="400" :color="'#f4ac3e'" class="hidden md:block"/>
+    <DottedPanel :right="0" :top="350" :zIndex="5" :opacity="100" :width="200" :height="300" class="hidden md:block"/>
 
     <div class="hero">
       <div class="hero-image" />

@@ -31,6 +31,6 @@ import TopPizzak from '@/components/TopPizzak.vue'
 }
 /* globális háttér */
 body {
-  background: #cccccc;
+  background: #f5f5f5;
 }
 </style>
