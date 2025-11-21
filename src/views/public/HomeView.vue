@@ -6,7 +6,7 @@ import TopPizzak from '@/components/TopPizzak.vue'
 <template>
   <div class="homeview relative min-h-screen overflow-x-hidden">
 
-    <section class="relative h-[60vh] md:h-screen pt-[80px]">
+    <section class="relative h-auto md:h-screen">
       <HeroSection />
     </section>
 

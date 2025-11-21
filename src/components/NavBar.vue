@@ -2,7 +2,7 @@
   <nav class="nav fixed top-0 right-0 left-0 z-50 h-[80px] shadow-md flex items-center">
     <div class="container worker-sans-regular text-white flex justify-between">
       <router-link to="/" class="logo">
-        <img src="/static_images/logo.png" class="h-[80px]" />
+        <img src="/static_images/logo.png" class="h-[60px]" />
       </router-link>
 
       <ul class="links h-full flex items-center">
