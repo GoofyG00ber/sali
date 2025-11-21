@@ -1,7 +1,7 @@
 <template>
-  <div class="kosar-wrapper">
+  <div class="kosar-wrapper" :class="{ 'in-menu': isInMenu }">
     <aside class="kosar">
-      <h3>Kosár ({{ cartStore.itemCount }})</h3>
+      <h3>Kosár <span class="count">({{ cartStore.itemCount }})</span></h3>
       <div v-if="cartStore.isEmpty" class="empty">Üres a kosár</div>
       <div v-else class="items">
         <div
@@ -52,8 +52,17 @@
 
 <script setup lang="ts">
 import { useCartStore } from '@/stores/cart'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const cartStore = useCartStore()
+const route = useRoute()
+
+const props = defineProps<{
+  isInSidebar?: boolean
+}>()
+
+const isInMenu = computed(() => !props.isInSidebar && route.path === '/menu')
 
 function formatPrice(n: number) {
   return n.toLocaleString()
@@ -61,9 +70,38 @@ function formatPrice(n: number) {
 </script>
 
 <style scoped>
-.kosar-wrapper { display: block; }
-.kosar { width: 300px; background: #fff; padding: 16px; border-radius: 12px; display: block; overflow: visible; }
-.kosar h3 { display: block; margin: 0 0 12px 0; padding: 0; font-size: 18px; font-weight: 600; }
+.kosar-wrapper { display: block; position: relative; }
+.kosar { width: 300px; background: #fff; padding: 16px; border-radius: 12px; display: block; overflow: visible; position: relative; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.kosar h3 { display: block; margin: 0 0 12px 0; padding: 0; font-family: "Work Sans", sans-serif; font-weight: 600; font-style: normal; color: #000; font-size: 1rem; }
+
+/* In menu view - apply Pacifico style with overflow */
+.kosar-wrapper.in-menu .kosar {
+  margin-top: 20px;
+}
+
+.kosar-wrapper.in-menu .kosar h3 {
+  font-family: 'Pacifico', cursive;
+  font-weight: 400;
+  font-style: normal;
+  color: #682121;
+  font-size: 2.25rem;
+  position: absolute;
+  top: -20px;
+  left: 16px;
+  line-height: 1.2;
+  margin: 0;
+}
+
+.kosar-wrapper.in-menu .kosar h3 .count {
+  font-family: "Work Sans", sans-serif;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.kosar-wrapper.in-menu .kosar .items {
+  margin-top: 0;
+}
+
 .kosar .items { overflow: visible; }
 .kosar .empty { color: #999; }
 .ci { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px dashed #eee; }
@@ -81,7 +119,7 @@ function formatPrice(n: number) {
   .kosar-wrapper { display: flex; flex-direction: column; height: 100%; }
   .kosar h3 { display: none; }
   .kosar { width: 100%; padding: 0; display: flex; flex-direction: column; overflow: hidden; flex: 1; }
-  .kosar .items { flex: 1; overflow-y: auto; padding: 16px; }
+  .kosar .items { flex: 1; overflow-y: auto; padding: 16px; padding-top: 16px; margin-top: 0; }
   .bottom { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px dashed #eee; }
 }
 </style>

@@ -29,7 +29,7 @@
       <!-- Teleported dropdown to body so it can float top-right -->
       <teleport to="body">
         <div v-if="showCart" class="cart-dropdown fixed z-50" :style="dropdownStyle" ref="dropdownEl" role="dialog" aria-label="Kosár">
-          <KosarWidget :cart="kosarCart" @increment="onIncrement" @decrement="onDecrement" />
+          <KosarWidget :isInSidebar="true" :cart="kosarCart" @increment="onIncrement" @decrement="onDecrement" />
         </div>
       </teleport>
     </div>
@@ -42,7 +42,6 @@
         <router-link to="/" class="mobile-link" :class="{ active: route.path === '/' }" aria-label="Főoldal">
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-            <polyline points="9 22 9 12 15 12 15 22"></polyline>
           </svg>
         </router-link>
       </li>
@@ -151,7 +150,7 @@ function updateDropdownPosition(){
   const liCenter = rect.left + rect.width / 2
   let left = liCenter - DROPDOWN_WIDTH / 2
   // clamp inside viewport
-  left = Math.max(8, Math.min(left, window.innerWidth - DROPDOWN_WIDTH - 8))
+  left = Math.max(8, Math.min(left, window.innerWidth - DROPDOWN_WIDTH - 28))
   const leftRounded = Math.round(left)
   // compute arrow offset relative to dropdown left (pixels)
   const arrowOffset = Math.round(liCenter - leftRounded)
@@ -353,7 +352,7 @@ watchEffect(async ()=>{
 /* cart styles */
 .cart-btn{ background: transparent; border: none; color: inherit; cursor: pointer; position: relative; }
 .cart-badge{ position: absolute; top: -5px; right: -5px; background:#FF6106; color:#fff; font-weight:700; border-radius:999px; padding:0 6px; font-size:12px; min-width: 20px; text-align: center; }
-.cart-dropdown{ width:300px; background:#fff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.08); padding:0 }
+.cart-dropdown{ width:300px; background:#fff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.08); padding:0; margin-right: 20px; }
 .cart-dropdown::before{ /* outer arrow / border */
   content: '';
   position: absolute;

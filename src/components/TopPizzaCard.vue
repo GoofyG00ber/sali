@@ -65,12 +65,29 @@ const selectSize = (size: number) => {
         <div class="text-lg work-sans-medium text-slate-900">
           3290,00 Ft
         </div>
-        <button
-          type="button"
-          class="rounded-lg bg-orange-600 px-6 py-2 text-sm work-sans-semibold text-white shadow hover:bg-orange-700 transition"
-        >
-          kosárba
-        </button>
+        <div class="flex gap-2">
+          <button
+            type="button"
+            class="rounded-lg border-2 border-orange-600 bg-white px-3 py-2 text-sm work-sans-semibold text-orange-600 shadow hover:bg-orange-50 transition flex items-center justify-center"
+            title="Add extras"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="rounded-lg bg-orange-600 px-4 py-2 text-sm work-sans-semibold text-white shadow hover:bg-orange-700 transition flex items-center justify-center"
+            title="Add to cart"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="9" cy="21" r="1" />
+              <circle cx="20" cy="21" r="1" />
+              <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
   </article>
