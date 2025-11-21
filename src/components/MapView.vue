@@ -1,82 +1,12 @@
 <template>
   <div>
-    <div v-if="!apiKey" class="h-64 w-full flex items-center justify-center bg-gray-100 rounded-lg text-gray-600 p-4">
-      <div class="text-center">
-        <div class="font-medium">Google Maps nincs konfigurálva</div>
-        <div class="text-sm mt-2">Állítsd be a <code>VITE_GOOGLE_MAPS_API_KEY</code> környezeti változót a `.env` fájlban.</div>
+    <div class=" h-64 bg-gray-100 rounded-lg text-gray-600">
+      <div class="text-center h-64">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2686.645348294831!2d19.531765076702673!3d47.671885683466556!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4741b537a5a3322d%3A0xc41a658e550b819c!2sSALI%20Pizzéria!5e0!3m2!1shu!2shu!4v1763720918489!5m2!1shu!2shu" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
       </div>
     </div>
-
-    <div v-else id="gmap" ref="mapEl" style="height: 250px; width: 100%;" />
   </div>
 </template>
-
-<script setup lang="ts">
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-
-// Center used previously in Leaflet version
-const defaultPosition = { lat: 47.67204465176636, lng: 19.534340000000004 }
-const defaultZoom = 15
-
-const apiKey = (import.meta.env.VITE_GOOGLE_MAPS_API_KEY as string) || ''
-const mapEl = ref<HTMLElement | null>(null)
-let map: any = null
-let marker: any = null
-
-function loadGoogleMaps(key: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if ((window as any).google && (window as any).google.maps) return resolve()
-
-    const script = document.createElement('script')
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(key)}`
-    script.async = true
-    script.defer = true
-    script.onload = () => {
-      if ((window as any).google && (window as any).google.maps) resolve()
-      else reject(new Error('Google Maps failed to load'))
-    }
-    script.onerror = () => reject(new Error('Failed to load Google Maps script'))
-    document.head.appendChild(script)
-  })
-}
-
-onMounted(async () => {
-  if (!apiKey) return
-
-  try {
-    await loadGoogleMaps(apiKey)
-
-    if (!mapEl.value) return
-
-    map = new (window as any).google.maps.Map(mapEl.value, {
-      center: defaultPosition,
-      zoom: defaultZoom,
-      mapTypeControl: false,
-      streetViewControl: false,
-      fullscreenControl: false
-    })
-
-    // use a marker roughly similar to the previous one
-    marker = new (window as any).google.maps.Marker({
-      position: defaultPosition,
-      map,
-      title: 'Cím',
-    })
-  } catch (err: any) {
-    console.error('Google Maps init error', err)
-  }
-})
-
-onBeforeUnmount(() => {
-  if (marker) {
-    marker.setMap(null)
-    marker = null
-  }
-  map = null
-})
-</script>
-
 <style scoped>
 #gmap {
   border-radius: 12px;
