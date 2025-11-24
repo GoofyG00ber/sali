@@ -1,6 +1,34 @@
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
 import NavBar from './components/NavBar.vue'
 import Footer from './components/Footer.vue'
+import RestaurantStatusModal from './components/RestaurantStatusModal.vue'
+
+const showStatusModal = ref(false)
+const statusMessage = ref('')
+const todaySchedule = ref(null)
+
+onMounted(async () => {
+  // Check if we already showed the modal in this session
+  const hasSeenModal = sessionStorage.getItem('hasSeenStatusModal')
+
+  try {
+    const response = await fetch('/api/restaurant-status')
+    const data = await response.json()
+
+    if (!data.isOpen) {
+      statusMessage.value = data.message
+      todaySchedule.value = data.schedule
+      // Show modal if not seen yet
+      if (!hasSeenModal) {
+        showStatusModal.value = true
+        sessionStorage.setItem('hasSeenStatusModal', 'true')
+      }
+    }
+  } catch (error) {
+    console.error('Error checking restaurant status:', error)
+  }
+})
 </script>
 
 <template>
@@ -14,6 +42,13 @@ import Footer from './components/Footer.vue'
       <router-view />
     </main>
     <Footer class="pb-[80px] md:pb-[0px]" />
+
+    <RestaurantStatusModal
+      :is-open="showStatusModal"
+      :message="statusMessage"
+      :schedule="todaySchedule"
+      @close="showStatusModal = false"
+    />
   </div>
 </template>
 
