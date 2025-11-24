@@ -342,6 +342,16 @@ const handleSubmitOrder = async () => {
   submitting.value = true
 
   try {
+    // Check restaurant status before submitting
+    const statusResponse = await fetch('/api/restaurant-status')
+    const statusData = await statusResponse.json()
+
+    if (!statusData.isOpen) {
+      errorMessage.value = statusData.message || 'Az étterem jelenleg zárva tart.'
+      submitting.value = false
+      return
+    }
+
     // Prepare order items
     const items: OrderItem[] = cartStore.items.map(item => ({
       itemId: item.food.id,
