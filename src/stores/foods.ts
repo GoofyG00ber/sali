@@ -15,9 +15,11 @@ export interface Food {
   prices: FoodPrice[]
   badges?: string[]
   image: string
-  active?: boolean
+  active?: number | boolean
   categoryId?: number
+  category_id?: number
   categoryTitle?: string
+  top_id?: number
 }
 
 export interface Category {
@@ -29,6 +31,7 @@ export interface Category {
 export const useFoodsStore = defineStore('foods', () => {
   const foods = ref<Food[]>([])
   const categories = ref<Category[]>([])
+  const topPizzas = ref<Food[]>([])
   const loading = ref(false)
   const error = ref<string | null>(null)
 
@@ -39,10 +42,78 @@ export const useFoodsStore = defineStore('foods', () => {
     try {
       const response = await fetch(`${API_BASE}/foods`)
       if (!response.ok) throw new Error('Failed to fetch foods')
-      foods.value = await response.json()
+      const data = await response.json()
+      // Map category_id to categoryId if needed
+      foods.value = data.map((item: Record<string, unknown>) => ({
+        ...item,
+        categoryId: item.categoryId || item.category_id
+      })) as Food[]
     } catch (e) {
       error.value = e instanceof Error ? e.message : 'Unknown error'
       console.error('Error fetching foods:', e)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Fetch top pizzas
+  const fetchTopPizzas = async () => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await fetch(`${API_BASE}/top-pizzas`)
+      if (!response.ok) throw new Error('Failed to fetch top pizzas')
+      const data = await response.json()
+      topPizzas.value = data.map((item: Record<string, unknown>) => ({
+        ...item,
+        categoryId: item.categoryId || item.category_id
+      })) as Food[]
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Unknown error'
+      console.error('Error fetching top pizzas:', e)
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Add top pizza
+  const addTopPizza = async (itemId: number) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await fetch(`${API_BASE}/top-pizzas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ itemId })
+      })
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.error || 'Failed to add top pizza')
+      }
+      await fetchTopPizzas()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Unknown error'
+      console.error('Error adding top pizza:', e)
+      throw e
+    } finally {
+      loading.value = false
+    }
+  }
+
+  // Remove top pizza
+  const removeTopPizza = async (id: number) => {
+    loading.value = true
+    error.value = null
+    try {
+      const response = await fetch(`${API_BASE}/top-pizzas/${id}`, {
+        method: 'DELETE'
+      })
+      if (!response.ok) throw new Error('Failed to remove top pizza')
+      await fetchTopPizzas()
+    } catch (e) {
+      error.value = e instanceof Error ? e.message : 'Unknown error'
+      console.error('Error removing top pizza:', e)
+      throw e
     } finally {
       loading.value = false
     }
@@ -151,14 +222,18 @@ export const useFoodsStore = defineStore('foods', () => {
   return {
     foods,
     categories,
+    topPizzas,
     loading,
     error,
     fetchFoods,
+    fetchTopPizzas,
     fetchCategories,
     createFood,
     updateFood,
     deleteFood,
     toggleActive,
-    getFoodById
+    getFoodById,
+    addTopPizza,
+    removeTopPizza
   }
 })

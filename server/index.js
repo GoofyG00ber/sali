@@ -107,6 +107,80 @@ app.get('/api/categories/:id', async (req, res) => {
   }
 })
 
+app.get('/api/top-pizzas', async (req, res) => {
+  try {
+    const [rows] = await pool.query(`
+      SELECT tp.id as top_id, mi.*
+      FROM top_pizzas tp
+      JOIN menu_items mi ON tp.item_id = mi.id
+    `)
+
+    if (rows.length === 0) {
+      return res.json([])
+    }
+
+    // Fetch prices for these items
+    const itemIds = rows.map(r => r.id)
+    const [prices] = await pool.query('SELECT * FROM item_prices WHERE item_id IN (?)', [itemIds])
+
+    const priceMap = new Map()
+    for (const price of prices) {
+      const key = String(price.item_id)
+      if (!priceMap.has(key)) {
+        priceMap.set(key, [])
+      }
+      priceMap.get(key).push(price)
+    }
+
+    const topPizzas = rows.map(food => {
+      const foodPrices = buildPricesForFood(food, priceMap.get(String(food.id)) || [])
+      return {
+        ...food,
+        prices: foodPrices,
+        badges: Array.isArray(food?.badges) ? food.badges : []
+      }
+    })
+
+    res.json(topPizzas)
+  } catch (err) {
+    console.error('Error fetching top pizzas:', err)
+    res.status(500).json({ error: 'Failed to fetch top pizzas' })
+  }
+})
+
+app.post('/api/top-pizzas', async (req, res) => {
+  const { itemId } = req.body
+  try {
+    // Check if already exists
+    const [existing] = await pool.query('SELECT * FROM top_pizzas WHERE item_id=?', [itemId])
+    if (existing.length > 0) {
+      return res.status(400).json({ error: 'Item already in top pizzas' })
+    }
+
+    // Check if item exists and is a pizza (category_id=1)
+    const [item] = await pool.query('SELECT * FROM menu_items WHERE id=? AND category_id=1', [itemId])
+    if (item.length === 0) {
+      return res.status(400).json({ error: 'Item not found or not a pizza' })
+    }
+
+    const [result] = await pool.query('INSERT INTO top_pizzas (item_id) VALUES (?)', [itemId])
+    res.json({ id: result.insertId, itemId })
+  } catch (err) {
+    console.error('Error adding top pizza:', err)
+    res.status(500).json({ error: 'Failed to add top pizza' })
+  }
+})
+
+app.delete('/api/top-pizzas/:id', async (req, res) => {
+  try {
+    await pool.query('DELETE FROM top_pizzas WHERE id=?', [req.params.id])
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Error deleting top pizza:', err)
+    res.status(500).json({ error: 'Failed to delete top pizza' })
+  }
+})
+
 app.post('/api/categories', async (req, res) => {
   const { title, image } = req.body
   try {
@@ -264,7 +338,7 @@ app.delete('/api/foods/:id', async (req, res) => {
 
 app.patch('/api/foods/:id/toggle-active', async (req, res) => {
   try {
-    await pool.query('UPDATE menu_items SET active = NOT active WHERE id=?', [req.params.id])
+    await pool.query('UPDATE menu_items SET active = IF(active = 1, 0, 1) WHERE id=?', [req.params.id])
     res.json({ success: true })
   } catch (err) {
     console.error(err)
@@ -303,7 +377,7 @@ app.get('/api/orders', async (req, res) => {
     const [items] = await pool.query(`
       SELECT oi.*, mi.title as foodTitle
       FROM order_items oi
-      LEFT JOIN menu_items mi ON oi.food_id = mi.id
+      LEFT JOIN menu_items mi ON oi.item_id = mi.id
     `)
 
     // Map items to orders
@@ -317,7 +391,7 @@ app.get('/api/orders', async (req, res) => {
       return {
         id: order.id.toString(),
         items: orderItems.map(item => ({
-          foodId: item.food_id,
+          itemId: item.item_id,
           foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
           priceLabel: item.price_label || '',
           price: item.price,
@@ -360,14 +434,14 @@ app.get('/api/orders/:id', async (req, res) => {
     const [items] = await pool.query(`
       SELECT oi.*, mi.title as foodTitle
       FROM order_items oi
-      LEFT JOIN menu_items mi ON oi.food_id = mi.id
+      LEFT JOIN menu_items mi ON oi.item_id = mi.id
       WHERE oi.order_id = ?
     `, [order.id])
 
     res.json({
       id: order.id.toString(),
       items: items.map(item => ({
-        foodId: item.food_id,
+        itemId: item.item_id,
         foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
         priceLabel: item.price_label || '',
         price: item.price,
@@ -537,14 +611,14 @@ app.put('/api/orders/:id/status', async (req, res) => {
       )
     }
 
-    // Insert order items — fill all available columns (use food_id to match schema)
+    // Insert order items — fill all available columns (use item_id to match schema)
     if (items && Array.isArray(items) && items.length > 0) {
       for (const item of items) {
         await pool.query(
-          'INSERT INTO order_items (order_id, food_id, food_title, price_label, price, quantity) VALUES (?, ?, ?, ?, ?, ?)',
+          'INSERT INTO order_items (order_id, item_id, food_title, price_label, price, quantity) VALUES (?, ?, ?, ?, ?, ?)',
           [
             orderId,
-            item.foodId ?? item.itemId ?? null,
+            item.itemId ?? item.foodId ?? null,
             item.foodTitle ?? item.name ?? '',
             item.priceLabel ?? '',
             item.price ?? 0,
@@ -564,14 +638,14 @@ app.put('/api/orders/:id/status', async (req, res) => {
     const [orderItems] = await pool.query(`
       SELECT oi.*, mi.title as foodTitle
       FROM order_items oi
-      LEFT JOIN menu_items mi ON oi.food_id = mi.id
+      LEFT JOIN menu_items mi ON oi.item_id = mi.id
       WHERE oi.order_id = ?
     `, [orderId])
 
     res.json({
       id: orderId.toString(),
       items: orderItems.map(item => ({
-        foodId: item.food_id,
+        itemId: item.item_id,
         foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
         priceLabel: item.price_label || '',
         price: item.price,
@@ -653,7 +727,7 @@ app.patch('/api/orders/:id', async (req, res) => {
     res.json({
       id: order.id.toString(),
       items: items.map(item => ({
-        foodId: item.food_id,
+        itemId: item.item_id,
         foodTitle: item.foodTitle || item.food_title || 'Unknown Item',
         priceLabel: item.price_label || '',
         price: item.price,
@@ -694,13 +768,13 @@ app.get('/api/order-items/:orderId', async (req, res) => {
 })
 
 app.post('/api/order-items', async (req, res) => {
-  const { orderId, foodId, quantity, price } = req.body
+  const { orderId, itemId, quantity, price } = req.body
   try {
     const [result] = await pool.query(
-      'INSERT INTO order_items (order_id, food_id, quantity, price) VALUES (?, ?, ?, ?)',
-      [orderId, foodId, quantity, price]
+      'INSERT INTO order_items (order_id, item_id, quantity, price) VALUES (?, ?, ?, ?)',
+      [orderId, itemId, quantity, price]
     )
-    res.json({ id: result.insertId, orderId, foodId, quantity, price })
+    res.json({ id: result.insertId, orderId, itemId, quantity, price })
   } catch (err) {
     console.error('Error creating order item:', err)
     res.status(500).json({ error: 'Failed to create order item' })

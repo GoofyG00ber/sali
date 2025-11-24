@@ -108,7 +108,7 @@ function formatPrice(n: number) {
 .ci .left .title { font-weight: 600; }
 .ci .meta { color: #888; font-size: 13px; }
 .qty { display: flex; align-items: center; gap: 6px; }
-.qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: #fff; }
+.qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 .lineprice { font-weight: 700; }
 .bottom { display: block; padding-top: 12px; border-top: 1px dashed #eee; }
 .total { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
