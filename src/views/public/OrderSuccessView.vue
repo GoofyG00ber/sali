@@ -6,8 +6,8 @@
         <div class="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
           <span class="text-4xl">⏳</span>
         </div>
-        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">Loading Order...</h1>
-        <p class="text-gray-600">Please wait while we check your order status.</p>
+        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">Rendelés betöltése...</h1>
+        <p class="text-gray-600">Kérjük, várj, amíg ellenőrizzük a rendelésed állapotát.</p>
       </div>
 
       <!-- No order ID -->
@@ -15,15 +15,15 @@
         <div class="mx-auto w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
           <span class="text-4xl">❓</span>
         </div>
-        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">No Order Found</h1>
+        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">Nincs rendelés találva</h1>
         <p class="text-gray-600 mb-6">
-          We couldn't find your order. Please check your order confirmation email.
+          Nem találtuk meg a rendelésed. Kérjük, ellenőrizd a megerősítő e-mailt.
         </p>
         <router-link
           to="/menu"
           class="block w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition"
         >
-          Back to Menu
+          Vissza a menühöz
         </router-link>
       </div>
 
@@ -32,25 +32,25 @@
         <div class="mx-auto w-16 h-16 bg-red-100 rounded-full flex items-center justify-center">
           <span class="text-4xl">✗</span>
         </div>
-        <h1 class="text-3xl font-bold mb-4 text-red-600 mt-6">Payment Failed</h1>
+        <h1 class="text-3xl font-bold mb-4 text-red-600 mt-6">Fizetés sikertelen</h1>
         <p class="text-gray-600 mb-2">
-          Unfortunately, your payment could not be processed.
+          Sajnálom, a fizetésed nem dolgozható fel.
         </p>
         <p class="text-sm text-gray-500 mb-6">
-          Order ID: <span class="font-mono">{{ orderId }}</span>
+          Rendelés ID: <span class="font-mono">{{ orderId }}</span>
         </p>
         <div class="space-y-3">
           <router-link
             to="/order"
             class="block w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition"
           >
-            Try Again
+            Próbáld újra
           </router-link>
           <router-link
             to="/menu"
             class="block w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-300 transition"
           >
-            Back to Menu
+            Vissza a menühez
           </router-link>
         </div>
       </div>
@@ -60,21 +60,21 @@
         <div class="mx-auto w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center">
           <span class="text-4xl">⏳</span>
         </div>
-        <h1 class="text-3xl font-bold mb-4 text-yellow-600 mt-6">Payment Processing...</h1>
+        <h1 class="text-3xl font-bold mb-4 text-yellow-600 mt-6">Fizetés feldolgozása...</h1>
         <p class="text-gray-600 mb-2">
-          Your payment is being processed. This may take a few moments.
+          A fizetésed feldolgozása folyamatban van. Ez eltarthat néhány másodpercig.
         </p>
         <p class="text-sm text-gray-500 mb-6">
-          Order ID: <span class="font-mono">{{ orderId }}</span>
+          Rendelés ID: <span class="font-mono">{{ orderId }}</span>
         </p>
         <p class="text-sm text-gray-400 mb-6">
-          Please refresh this page in a few seconds, or check your email for confirmation.
+          Kérjük, frissítsd az oldalt néhány másodperc múlva, vagy ellenőrizd az e-mailt a megerősítésért.
         </p>
         <button
           @click="refreshStatus"
           class="block w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition"
         >
-          Refresh Status
+          Állapot frissítése
         </button>
       </div>
 
@@ -83,18 +83,18 @@
         <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
           <span class="text-4xl">✓</span>
         </div>
-        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">Order Successful!</h1>
+        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">Rendelés sikeres!</h1>
         <p class="text-gray-600 mb-2">
-          Thank you for your order. We've received your payment and will process it shortly.
+          Köszönjük a rendelésed. Kaptuk a fizetésed és hamarosan feldolgozzuk.
         </p>
 
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
-          <p class="text-sm text-gray-500 mb-1">Order ID:</p>
+          <p class="text-sm text-gray-500 mb-1">Rendelés ID:</p>
           <p class="font-mono text-lg font-medium">{{ orderId }}</p>
         </div>
 
         <p class="text-sm text-gray-500 mb-6">
-          You will receive a confirmation email shortly with your order details.
+          Rövid időn belül megerősítő e-mailt fogsz kapni a rendelés adataival.
         </p>
 
         <div class="space-y-3">
@@ -102,13 +102,13 @@
             to="/menu"
             class="block w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition"
           >
-            Continue Shopping
+            Folytatás a vásárlással
           </router-link>
           <router-link
             to="/"
             class="block w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-300 transition"
           >
-            Back to Home
+            Vissza a kezdőlapra
           </router-link>
         </div>
       </div>
@@ -118,18 +118,18 @@
         <div class="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
           <span class="text-4xl">✓</span>
         </div>
-        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">Order Successful!</h1>
+        <h1 class="text-3xl font-bold mb-4 text-gray-900 mt-6">Rendelés sikeres!</h1>
         <p class="text-gray-600 mb-2">
-          Thank you for your order. We've received your request and will process it shortly.
+          Köszönjük a rendelésed. Kaptuk a kérésd és hamarosan feldolgozzuk.
         </p>
 
         <div class="bg-gray-50 rounded-lg p-4 mb-6">
-          <p class="text-sm text-gray-500 mb-1">Order ID:</p>
+          <p class="text-sm text-gray-500 mb-1">Rendelés ID:</p>
           <p class="font-mono text-lg font-medium">{{ orderId }}</p>
         </div>
 
         <p class="text-sm text-gray-500 mb-6">
-          You will receive a confirmation shortly.
+          Rövid időn belül megerősítő e-mailt fogsz kapni.
         </p>
 
         <div class="space-y-3">
@@ -137,13 +137,13 @@
             to="/menu"
             class="block w-full bg-blue-600 text-white py-3 px-6 rounded-md hover:bg-blue-700 transition"
           >
-            Continue Shopping
+            Folytatás a vásárlással
           </router-link>
           <router-link
             to="/"
             class="block w-full bg-gray-200 text-gray-700 py-3 px-6 rounded-md hover:bg-gray-300 transition"
           >
-            Back to Home
+            Vissza a kezdőlapra
           </router-link>
         </div>
       </div>

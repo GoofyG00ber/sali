@@ -46,7 +46,7 @@
               <button
                 type="button"
                 @click="deliveryType = 'pickup'"
-                :class="['p-4 border-2 rounded-lg transition', deliveryType === 'pickup' ? 'border-blue-600 bg-blue-50' : 'border-gray-300 hover:border-gray-400']"
+                :class="['p-4 border-2 rounded-lg transition', deliveryType === 'pickup' ? 'border-ff6106 bg-fff4e6' : 'border-gray-300 hover:border-gray-400']"
               >
                 <div class="text-2xl mb-2">🏪</div>
                 <div class="font-medium">Elvitel</div>
@@ -55,7 +55,7 @@
               <button
                 type="button"
                 @click="deliveryType = 'delivery'"
-                :class="['p-4 border-2 rounded-lg transition', deliveryType === 'delivery' ? 'border-blue-600 bg-blue-50' : 'border-gray-300 hover:border-gray-400']"
+                :class="['p-4 border-2 rounded-lg transition', deliveryType === 'delivery' ? 'border-ff6106 bg-fff4e6' : 'border-gray-300 hover:border-gray-400']"
               >
                 <div class="text-2xl mb-2">🚚</div>
                 <div class="font-medium">Szállítás</div>
@@ -165,7 +165,7 @@
             <label class="block text-lg font-medium mb-3">Fizetés módja</label>
             <div class="space-y-3">
               <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                :class="paymentMethod === 'barion' ? 'border-blue-600 bg-blue-50' : 'border-gray-300'">
+                :class="paymentMethod === 'barion' ? 'border-ff6106 bg-fff4e6' : 'border-gray-300'">
                 <input
                   type="radio"
                   v-model="paymentMethod"
@@ -178,7 +178,7 @@
                 </div>
               </label>
               <label class="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50 transition"
-                :class="paymentMethod === 'cash' ? 'border-blue-600 bg-blue-50' : 'border-gray-300'">
+                :class="paymentMethod === 'cash' ? 'border-ff6106 bg-fff4e6' : 'border-gray-300'">
                 <input
                   type="radio"
                   v-model="paymentMethod"
@@ -217,7 +217,7 @@
           <button
             type="submit"
             :disabled="submitting"
-            class="w-full bg-green-600 text-white py-3 px-6 rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition text-lg font-medium"
+            class="w-full bg-ff6106 text-white py-3 px-6 rounded-md hover:bg-e55a00 disabled:bg-gray-400 disabled:cursor-not-allowed transition text-lg font-medium"
           >
             {{ submitting ? 'Feldolgozás...' : paymentMethod === 'barion' ? 'Tovább a fizetéshez' : 'Rendelés leadása' }}
           </button>
@@ -444,5 +444,24 @@ const initiateBarionPayment = async (amount: number, items: OrderItem[], orderId
 </script>
 
 <style scoped>
-/* Additional styles if needed */
+.border-ff6106 {
+  border-color: #ff6106;
+}
+
+.bg-fff4e6 {
+  background-color: #fff4e6;
+}
+
+.bg-ff6106 {
+  background-color: #ff6106;
+}
+
+.hover\:bg-e55a00:hover {
+  background-color: #e55a00;
+  cursor: pointer;
+}
+
+button {
+  cursor: pointer;
+}
 </style>
