@@ -193,12 +193,18 @@ function onDocClick(e: MouseEvent){
   }
 }
 
+function onWindowResize(){
+  updateDropdownPosition()
+  // Close cart on resize
+  cartStore.closeCart()
+}
+
 onMounted(()=>{
-  window.addEventListener('resize', updateDropdownPosition)
+  window.addEventListener('resize', onWindowResize)
   document.addEventListener('click', onDocClick)
 })
 onBeforeUnmount(()=>{
-  window.removeEventListener('resize', updateDropdownPosition)
+  window.removeEventListener('resize', onWindowResize)
   document.removeEventListener('click', onDocClick)
 })
 

@@ -13,13 +13,21 @@
           </router-link>
         </div>
         <div v-else>
-          <div v-for="item in cartStore.items" :key="`${item.food.id}-${item.selectedPrice.label}`" class="flex justify-between items-center py-3 border-b">
-            <div class="flex-1">
-              <h3 class="font-medium">{{ item.food.title }}</h3>
-              <p class="text-sm text-gray-500">{{ item.selectedPrice.label }}</p>
+          <div v-for="item in cartStore.items" :key="`${item.food.id}-${item.selectedPrice.label}`" class="py-3 border-b">
+            <div class="flex justify-between items-start">
+              <div class="flex-1">
+                <h3 class="font-medium">{{ item.food.title }}</h3>
+                <p class="text-sm text-gray-500">{{ item.selectedPrice.label }}</p>
+                <div v-if="item.extras && item.extras.length > 0" class="mt-2 ml-2 text-sm space-y-1">
+                  <div v-for="extra in item.extras" :key="extra.id" class="text-gray-600">
+                    <span class="font-medium">{{ extra.quantity }}x {{ extra.title }}</span>
+                    <span class="text-gray-500">({{ (extra.price * extra.quantity).toLocaleString('hu-HU') }} Ft)</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500 mx-4">x{{ item.quantity }}</div>
+              <div class="font-medium">{{ (item.selectedPrice.price * item.quantity + (item.extras?.reduce((sum, e) => sum + (e.price * e.quantity), 0) || 0) * item.quantity).toLocaleString('hu-HU') }} Ft</div>
             </div>
-            <div class="text-sm text-gray-500 mx-4">x{{ item.quantity }}</div>
-            <div class="font-medium">{{ item.selectedPrice.price * item.quantity }} Ft</div>
           </div>
           <div class="flex justify-between items-center pt-4 text-xl font-bold">
             <span>Total:</span>
@@ -285,7 +293,13 @@ const handleSubmitOrder = async () => {
       foodTitle: item.food.title,
       priceLabel: item.selectedPrice.label,
       price: item.selectedPrice.price,
-      quantity: item.quantity
+      quantity: item.quantity,
+      extras: item.extras && item.extras.length > 0 ? item.extras.map(e => ({
+        id: e.id,
+        title: e.title,
+        quantity: e.quantity,
+        price: e.price
+      })) : undefined
     }))
 
     const orderData = {

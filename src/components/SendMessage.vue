@@ -1,21 +1,21 @@
 <template>
-  <form id="contact-form" @submit.prevent="send" class="h-full max-w-xl mx-auto p-6 bg-white rounded-lg shadow-md flex flex-col">
+  <form id="contact-form" @submit.prevent="send" class="h-full max-w-xl mx-auto p-6 rounded-lg flex flex-col">
     <div>
       <h3 class="text-2xl font-semibold mb-4">Üzenet küldése</h3>
 
       <label class="block mb-2">
         <span class="text-sm text-gray-600">Név</span>
-        <input v-model="name" required class="mt-1 block w-full rounded-md border-gray-200 shadow-sm focus:border-orange-400 focus:ring-orange-300" />
+        <input v-model="name" required class="mt-1 block w-full px-2 py-1 rounded-md border-gray-200 shadow-sm focus:border-orange-400 focus:ring-orange-300" />
       </label>
 
       <label class="block mb-2">
         <span class="text-sm text-gray-600">Email</span>
-        <input v-model="email" type="email" required class="mt-1 block w-full rounded-md border-gray-200 shadow-sm focus:border-orange-400 focus:ring-orange-300" />
+        <input v-model="email" type="email" required class="mt-1 block w-full px-2 py-1 rounded-md border-gray-200 shadow-sm focus:border-orange-400 focus:ring-orange-300" />
       </label>
 
       <label class="block mb-3 h-48">
         <span class="text-sm text-gray-600">Üzenet</span>
-        <textarea v-model="message" required class="mt-1 block w-full h-32 rounded-md border-gray-200 shadow-sm focus:border-orange-400 focus:ring-orange-300"></textarea>
+        <textarea v-model="message" required class="mt-1 block w-full h-32 px-2 py-1 rounded-md border-gray-200 shadow-sm focus:border-orange-400 focus:ring-orange-300"></textarea>
       </label>
     </div>
 
