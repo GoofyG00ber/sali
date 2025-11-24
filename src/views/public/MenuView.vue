@@ -15,7 +15,7 @@
         </div>
       </div>
 
-      <FoodCards :items="currentPageItems" @add="handleAddToCart" />
+      <FoodCards :items="currentPageItems" @add="handleAddToCart" @openExtras="handleOpenExtras" />
 
       <div v-if="totalPages > 1" class="pagination mt-4">
         <button
@@ -48,6 +48,14 @@
     <div class="right" ref="rightContainer">
       <KosarWidget />
     </div>
+
+    <PizzaExtrasModal
+      :isOpen="isExtrasModalOpen"
+      :item="selectedItemForExtras"
+      :extras="feltekExtras"
+      @close="isExtrasModalOpen = false"
+      @addToCart="handleAddWithExtras"
+    />
   </div>
 </template>
 
@@ -57,13 +65,14 @@ import { useRouter } from 'vue-router'
 import CategoryList from '@/components/CategoryList.vue'
 import FoodCards from '@/components/FoodCards.vue'
 import KosarWidget from '@/components/KosarWidget.vue'
+import PizzaExtrasModal from '@/components/PizzaExtrasModal.vue'
 import { useCartStore } from '@/stores/cart'
 import type { Food } from '@/stores/foods'
 
 const router = useRouter()
 
 type Price = { label: string; price: number }
-type Item = { id:number; title:string; description?:string; prices?: Price[]; image?:string }
+type Item = { id:number; title:string; description?:string; prices?: Price[]; image?:string; category_id?: number }
 type Category = { id:number; title:string; items: Item[] }
 type UnknownRecord = Record<string, unknown>
 type MaybePriceEntry = { label?: unknown; Label?: unknown; price?: unknown; Price?: unknown }
@@ -74,6 +83,11 @@ const page = ref(1)
 const pageSize = ref(8)
 const cartStore = useCartStore()
 const rightContainer = ref<HTMLElement | null>(null)
+const isExtrasModalOpen = ref(false)
+const selectedItemForExtras = ref<Item | null>(null)
+type Extra = { id: number; title: string; description?: string; prices?: Price[] }
+const feltekExtras = ref<Extra[]>([])
+const feltekCategoryId = ref<number | null>(null)
 
 function handleScroll() {
   if (!rightContainer.value || window.innerWidth < 1000) return
@@ -154,7 +168,24 @@ function normalizePrices(raw: unknown): Price[] {
 }
 
 function derivePrices(food: UnknownRecord): Price[] {
-  const fields = ['prices', 'prices_json', 'price_options', 'priceOptions']
+  // If prices is already an array of correct format, return it directly
+  if (Array.isArray(food?.prices)) {
+    const items = food.prices as unknown[]
+    const priceArray = items
+      .map((p: unknown) => {
+        const entry = p as { label?: unknown; price?: unknown }
+        if (typeof entry.label === 'string' && typeof entry.price === 'number') {
+          return { label: entry.label.trim(), price: entry.price }
+        }
+        return null
+      })
+      .filter((p): p is Price => p !== null)
+    if (priceArray.length > 0) {
+      return priceArray
+    }
+  }
+
+  const fields = ['prices_json', 'price_options', 'priceOptions']
   for (const field of fields) {
     const normalized = normalizePrices(food?.[field])
     if (normalized.length) {
@@ -218,7 +249,20 @@ async function loadMenu(){
     const foods: UnknownRecord[] = await foodsRes.json()
 
     // foods from API include category_id; group them by category
-    const categories: Category[] = cats.map((c: { id:number; title:string }) => ({ id: c.id, title: c.title, items: [] }))
+    // Filter out 'Feltétek' category
+    const normalizedStr = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
+
+    // Find and store the Feltétek category ID
+    const feltekCat = cats.find((c) => normalizedStr(c.title).includes('feltet'))
+    if (feltekCat) {
+      feltekCategoryId.value = feltekCat.id
+    }
+
+    const filteredCats = cats.filter((c) => {
+      const title = normalizedStr(c.title)
+      return !title.includes('feltet')
+    })
+    const categories: Category[] = filteredCats.map((c: { id:number; title:string }) => ({ id: c.id, title: c.title, items: [] }))
     for (const raw of foods) {
       const f = raw as UnknownRecord & { id: number; title: string; description?: string; category_id?: number; image?: string; active?: number }
 
@@ -232,7 +276,8 @@ async function loadMenu(){
         title: f.title,
         description: f.description,
         prices: priceOptions,
-        image: f.image || '/placeholder.png'
+        image: f.image || '/placeholder.png',
+        category_id: f.category_id
       }
       if (cat) cat.items.push(item)
     }
@@ -257,6 +302,85 @@ function handleAddToCart(payload: { item: Item; price: Price }){
     badges: []
   }
   cartStore.addItem(food, price, 1)
+}
+
+async function handleOpenExtras(payload: { item: Item }) {
+  const { item } = payload
+  selectedItemForExtras.value = item
+
+  // Load extras from feltétek category if not already loaded
+  if (feltekExtras.value.length === 0 && feltekCategoryId.value !== null) {
+    try {
+      const response = await fetch('/api/foods')
+      const foods: UnknownRecord[] = await response.json()
+      const filteredFoods = foods.filter((f: UnknownRecord) => {
+        return f.category_id === feltekCategoryId.value
+      })
+      feltekExtras.value = filteredFoods.map((f: UnknownRecord) => ({
+        id: f.id,
+        title: f.title,
+        description: f.description,
+        prices: derivePrices(f)
+      })) as Extra[]
+      console.log('Loaded extras:', feltekExtras.value)
+    } catch (e) {
+      console.error('Failed to load extras:', e)
+    }
+  }
+
+  isExtrasModalOpen.value = true
+}
+
+function handleAddWithExtras(data: { item: Item; selectedSize: Price; selectedExtras: Record<number, number> }) {
+  const { item, selectedSize, selectedExtras } = data
+
+  // Convert extras data to store format
+  const extras: Array<{ id: number; title?: string; quantity: number; price: number }> = []
+  Object.entries(selectedExtras).forEach(([extraId, qty]) => {
+    if (qty > 0) {
+      const extra = feltekExtras.value.find((e) => e.id === Number(extraId))
+      if (extra && extra.prices) {
+        // Extract size number from selected size label
+        const selectedSizeMatch = selectedSize.label.match(/(\d+)/)
+        const selectedSizeNum = selectedSizeMatch ? selectedSizeMatch[1] : null
+
+        // Try exact match first
+        let price = extra.prices.find((p: Price) => p.label === selectedSize.label)?.price
+
+        // If no exact match and we have a size number, try to find a price that contains that size
+        if (!price && selectedSizeNum) {
+          price = extra.prices.find((p: Price) => p.label.includes(selectedSizeNum))?.price
+        }
+
+        // Fallback to first price if available
+        if (!price && extra.prices.length > 0) {
+          const firstPrice = extra.prices[0]
+          if (firstPrice) {
+            price = firstPrice.price
+          }
+        }
+
+        extras.push({
+          id: Number(extraId),
+          title: extra.title,
+          quantity: qty,
+          price: price || 0
+        })
+      }
+    }
+  })
+
+  // Convert the item to Food type for cart store
+  const food: Food = {
+    id: item.id,
+    title: item.title,
+    description: item.description || '',
+    prices: item.prices || [],
+    image: item.image || '/placeholder.png',
+    badges: []
+  }
+
+  cartStore.addItem(food, selectedSize, 1, extras.length > 0 ? extras : [])
 }
 
 function goToPizzaBuilder() {
@@ -376,37 +500,47 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width:1000px){
+  /* Two-column layout: categories + menu items; cart centered below them */
   .menu-page {
-    grid-template-columns: 1fr;
-    gap: 0;
-    padding: 0;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+    padding: 12px;
   }
+
+  /* Left (categories) stays as a left column */
   .left {
-    order: 1;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    background: white;
-    border-bottom: 1px solid #eee;
-    z-index: 40;
-    padding: 0;
+    grid-column: 1;
+    grid-row: 1;
+    position: static;
+    width: auto;
+    background: transparent;
+    border-bottom: none;
+    z-index: 2;
+    padding: 0 8px 0 0;
     margin: 0;
   }
+
+  /* Center (menu items) takes the right column */
   .center {
-    order: 2;
-    margin-top: 12px;
-    padding: 20px;
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+    padding: 0 12px;
   }
+
+  /* Right (cart) spans both columns and is centered below */
   .right {
-    order: 3;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
     position: static;
+    width: 320px;
+    max-height: none;
+    display: block;
+    margin-top: 18px;
+    z-index: 10;
     right: auto;
     top: auto;
-    width: 100%;
-    max-height: none;
-    display: none;
   }
 
   .pizza-builder-card {
@@ -416,6 +550,43 @@ onBeforeUnmount(() => {
 
   .builder-icon {
     font-size: 60px;
+  }
+}
+
+/* Mobile layout: single column, left becomes fixed top bar, center content scrolls below, cart hidden */
+@media (max-width:768px) {
+  /* Ensure a true single-column mobile layout and override any earlier two-column rules */
+  .menu-page {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  .left {
+    order: 1;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    background: white; /* mobile: fixed top bar should have white background */
+    border-bottom: 1px solid #eee;
+    z-index: 60;
+    padding: 10px 12px;
+    margin: 0;
+  }
+
+  .center {
+    order: 2;
+    /* Ensure content sits below the fixed top bar regardless of earlier rules */
+    margin-top: 68px !important; /* adjust if top bar height changes */
+    padding: 12px !important;
+    grid-column: 1 / -1 !important;
+  }
+
+  .right {
+    order: 3;
+    display: none !important; /* hide cart on mobile */
   }
 }
 

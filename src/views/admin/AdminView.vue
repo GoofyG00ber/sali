@@ -3,10 +3,10 @@
     <!-- Login Screen -->
     <div v-if="!authStore.isAuthenticated" class="login-wrapper min-h-screen flex items-center justify-center">
       <div class="login-box bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 class="text-3xl font-bold mb-6 text-center">Admin Bejelentkezés</h1>
+        <h1 class="text-3xl font-bold mb-6 text-center">Admin bejelentkezés</h1>
 
         <div v-if="authStore.isLocked" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          Túl sok sikertelen próbálkozás. Kérlek, várj 5 percet.
+          Túl sok sikertelen próbálkozás. Kérjük, várjon 5 percet.
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-4">
@@ -17,7 +17,7 @@
               v-model="password"
               type="password"
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Add meg az admin jelszót"
+              placeholder="Adja meg az admin jelszót"
               :disabled="authStore.isLocked"
             />
           </div>
@@ -46,7 +46,7 @@
       <!-- Side Panel -->
       <aside class="sidebar w-64 bg-gray-800 text-white flex flex-col">
         <div class="sidebar-header p-6 border-b border-gray-700">
-          <h2 class="text-2xl font-bold">Admin Panel</h2>
+          <h2 class="text-2xl font-bold">Admin felület</h2>
         </div>
 
         <nav class="sidebar-nav flex-1 p-4">
@@ -56,7 +56,14 @@
                 @click="currentView = 'dashboard'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'dashboard' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                Irányítópult
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="10" width="3" height="11" rx="1" />
+                    <rect x="9" y="4" width="3" height="17" rx="1" />
+                    <rect x="15" y="7" width="3" height="14" rx="1" />
+                  </svg>
+                  Irányítópult
+                </span>
               </button>
             </li>
             <li>
@@ -80,7 +87,13 @@
                 @click="currentView = 'aszf'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'aszf' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                ÁSZF
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="3" width="13" height="18" rx="2" />
+                    <path d="M8 7h5M8 11h8M8 15h5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  ÁSZF
+                </span>
               </button>
             </li>
             <li>
@@ -88,7 +101,13 @@
                 @click="currentView = 'privacy'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'privacy' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                Adatvédelmi Nyilatkozat
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                    <path d="M8 11V8a4 4 0 018 0v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  Adatvédelmi Nyilatkozat
+                </span>
               </button>
             </li>
             <li>
@@ -96,7 +115,12 @@
                 @click="currentView = 'orders'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'orders' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                Rendelések
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  </svg>
+                  Rendelések
+                </span>
               </button>
             </li>
             <li>
@@ -104,18 +128,24 @@
                 @click="currentView = 'password'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'password' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                Jelszó módosítása
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                    <path d="M8 11V8a4 4 0 018 0v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  Jelszó módosítása
+                </span>
               </button>
             </li>
           </ul>
         </nav>
 
         <div class="sidebar-footer p-4 border-t border-gray-700">
-          <button
+            <button
             @click="handleLogout"
             class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
           >
-            Logout
+            Kijelentkezés
           </button>
         </div>
       </aside>
@@ -148,14 +178,17 @@
               <h1 class="text-3xl font-bold">Ételek kezelése</h1>
               <button
                 @click="openAddFoodModal"
-                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition inline-flex items-center"
               >
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+                </svg>
                 Új étel hozzáadása
               </button>
             </div>
 
             <div v-if="foodsStore.loading" class="text-center py-8">
-              <p class="text-gray-600">Ételek betöltése...</p>
+                <p class="text-gray-600">Ételek betöltése...</p>
             </div>
 
             <div v-else-if="foodsStore.error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
@@ -315,10 +348,14 @@
               <h1 class="text-3xl font-bold">Általános Szerződési Feltételek</h1>
               <button
                 @click="saveAszf"
-                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition inline-flex items-center"
                 :disabled="policiesStore.loading"
               >
-                Mentés
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 5h14v14H5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" />
+                  <path d="M9 5v6h6V5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                </svg>
+                ÁSZF mentése
               </button>
             </div>
 
@@ -350,10 +387,14 @@
               <h1 class="text-3xl font-bold">Adatvédelmi Nyilatkozat</h1>
               <button
                 @click="savePrivacy"
-                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition inline-flex items-center"
                 :disabled="policiesStore.loading"
               >
-                Mentés
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 5h14v14H5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" />
+                  <path d="M9 5v6h6V5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                </svg>
+                Adatvédelmi Nyilatkozat mentése
               </button>
             </div>
 
@@ -375,7 +416,7 @@
             </div>
 
             <div v-if="saveSuccess" class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              Adatvédelmi nyilatkozat sikeresen elmentve!
+              Adatvédelmi Nyilatkozat sikeresen elmentve!
             </div>
           </div>
 
@@ -385,8 +426,12 @@
               <h1 class="text-3xl font-bold">Rendelések kezelése</h1>
               <button
                 @click="ordersStore.fetchOrders"
-                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition inline-flex items-center"
               >
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M21 12a9 9 0 11-2.83-6.17" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" />
+                  <path d="M21 3v6h-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" />
+                </svg>
                 Frissítés
               </button>
             </div>
@@ -514,9 +559,12 @@
                   type="button"
                   @click="removePrice(index)"
                   v-if="foodForm.prices.length > 1"
-                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 inline-flex items-center justify-center"
+                  aria-label="Ár sor törlése"
                 >
-                  ✕
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" />
+                  </svg>
                 </button>
               </div>
               <button
@@ -634,7 +682,7 @@ const handleLogin = async () => {
       ordersStore.fetchOrders()
     ])
   } else {
-    loginError.value = 'Invalid password'
+    loginError.value = 'Érvénytelen jelszó'
     password.value = ''
   }
 }
@@ -651,12 +699,12 @@ const handlePasswordChange = async () => {
   passwordSuccess.value = ''
 
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    passwordError.value = 'New passwords do not match'
+    passwordError.value = 'Az új jelszavak nem egyeznek'
     return
   }
 
   if (passwordForm.value.newPassword.length < 6) {
-    passwordError.value = 'New password must be at least 6 characters'
+    passwordError.value = 'Az új jelszónak legalább 6 karakter hosszúnak kell lennie'
     return
   }
 
@@ -666,10 +714,10 @@ const handlePasswordChange = async () => {
   )
 
   if (success) {
-    passwordSuccess.value = 'Password changed successfully'
+    passwordSuccess.value = 'A jelszó sikeresen megváltozott'
     passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
   } else {
-    passwordError.value = 'Current password is incorrect'
+    passwordError.value = 'A jelenlegi jelszó helytelen'
   }
 }
 
@@ -780,7 +828,7 @@ const toggleFoodActive = async (id: number) => {
 }
 
 const confirmDeleteFood = async (id: number) => {
-  if (confirm('Are you sure you want to delete this food item?')) {
+  if (confirm('Biztosan törli ezt az ételt?')) {
     try {
       await foodsStore.deleteFood(id)
     } catch (error) {
