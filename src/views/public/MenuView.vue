@@ -372,37 +372,47 @@ onBeforeUnmount(() => {
 }
 
 @media (max-width:1000px){
+  /* Two-column layout: categories + menu items; cart centered below them */
   .menu-page {
-    grid-template-columns: 1fr;
-    gap: 0;
-    padding: 0;
+    grid-template-columns: 220px 1fr;
+    gap: 20px;
+    padding: 12px;
   }
+
+  /* Left (categories) stays as a left column */
   .left {
-    order: 1;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    background: white;
-    border-bottom: 1px solid #eee;
-    z-index: 40;
-    padding: 0;
+    grid-column: 1;
+    grid-row: 1;
+    position: static;
+    width: auto;
+    background: transparent;
+    border-bottom: none;
+    z-index: 2;
+    padding: 0 8px 0 0;
     margin: 0;
   }
+
+  /* Center (menu items) takes the right column */
   .center {
-    order: 2;
-    margin-top: 12px;
-    padding: 20px;
+    grid-column: 2;
+    grid-row: 1;
+    margin-top: 0;
+    padding: 0 12px;
   }
+
+  /* Right (cart) spans both columns and is centered below */
   .right {
-    order: 3;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    justify-self: center;
     position: static;
+    width: 320px;
+    max-height: none;
+    display: block;
+    margin-top: 18px;
+    z-index: 10;
     right: auto;
     top: auto;
-    width: 100%;
-    max-height: none;
-    display: none;
   }
 
   .pizza-builder-card {
@@ -412,6 +422,43 @@ onBeforeUnmount(() => {
 
   .builder-icon {
     font-size: 60px;
+  }
+}
+
+/* Mobile layout: single column, left becomes fixed top bar, center content scrolls below, cart hidden */
+@media (max-width:768px) {
+  /* Ensure a true single-column mobile layout and override any earlier two-column rules */
+  .menu-page {
+    grid-template-columns: 1fr !important;
+    gap: 0 !important;
+    padding: 0 !important;
+  }
+
+  .left {
+    order: 1;
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    background: white; /* mobile: fixed top bar should have white background */
+    border-bottom: 1px solid #eee;
+    z-index: 60;
+    padding: 10px 12px;
+    margin: 0;
+  }
+
+  .center {
+    order: 2;
+    /* Ensure content sits below the fixed top bar regardless of earlier rules */
+    margin-top: 68px !important; /* adjust if top bar height changes */
+    padding: 12px !important;
+    grid-column: 1 / -1 !important;
+  }
+
+  .right {
+    order: 3;
+    display: none !important; /* hide cart on mobile */
   }
 }
 

@@ -3,21 +3,21 @@
     <!-- Login Screen -->
     <div v-if="!authStore.isAuthenticated" class="login-wrapper min-h-screen flex items-center justify-center">
       <div class="login-box bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
-        <h1 class="text-3xl font-bold mb-6 text-center">Admin Login</h1>
+        <h1 class="text-3xl font-bold mb-6 text-center">Admin bejelentkezés</h1>
 
         <div v-if="authStore.isLocked" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          Too many failed attempts. Please wait 5 minutes.
+          Túl sok sikertelen próbálkozás. Kérjük, várjon 5 percet.
         </div>
 
         <form @submit.prevent="handleLogin" class="space-y-4">
           <div>
-            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Jelszó</label>
             <input
               id="password"
               v-model="password"
               type="password"
               class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter admin password"
+              placeholder="Adja meg az admin jelszót"
               :disabled="authStore.isLocked"
             />
           </div>
@@ -31,11 +31,11 @@
             :disabled="authStore.isLocked"
             class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition"
           >
-            Login
+            Bejelentkezés
           </button>
 
           <p class="text-sm text-gray-600 text-center mt-2">
-            Attempts: {{ authStore.loginAttempts }} / 5
+            Próbálkozások: {{ authStore.loginAttempts }} / 5
           </p>
         </form>
       </div>
@@ -46,7 +46,7 @@
       <!-- Side Panel -->
       <aside class="sidebar w-64 bg-gray-800 text-white flex flex-col">
         <div class="sidebar-header p-6 border-b border-gray-700">
-          <h2 class="text-2xl font-bold">Admin Panel</h2>
+          <h2 class="text-2xl font-bold">Admin felület</h2>
         </div>
 
         <nav class="sidebar-nav flex-1 p-4">
@@ -56,7 +56,14 @@
                 @click="currentView = 'dashboard'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'dashboard' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                📊 Dashboard
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="3" y="10" width="3" height="11" rx="1" />
+                    <rect x="9" y="4" width="3" height="17" rx="1" />
+                    <rect x="15" y="7" width="3" height="14" rx="1" />
+                  </svg>
+                  Irányítópult
+                </span>
               </button>
             </li>
             <li>
@@ -64,7 +71,14 @@
                 @click="currentView = 'foods'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'foods' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                🍕 Manage Foods
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="8" />
+                    <circle cx="12" cy="9" r="1.2" />
+                    <circle cx="15" cy="13" r="1" />
+                  </svg>
+                  Ételek kezelése
+                </span>
               </button>
             </li>
             <li>
@@ -72,7 +86,13 @@
                 @click="currentView = 'aszf'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'aszf' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                📄 ÁSZF
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="4" y="3" width="13" height="18" rx="2" />
+                    <path d="M8 7h5M8 11h8M8 15h5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  ÁSZF
+                </span>
               </button>
             </li>
             <li>
@@ -80,7 +100,13 @@
                 @click="currentView = 'privacy'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'privacy' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                🔐 Privacy Policy
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                    <path d="M8 11V8a4 4 0 018 0v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  Adatvédelmi Nyilatkozat
+                </span>
               </button>
             </li>
             <li>
@@ -88,7 +114,12 @@
                 @click="currentView = 'orders'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'orders' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                📦 Orders
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                  </svg>
+                  Rendelések
+                </span>
               </button>
             </li>
             <li>
@@ -96,18 +127,24 @@
                 @click="currentView = 'password'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'password' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                🔒 Change Password
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="5" y="11" width="14" height="10" rx="2" />
+                    <path d="M8 11V8a4 4 0 018 0v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  Jelszó módosítása
+                </span>
               </button>
             </li>
           </ul>
         </nav>
 
         <div class="sidebar-footer p-4 border-t border-gray-700">
-          <button
+            <button
             @click="handleLogout"
             class="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
           >
-            Logout
+            Kijelentkezés
           </button>
         </div>
       </aside>
@@ -117,18 +154,18 @@
         <div class="content-wrapper p-8">
           <!-- Dashboard View -->
           <div v-if="currentView === 'dashboard'" class="dashboard-view">
-            <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+            <h1 class="text-3xl font-bold mb-6">Irányítópult</h1>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div class="stat-card bg-white p-6 rounded-lg shadow">
-                <h3 class="text-gray-600 text-sm font-medium mb-2">Total Foods</h3>
+                <h3 class="text-gray-600 text-sm font-medium mb-2">Összes étel</h3>
                 <p class="text-3xl font-bold text-blue-600">{{ foodsStore.foods.length }}</p>
               </div>
               <div class="stat-card bg-white p-6 rounded-lg shadow">
-                <h3 class="text-gray-600 text-sm font-medium mb-2">Active Foods</h3>
+                <h3 class="text-gray-600 text-sm font-medium mb-2">Aktív ételek</h3>
                 <p class="text-3xl font-bold text-green-600">{{ activeFoodsCount }}</p>
               </div>
               <div class="stat-card bg-white p-6 rounded-lg shadow">
-                <h3 class="text-gray-600 text-sm font-medium mb-2">Categories</h3>
+                <h3 class="text-gray-600 text-sm font-medium mb-2">Kategóriák</h3>
                 <p class="text-3xl font-bold text-purple-600">{{ foodsStore.categories.length }}</p>
               </div>
             </div>
@@ -137,21 +174,24 @@
           <!-- Foods Management View -->
           <div v-if="currentView === 'foods'" class="foods-view">
             <div class="flex justify-between items-center mb-6">
-              <h1 class="text-3xl font-bold">Manage Foods</h1>
+              <h1 class="text-3xl font-bold">Ételek kezelése</h1>
               <button
                 @click="openAddFoodModal"
-                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition inline-flex items-center"
               >
-                ➕ Add New Food
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" />
+                </svg>
+                Új étel hozzáadása
               </button>
             </div>
 
             <div v-if="foodsStore.loading" class="text-center py-8">
-              <p class="text-gray-600">Loading foods...</p>
+                <p class="text-gray-600">Ételek betöltése...</p>
             </div>
 
             <div v-else-if="foodsStore.error" class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              Error: {{ foodsStore.error }}
+              Hiba: {{ foodsStore.error }}
             </div>
 
             <div v-else class="bg-white rounded-lg shadow overflow-hidden">
@@ -159,11 +199,11 @@
                 <thead class="bg-gray-50">
                   <tr>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price Range</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cím</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategória</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ártartomány</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Állapot</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Műveletek</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -176,15 +216,15 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                       <span :class="['px-2 py-1 text-xs rounded-full', food.active !== false ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800']">
-                        {{ food.active !== false ? 'Active' : 'Inactive' }}
+                        {{ food.active !== false ? 'Aktív' : 'Inaktív' }}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                      <button @click="editFood(food)" class="text-blue-600 hover:text-blue-900">Edit</button>
+                      <button @click="editFood(food)" class="text-blue-600 hover:text-blue-900">Szerkesztés</button>
                       <button @click="toggleFoodActive(food.id)" class="text-yellow-600 hover:text-yellow-900">
-                        {{ food.active !== false ? 'Deactivate' : 'Activate' }}
+                        {{ food.active !== false ? 'Inaktiválás' : 'Aktiválás' }}
                       </button>
-                      <button @click="confirmDeleteFood(food.id)" class="text-red-600 hover:text-red-900">Delete</button>
+                      <button @click="confirmDeleteFood(food.id)" class="text-red-600 hover:text-red-900">Törlés</button>
                     </td>
                   </tr>
                 </tbody>
@@ -194,11 +234,11 @@
 
           <!-- Password Change View -->
           <div v-if="currentView === 'password'" class="password-view">
-            <h1 class="text-3xl font-bold mb-6">Change Password</h1>
+            <h1 class="text-3xl font-bold mb-6">Jelszó módosítása</h1>
             <div class="bg-white p-6 rounded-lg shadow max-w-md">
               <form @submit.prevent="handlePasswordChange" class="space-y-4">
                 <div>
-                  <label for="old-password" class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+                  <label for="old-password" class="block text-sm font-medium text-gray-700 mb-2">Jelenlegi jelszó</label>
                   <input
                     id="old-password"
                     v-model="passwordForm.oldPassword"
@@ -208,7 +248,7 @@
                 </div>
 
                 <div>
-                  <label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                  <label for="new-password" class="block text-sm font-medium text-gray-700 mb-2">Új jelszó</label>
                   <input
                     id="new-password"
                     v-model="passwordForm.newPassword"
@@ -218,7 +258,7 @@
                 </div>
 
                 <div>
-                  <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+                  <label for="confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Új jelszó megerősítése</label>
                   <input
                     id="confirm-password"
                     v-model="passwordForm.confirmPassword"
@@ -239,7 +279,7 @@
                   type="submit"
                   class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
                 >
-                  Change Password
+                  Jelszó módosítása
                 </button>
               </form>
             </div>
@@ -251,15 +291,19 @@
               <h1 class="text-3xl font-bold">Általános Szerződési Feltételek</h1>
               <button
                 @click="saveAszf"
-                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition inline-flex items-center"
                 :disabled="policiesStore.loading"
               >
-                💾 Save ASZF
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 5h14v14H5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" />
+                  <path d="M9 5v6h6V5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                </svg>
+                ASZF mentése
               </button>
             </div>
 
             <div v-if="policiesStore.loading" class="text-center py-8">
-              <p class="text-gray-600">Loading...</p>
+              <p class="text-gray-600">Betöltés...</p>
             </div>
 
             <div v-else class="bg-white rounded-lg shadow p-6">
@@ -276,7 +320,7 @@
             </div>
 
             <div v-if="saveSuccess" class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              ASZF saved successfully!
+              ASZF sikeresen elmentve!
             </div>
           </div>
 
@@ -286,15 +330,19 @@
               <h1 class="text-3xl font-bold">Adatvédelmi Nyilatkozat</h1>
               <button
                 @click="savePrivacy"
-                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition"
+                class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition inline-flex items-center"
                 :disabled="policiesStore.loading"
               >
-                💾 Save Privacy Policy
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M5 5h14v14H5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" />
+                  <path d="M9 5v6h6V5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                </svg>
+                Adatvédelmi Nyilatkozat mentése
               </button>
             </div>
 
             <div v-if="policiesStore.loading" class="text-center py-8">
-              <p class="text-gray-600">Loading...</p>
+              <p class="text-gray-600">Betöltés...</p>
             </div>
 
             <div v-else class="bg-white rounded-lg shadow p-6">
@@ -311,42 +359,46 @@
             </div>
 
             <div v-if="saveSuccess" class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
-              Privacy Policy saved successfully!
+              Adatvédelmi Nyilatkozat sikeresen elmentve!
             </div>
           </div>
 
           <!-- Orders Management View -->
           <div v-if="currentView === 'orders'" class="orders-view">
             <div class="flex justify-between items-center mb-6">
-              <h1 class="text-3xl font-bold">Orders Management</h1>
+              <h1 class="text-3xl font-bold">Rendelések kezelése</h1>
               <button
                 @click="ordersStore.fetchOrders"
-                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition"
+                class="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 transition inline-flex items-center"
               >
-                🔄 Refresh
+                <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M21 12a9 9 0 11-2.83-6.17" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" />
+                  <path d="M21 3v6h-6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" />
+                </svg>
+                Frissítés
               </button>
             </div>
 
             <div v-if="ordersStore.loading" class="text-center py-8">
-              <p class="text-gray-600">Loading orders...</p>
+              <p class="text-gray-600">Rendelések betöltése...</p>
             </div>
 
             <div v-else-if="ordersStore.orders.length === 0" class="bg-white rounded-lg shadow p-8 text-center">
-              <p class="text-gray-500">No orders yet</p>
+              <p class="text-gray-500">Nincsenek rendelések</p>
             </div>
 
             <div v-else class="bg-white rounded-lg shadow overflow-hidden">
               <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                   <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Order ID</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rendelés ID</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Vásárló</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Típus</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Összesen</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Állapot</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fizetés</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Létrehozva</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Műveletek</th>
                   </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -358,7 +410,7 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       <span :class="['px-2 py-1 text-xs rounded-full', order.deliveryType === 'delivery' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800']">
-                        {{ order.deliveryType }}
+                        {{ order.deliveryType === 'delivery' ? 'Kiszállítás' : order.deliveryType === 'pickup' ? 'Személyes átvétel' : order.deliveryType }}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ order.totalPrice }} Ft</td>
@@ -368,12 +420,12 @@
                         @change="updateOrder(order.id, order.status, undefined)"
                         class="text-xs rounded px-2 py-1 border border-gray-300"
                       >
-                        <option value="pending">Pending</option>
-                        <option value="confirmed">Confirmed</option>
-                        <option value="preparing">Preparing</option>
-                        <option value="ready">Ready</option>
-                        <option value="delivered">Delivered</option>
-                        <option value="cancelled">Cancelled</option>
+                        <option value="pending">Függő</option>
+                        <option value="confirmed">Megerősítve</option>
+                        <option value="preparing">Előkészítés alatt</option>
+                        <option value="ready">Kész</option>
+                        <option value="delivered">Kiszállítva</option>
+                        <option value="cancelled">Törölve</option>
                       </select>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
@@ -381,14 +433,14 @@
                         order.paymentStatus === 'paid' ? 'bg-green-100 text-green-800' :
                         order.paymentStatus === 'failed' ? 'bg-red-100 text-red-800' :
                         'bg-yellow-100 text-yellow-800']">
-                        {{ order.paymentStatus }}
+                        {{ order.paymentStatus === 'paid' ? 'Fizetve' : order.paymentStatus === 'failed' ? 'Sikertelen' : 'Függő' }}
                       </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {{ new Date(order.createdAt).toLocaleString() }}
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <button @click="viewOrderDetails(order)" class="text-blue-600 hover:text-blue-900">View</button>
+                      <button @click="viewOrderDetails(order)" class="text-blue-600 hover:text-blue-900">Megtekintés</button>
                     </td>
                   </tr>
                 </tbody>
@@ -403,13 +455,13 @@
     <div v-if="showFoodModal" class="modal-overlay fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
       <div class="modal-content bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div class="modal-header p-6 border-b border-gray-200">
-          <h2 class="text-2xl font-bold">{{ editingFood ? 'Edit Food' : 'Add New Food' }}</h2>
+          <h2 class="text-2xl font-bold">{{ editingFood ? 'Étel szerkesztése' : 'Új étel hozzáadása' }}</h2>
         </div>
 
         <div class="modal-body p-6">
           <form @submit.prevent="saveFoodItem" class="space-y-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Title</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Cím</label>
               <input
                 v-model="foodForm.title"
                 type="text"
@@ -419,7 +471,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Leírás</label>
               <textarea
                 v-model="foodForm.description"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
@@ -429,7 +481,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Category</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Kategória</label>
               <select
                 v-model="foodForm.categoryId"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
@@ -442,19 +494,19 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Prices</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Árak</label>
               <div v-for="(price, index) in foodForm.prices" :key="index" class="flex gap-2 mb-2">
                 <input
                   v-model="price.label"
                   type="text"
-                  placeholder="Size (e.g., 26 cm)"
+                  placeholder="Méret (pl. 26 cm)"
                   class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                   required
                 />
                 <input
                   v-model.number="price.price"
                   type="number"
-                  placeholder="Price"
+                  placeholder="Ár"
                   class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                   required
                 />
@@ -462,9 +514,12 @@
                   type="button"
                   @click="removePrice(index)"
                   v-if="foodForm.prices.length > 1"
-                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700"
+                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 inline-flex items-center justify-center"
+                  aria-label="Ár sor törlése"
                 >
-                  ✕
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" />
+                  </svg>
                 </button>
               </div>
               <button
@@ -472,12 +527,12 @@
                 @click="addPrice"
                 class="mt-2 px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700"
               >
-                + Add Price
+                + Ár hozzáadása
               </button>
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Badges (comma-separated)</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Címkék (vesszővel elválasztva)</label>
               <input
                 v-model="foodForm.badgesString"
                 type="text"
@@ -487,7 +542,7 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Image URL</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Kép URL</label>
               <input
                 v-model="foodForm.image"
                 type="text"
@@ -500,14 +555,14 @@
                 type="submit"
                 class="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
               >
-                Save
+                Mentés
               </button>
               <button
                 type="button"
                 @click="closeFoodModal"
                 class="flex-1 bg-gray-400 text-white py-2 px-4 rounded-md hover:bg-gray-500 transition"
               >
-                Cancel
+                Mégse
               </button>
             </div>
           </form>
@@ -573,7 +628,7 @@ const handleLogin = async () => {
       foodsStore.fetchCategories()
     ])
   } else {
-    loginError.value = 'Invalid password'
+    loginError.value = 'Érvénytelen jelszó'
     password.value = ''
   }
 }
@@ -590,12 +645,12 @@ const handlePasswordChange = async () => {
   passwordSuccess.value = ''
 
   if (passwordForm.value.newPassword !== passwordForm.value.confirmPassword) {
-    passwordError.value = 'New passwords do not match'
+    passwordError.value = 'Az új jelszavak nem egyeznek'
     return
   }
 
   if (passwordForm.value.newPassword.length < 6) {
-    passwordError.value = 'New password must be at least 6 characters'
+    passwordError.value = 'Az új jelszónak legalább 6 karakter hosszúnak kell lennie'
     return
   }
 
@@ -605,10 +660,10 @@ const handlePasswordChange = async () => {
   )
 
   if (success) {
-    passwordSuccess.value = 'Password changed successfully'
+    passwordSuccess.value = 'A jelszó sikeresen megváltozott'
     passwordForm.value = { oldPassword: '', newPassword: '', confirmPassword: '' }
   } else {
-    passwordError.value = 'Current password is incorrect'
+    passwordError.value = 'A jelenlegi jelszó helytelen'
   }
 }
 import { useAuthStore } from '@/stores/auth'
@@ -708,7 +763,7 @@ const toggleFoodActive = async (id: number) => {
 }
 
 const confirmDeleteFood = async (id: number) => {
-  if (confirm('Are you sure you want to delete this food item?')) {
+  if (confirm('Biztosan törli ezt az ételt?')) {
     try {
       await foodsStore.deleteFood(id)
     } catch (error) {

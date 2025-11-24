@@ -115,6 +115,11 @@ function formatPrice(n: number) {
 .checkout { display: block; width: 100%; background: #FF6106; color: #fff; border: 1px solid #FF6106; padding: 12px 16px; border-radius: 8px; text-decoration: none; text-align: center; cursor: pointer; font-weight: 600; font-size: 16px; font-family: "Work Sans", sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease; }
 .checkout:hover { background: #E55A00; border-color: #E55A00; }
 
+/* Hide kosar on medium screens and below (1000px to 769px) */
+@media (max-width: 1000px) {
+  .kosar-wrapper { display: none; }
+}
+
 @media (max-width: 768px) {
   .kosar-wrapper { display: flex; flex-direction: column; height: 100%; }
   .kosar h3 { display: none; }
