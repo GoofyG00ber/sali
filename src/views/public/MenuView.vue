@@ -299,7 +299,8 @@ function handleAddToCart(payload: { item: Item; price: Price }){
     description: item.description || '',
     prices: item.prices || [],
     image: item.image || '/placeholder.png',
-    badges: []
+    badges: [],
+    categoryId: item.category_id
   }
   cartStore.addItem(food, price, 1)
 }
@@ -380,7 +381,8 @@ function handleAddWithExtras(data: { item: Item; selectedSize: Price; selectedEx
     description: item.description || '',
     prices: item.prices || [],
     image: item.image || '/placeholder.png',
-    badges: []
+    badges: [],
+    categoryId: item.category_id
   }
 
   cartStore.addItem(food, selectedSize, 1, extras.length > 0 ? extras : [])
