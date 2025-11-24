@@ -156,6 +156,32 @@
           <!-- Dashboard View -->
           <div v-if="currentView === 'dashboard'" class="dashboard-view">
             <h1 class="text-3xl font-bold mb-6">Irányítópult</h1>
+
+            <!-- Restaurant Status Switch -->
+            <div class="bg-white p-6 rounded-lg shadow mb-6 flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-bold mb-1">Étterem státusza</h2>
+                <p class="text-gray-600 text-sm">
+                  {{ manualOpen ? 'A rendelésfelvétel engedélyezve van (nyitvatartási időben).' : 'A rendelésfelvétel manuálisan le van tiltva.' }}
+                </p>
+              </div>
+              <div class="flex items-center">
+                <span class="mr-3 font-medium" :class="manualOpen ? 'text-green-600' : 'text-red-600'">
+                  {{ manualOpen ? 'NYITVA' : 'ZÁRVA' }}
+                </span>
+                <button
+                  @click="toggleRestaurantStatus"
+                  class="relative inline-flex h-8 w-14 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                  :class="manualOpen ? 'bg-green-500' : 'bg-gray-300'"
+                >
+                  <span
+                    class="inline-block h-6 w-6 transform rounded-full bg-white transition-transform shadow-sm"
+                    :class="manualOpen ? 'translate-x-7' : 'translate-x-1'"
+                  />
+                </button>
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div class="stat-card bg-white p-6 rounded-lg shadow">
                 <h3 class="text-gray-600 text-sm font-medium mb-2">Összes étel</h3>
@@ -621,6 +647,36 @@ const foodsStore = useFoodsStore()
 const policiesStore = usePoliciesStore()
 const ordersStore = useOrdersStore()
 
+// Restaurant Status
+const manualOpen = ref(true)
+
+const fetchRestaurantStatus = async () => {
+  try {
+    const response = await fetch('/api/restaurant-status')
+    const data = await response.json()
+    manualOpen.value = data.manualOpen
+  } catch (error) {
+    console.error('Error fetching restaurant status:', error)
+  }
+}
+
+const toggleRestaurantStatus = async () => {
+  try {
+    const newValue = !manualOpen.value
+    const response = await fetch('/api/restaurant-status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ manualOpen: newValue })
+    })
+    const data = await response.json()
+    if (data.success) {
+      manualOpen.value = data.manualOpen
+    }
+  } catch (error) {
+    console.error('Error updating restaurant status:', error)
+  }
+}
+
 // Helper to check active status
 const isActive = (status: number | boolean | undefined) => {
   return status === 1 || status === true
@@ -679,7 +735,8 @@ const handleLogin = async () => {
       foodsStore.fetchFoods(),
       foodsStore.fetchCategories(),
       foodsStore.fetchTopPizzas(),
-      ordersStore.fetchOrders()
+      ordersStore.fetchOrders(),
+      fetchRestaurantStatus()
     ])
   } else {
     loginError.value = 'Érvénytelen jelszó'
@@ -878,6 +935,7 @@ onMounted(() => {
     foodsStore.fetchFoods()
     foodsStore.fetchCategories()
     foodsStore.fetchTopPizzas()
+    fetchRestaurantStatus()
     policiesStore.fetchAszf().then(() => {
       if (policiesStore.aszf) {
         aszfContent.value = policiesStore.aszf.content

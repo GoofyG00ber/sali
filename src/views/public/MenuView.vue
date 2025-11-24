@@ -299,7 +299,8 @@ function handleAddToCart(payload: { item: Item; price: Price }){
     description: item.description || '',
     prices: item.prices || [],
     image: item.image || '/placeholder.png',
-    badges: []
+    badges: [],
+    categoryId: item.category_id
   }
   cartStore.addItem(food, price, 1)
 }
@@ -314,6 +315,9 @@ async function handleOpenExtras(payload: { item: Item }) {
       const response = await fetch('/api/foods')
       const foods: UnknownRecord[] = await response.json()
       const filteredFoods = foods.filter((f: UnknownRecord) => {
+        const food = f as UnknownRecord & { active?: number }
+        // Filter out inactive items (0 or 2 are inactive)
+        if (food.active === 0 || food.active === 2) return false
         return f.category_id === feltekCategoryId.value
       })
       feltekExtras.value = filteredFoods.map((f: UnknownRecord) => ({
@@ -377,7 +381,8 @@ function handleAddWithExtras(data: { item: Item; selectedSize: Price; selectedEx
     description: item.description || '',
     prices: item.prices || [],
     image: item.image || '/placeholder.png',
-    badges: []
+    badges: [],
+    categoryId: item.category_id
   }
 
   cartStore.addItem(food, selectedSize, 1, extras.length > 0 ? extras : [])

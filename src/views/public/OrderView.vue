@@ -224,19 +224,32 @@
         </form>
       </div>
     </div>
+
+    <DrinkOfferModal
+      :isOpen="showDrinkModal"
+      :drink="offeredDrink"
+      @close="showDrinkModal = false"
+      @add="handleAddDrink"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import { useOrdersStore } from '@/stores/orders'
 import type { OrderItem } from '@/stores/orders'
+import DrinkOfferModal from '@/components/DrinkOfferModal.vue'
+import { useFoodsStore, type Food } from '@/stores/foods'
 
 const router = useRouter()
 const cartStore = useCartStore()
 const ordersStore = useOrdersStore()
+const foodsStore = useFoodsStore()
+
+const showDrinkModal = ref(false)
+const offeredDrink = ref<Food | null>(null)
 
 const deliveryType = ref<'pickup' | 'delivery'>('pickup')
 const paymentMethod = ref<'barion' | 'cash'>('cash')
@@ -282,11 +295,71 @@ const handleCityChange = () => {
   }
 }
 
+onMounted(async () => {
+  if (cartStore.isEmpty) return
+
+  // Check if cart has any drink (category 12)
+  const hasDrink = cartStore.items.some(item => {
+    const cId = item.food.categoryId ?? item.food.category_id
+    return Number(cId) === 12
+  })
+
+  if (!hasDrink) {
+    // Fetch foods if needed
+    if (foodsStore.foods.length === 0) {
+      await foodsStore.fetchFoods()
+    }
+
+    // RE-CHECK hasDrink after fetching foods, in case we can match by ID (for items added before fix)
+    const hasDrinkRecheck = cartStore.items.some(item => {
+      const cId = item.food.categoryId ?? item.food.category_id
+      if (cId !== undefined) return Number(cId) === 12
+
+      // Fallback: find in foodsStore
+      const foodInStore = foodsStore.foods.find(f => f.id === item.food.id)
+      if (foodInStore) {
+        const storeCId = foodInStore.categoryId ?? foodInStore.category_id
+        return Number(storeCId) === 12
+      }
+      return false
+    })
+
+    if (hasDrinkRecheck) return
+
+    // Find first active drink
+    const drink = foodsStore.foods.find(f => {
+      const catId = f.categoryId || f.category_id
+      const isActive = f.active === 1 || f.active === true
+      return catId === 12 && isActive
+    })
+
+    if (drink) {
+      offeredDrink.value = drink
+      showDrinkModal.value = true
+    }
+  }
+})
+
+function handleAddDrink(payload: { drink: Food; price: { label: string; price: number } }) {
+  cartStore.addItem(payload.drink, payload.price, 1)
+  showDrinkModal.value = false
+}
+
 const handleSubmitOrder = async () => {
   errorMessage.value = ''
   submitting.value = true
 
   try {
+    // Check restaurant status before submitting
+    const statusResponse = await fetch('/api/restaurant-status')
+    const statusData = await statusResponse.json()
+
+    if (!statusData.isOpen) {
+      errorMessage.value = statusData.message || 'Az étterem jelenleg zárva tart.'
+      submitting.value = false
+      return
+    }
+
     // Prepare order items
     const items: OrderItem[] = cartStore.items.map(item => ({
       itemId: item.food.id,

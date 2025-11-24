@@ -84,7 +84,115 @@ async function ensureMenuMetaTables() {
   }
 }
 
+async function ensureSettingsTable() {
+  try {
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS settings (
+        setting_key VARCHAR(64) PRIMARY KEY,
+        setting_value VARCHAR(255) NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    `)
+
+    // Insert default manual_open status if not exists
+    const [rows] = await pool.query('SELECT * FROM settings WHERE setting_key = ?', ['manual_open'])
+    if (rows.length === 0) {
+      await pool.query('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?)', ['manual_open', 'true'])
+    }
+  } catch (err) {
+    console.error('Failed to ensure settings table exists:', err)
+  }
+}
+
 await ensureMenuMetaTables()
+await ensureSettingsTable()
+
+// Restaurant Status & Opening Hours
+app.get('/api/restaurant-status', async (req, res) => {
+  try {
+    // 1. Get Manual Override Status
+    const [settings] = await pool.query('SELECT setting_value FROM settings WHERE setting_key = ?', ['manual_open'])
+    const manualOpen = settings.length > 0 ? settings[0].setting_value === 'true' : true
+
+    // 2. Get Current Time in Hungary
+    const now = new Date()
+    const hungaryTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
+    const currentDay = hungaryTime.getDay() // 0 = Sunday, 1 = Monday, ...
+    const currentHour = hungaryTime.getHours()
+    const currentMinute = hungaryTime.getMinutes()
+    const currentTimeValue = currentHour * 60 + currentMinute
+
+    // Map JS getDay() to Hungarian day names in DB
+    const dayNames = ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat']
+    const todayName = dayNames[currentDay]
+
+    // 3. Get Opening Hours for Today
+    const [hours] = await pool.query('SELECT * FROM open_hours WHERE name_of_day = ?', [todayName])
+
+    let isOpenBySchedule = false
+    let schedule = null
+
+    if (hours.length > 0) {
+      const todayHours = hours[0]
+      // Parse DB times (assuming they are stored as Date objects or strings)
+      // We only care about the time part.
+      // The DB returns dates like 2025-11-17T09:00:00.000Z.
+      // We need to convert these to Hungary time to get the intended opening hour.
+
+      const fromDate = new Date(todayHours.from_time)
+      const tilDate = new Date(todayHours.til_time)
+
+      // Convert DB times to Hungary time components
+      // Note: The date part in DB is arbitrary, we just want the time.
+      // But we must ensure we interpret the stored time correctly.
+      // If stored as UTC 09:00, it means 10:00 CET.
+
+      const fromHungary = new Date(fromDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
+      const tilHungary = new Date(tilDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
+
+      const fromValue = fromHungary.getHours() * 60 + fromHungary.getMinutes()
+      const tilValue = tilHungary.getHours() * 60 + tilHungary.getMinutes()
+
+      isOpenBySchedule = currentTimeValue >= fromValue && currentTimeValue < tilValue
+
+      schedule = {
+        day: todayName,
+        from: `${fromHungary.getHours().toString().padStart(2, '0')}:${fromHungary.getMinutes().toString().padStart(2, '0')}`,
+        to: `${tilHungary.getHours().toString().padStart(2, '0')}:${tilHungary.getMinutes().toString().padStart(2, '0')}`
+      }
+    }
+
+    // 4. Determine Final Status
+    // If manual switch is OFF, we are closed regardless of schedule.
+    // If manual switch is ON, we follow the schedule.
+    const isOpen = manualOpen && isOpenBySchedule
+
+    res.json({
+      isOpen,
+      manualOpen,
+      isOpenBySchedule,
+      schedule,
+      message: isOpen ? 'Nyitva vagyunk' : (manualOpen ? 'Jelenleg zárva vagyunk (nyitvatartási időn kívül)' : 'Jelenleg zárva vagyunk (technikai okok miatt)')
+    })
+
+  } catch (err) {
+    console.error('Error checking restaurant status:', err)
+    res.status(500).json({ error: 'Failed to check status' })
+  }
+})
+
+app.post('/api/restaurant-status', async (req, res) => {
+  const { manualOpen } = req.body
+  try {
+    await pool.query('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?',
+      ['manual_open', String(manualOpen), String(manualOpen)]
+    )
+    res.json({ success: true, manualOpen })
+  } catch (err) {
+    console.error('Error updating restaurant status:', err)
+    res.status(500).json({ error: 'Failed to update status' })
+  }
+})
 
 // categories
 app.get('/api/categories', async (req, res) => {
@@ -113,6 +221,7 @@ app.get('/api/top-pizzas', async (req, res) => {
       SELECT tp.id as top_id, mi.*
       FROM top_pizzas tp
       JOIN menu_items mi ON tp.item_id = mi.id
+      WHERE mi.active = 1
     `)
 
     if (rows.length === 0) {
@@ -530,6 +639,44 @@ app.put('/api/orders/:id/status', async (req, res) => {
   console.log('Creating order with:', { method, orderStatus, price })
 
   try {
+    // Check restaurant status before creating order
+    // 1. Get Manual Override Status
+    const [settings] = await pool.query('SELECT setting_value FROM settings WHERE setting_key = ?', ['manual_open'])
+    const manualOpen = settings.length > 0 ? settings[0].setting_value === 'true' : true
+
+    // 2. Get Current Time in Hungary
+    const now = new Date()
+    const hungaryTime = new Date(now.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
+    const currentDay = hungaryTime.getDay() // 0 = Sunday, 1 = Monday, ...
+    const currentHour = hungaryTime.getHours()
+    const currentMinute = hungaryTime.getMinutes()
+    const currentTimeValue = currentHour * 60 + currentMinute
+
+    // Map JS getDay() to Hungarian day names in DB
+    const dayNames = ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat']
+    const todayName = dayNames[currentDay]
+
+    // 3. Get Opening Hours for Today
+    const [hours] = await pool.query('SELECT * FROM open_hours WHERE name_of_day = ?', [todayName])
+
+    let isOpenBySchedule = false
+    if (hours.length > 0) {
+      const todayHours = hours[0]
+      const fromDate = new Date(todayHours.from_time)
+      const tilDate = new Date(todayHours.til_time)
+      const fromHungary = new Date(fromDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
+      const tilHungary = new Date(tilDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
+      const fromValue = fromHungary.getHours() * 60 + fromHungary.getMinutes()
+      const tilValue = tilHungary.getHours() * 60 + tilHungary.getMinutes()
+      isOpenBySchedule = currentTimeValue >= fromValue && currentTimeValue < tilValue
+    }
+
+    const isOpen = manualOpen && isOpenBySchedule
+
+    if (!isOpen) {
+      return res.status(403).json({ error: 'Az étterem jelenleg zárva tart, rendelés nem adható le.' })
+    }
+
     // Determine orders.id column type so we generate a compatible id
     const [idCols] = await pool.query("SHOW COLUMNS FROM orders WHERE Field='id'")
     const idColType = (idCols && idCols[0] && idCols[0].Type) ? idCols[0].Type.toLowerCase() : ''
