@@ -2,6 +2,13 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { Food } from './foods'
 
+export interface Extra {
+  id: number
+  title?: string
+  quantity: number
+  price: number
+}
+
 export interface CartItem {
   food: Food
   selectedPrice: {
@@ -9,6 +16,7 @@ export interface CartItem {
     price: number
   }
   quantity: number
+  extras?: Extra[]
 }
 
 export const useCartStore = defineStore('cart', () => {
@@ -23,11 +31,12 @@ export const useCartStore = defineStore('cart', () => {
         if (Array.isArray(parsed)) {
           // migrate legacy entries that might miss selectedPrice
           items.value = parsed
-            .map((rawEntry) => {
+            .map((rawEntry: unknown) => {
               const raw = rawEntry as {
                 food?: Partial<Food> & { id?: number }
                 selectedPrice?: { label?: unknown; price?: unknown }
                 quantity?: unknown
+                extras?: unknown
               }
               const food = raw.food
               const selected = raw.selectedPrice
@@ -36,13 +45,31 @@ export const useCartStore = defineStore('cart', () => {
                 return null
               }
               const qty = typeof raw.quantity === 'number' && raw.quantity > 0 ? raw.quantity : 1
-              return {
+              let extras: Extra[] | undefined
+              if (Array.isArray(raw.extras)) {
+                const mappedExtras: Extra[] = []
+                for (const e of raw.extras) {
+                  const extra = e as { id?: unknown; title?: unknown; quantity?: unknown; price?: unknown }
+                  if (typeof extra.id === 'number' && typeof extra.quantity === 'number' && typeof extra.price === 'number' && extra.quantity > 0) {
+                    mappedExtras.push({
+                      id: extra.id,
+                      title: typeof extra.title === 'string' ? extra.title : undefined,
+                      quantity: extra.quantity,
+                      price: extra.price
+                    })
+                  }
+                }
+                if (mappedExtras.length > 0) extras = mappedExtras
+              }
+              const item: CartItem = {
                 food: food as Food,
                 selectedPrice: { label: selected.label, price: selected.price },
                 quantity: qty
-              } satisfies CartItem
+              }
+              if (extras) item.extras = extras
+              return item
             })
-            .filter((x): x is CartItem => x !== null)
+            .filter((x: CartItem | null): x is CartItem => x !== null)
         } else {
           items.value = []
         }
@@ -59,9 +86,14 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   // Add item to cart
-  const addItem = (food: Food, selectedPrice: { label: string; price: number }, quantity = 1) => {
+  const addItem = (food: Food, selectedPrice: { label: string; price: number }, quantity = 1, extras: Extra[] = []) => {
+    // Create a key to identify items with same pizza and extras
+    const extrasKey = extras.map(e => `${e.id}:${e.quantity}`).join('|')
     const existingIndex = items.value.findIndex(
-      item => item.food.id === food.id && item.selectedPrice.label === selectedPrice.label
+      item =>
+        item.food.id === food.id &&
+        item.selectedPrice.label === selectedPrice.label &&
+        (item.extras?.map(e => `${e.id}:${e.quantity}`).join('|') || '') === extrasKey
     )
 
     if (existingIndex > -1 && items.value[existingIndex]) {
@@ -70,7 +102,8 @@ export const useCartStore = defineStore('cart', () => {
       items.value.push({
         food,
         selectedPrice,
-        quantity
+        quantity,
+        extras: extras.length > 0 ? extras : undefined
       })
     }
 
@@ -114,7 +147,12 @@ export const useCartStore = defineStore('cart', () => {
 
   const totalPrice = computed(() => {
     return items.value.reduce((total, item) => {
-      return total + item.selectedPrice.price * item.quantity
+      let itemTotal = item.selectedPrice.price * item.quantity
+      if (item.extras) {
+        const extrasPrice = item.extras.reduce((sum, extra) => sum + (extra.price * extra.quantity), 0)
+        itemTotal += extrasPrice * item.quantity
+      }
+      return total + itemTotal
     }, 0)
   })
 

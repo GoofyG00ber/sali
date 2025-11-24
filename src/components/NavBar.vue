@@ -91,11 +91,11 @@
     <!-- Teleported dropdown for mobile cart -->
     <teleport to="body">
       <div v-if="showMobileCart" class="mobile-cart-dropdown fixed z-50" ref="mobileDropdownEl" role="dialog" aria-label="Kosár">
-        <div class="flex justify-between items-center p-4 border-b">
+        <div class="flex justify-between items-center p-4 border-b flex-shrink-0">
           <h2 class="text-lg font-semibold">Kosár ({{ itemCount }})</h2>
           <button @click="toggleMobileCart" class="text-gray-500 hover:text-gray-700 text-2xl leading-none" aria-label="Bezárás">×</button>
         </div>
-        <div class="flex-1 overflow-y-auto">
+        <div class="flex-1 overflow-y-auto min-h-0">
           <KosarWidget :cart="kosarCart" @increment="onIncrement" @decrement="onDecrement" />
         </div>
       </div>
@@ -301,7 +301,7 @@ watchEffect(async ()=>{
 }
 
 .mobile-cart-dropdown {
-  top: 12px;
+  top: 100px;
   bottom: 100px;
   left: 12px;
   right: 12px;
@@ -316,6 +316,7 @@ watchEffect(async ()=>{
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  max-height: calc(100vh - 200px);
 }
 
 .work-sans-light {
