@@ -1,5 +1,15 @@
 <script setup lang="ts">
+import { onMounted } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useFoodsStore } from '@/stores/foods'
 import TopPizzaCard from './TopPizzaCard.vue'
+
+const foodsStore = useFoodsStore()
+const { topPizzas } = storeToRefs(foodsStore)
+
+onMounted(() => {
+  foodsStore.fetchTopPizzas()
+})
 </script>
 
 <template>
@@ -12,9 +22,12 @@ import TopPizzaCard from './TopPizzaCard.vue'
                gap-y-[30px] md:gap-y-[30px]
                md:gap-x-[60px]"
       >
-        <TopPizzaCard class="mx-auto" />
-        <TopPizzaCard class="mx-auto" />
-        <TopPizzaCard class="mx-auto" />
+        <TopPizzaCard
+          v-for="pizza in topPizzas"
+          :key="pizza.id"
+          :pizza="pizza"
+          class="mx-auto"
+        />
       </div>
     </div>
   <img src="/static_images/toppizzak_dots.svg?url" class="absolute top-3/5 right-0 z-2 rotate-90 " />

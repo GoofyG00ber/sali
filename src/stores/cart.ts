@@ -13,6 +13,7 @@ export interface CartItem {
 
 export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([])
+  const isCartOpen = ref(false)
 
   // Load cart from sessionStorage on init
   const loadCart = () => {
@@ -107,6 +108,18 @@ export const useCartStore = defineStore('cart', () => {
     sessionStorage.removeItem('cart')
   }
 
+  const openCart = () => {
+    isCartOpen.value = true
+  }
+
+  const closeCart = () => {
+    isCartOpen.value = false
+  }
+
+  const toggleCart = () => {
+    isCartOpen.value = !isCartOpen.value
+  }
+
   // Computed properties
   const itemCount = computed(() => {
     return items.value.reduce((total, item) => total + item.quantity, 0)
@@ -132,6 +145,10 @@ export const useCartStore = defineStore('cart', () => {
     removeItem,
     updateQuantity,
     clearCart,
-    loadCart
+    loadCart,
+    isCartOpen,
+    openCart,
+    closeCart,
+    toggleCart
   }
 })
