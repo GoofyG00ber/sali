@@ -113,6 +113,7 @@ app.get('/api/top-pizzas', async (req, res) => {
       SELECT tp.id as top_id, mi.*
       FROM top_pizzas tp
       JOIN menu_items mi ON tp.item_id = mi.id
+      WHERE mi.active = 1
     `)
 
     if (rows.length === 0) {
