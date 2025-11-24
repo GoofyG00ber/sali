@@ -33,3 +33,9 @@ a,
     padding: 0 2rem;
   }
 }
+
+button,
+a,
+[role="button"] {
+  cursor: pointer;
+}

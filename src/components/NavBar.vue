@@ -117,12 +117,32 @@ const cartLi = ref<HTMLElement | null>(null)
 const dropdownEl = ref<HTMLElement | null>(null)
 const mobileDropdownEl = ref<HTMLElement | null>(null)
 
+// Sync local state with store state
+watchEffect(() => {
+  if (cartStore.isCartOpen) {
+    if (window.innerWidth < 768) {
+      showMobileCart.value = true
+      showCart.value = false
+    } else {
+      showCart.value = true
+      showMobileCart.value = false
+    }
+  } else {
+    showCart.value = false
+    showMobileCart.value = false
+  }
+})
+
 const itemCount = computed(() => cartStore.itemCount)
 
 const kosarCart = computed(() => cartStore.items.map(i => ({ item: i.food, price: { label: i.selectedPrice.label, price: i.selectedPrice.price }, qty: i.quantity })))
 
-function toggleCart(){ showCart.value = !showCart.value }
-function toggleMobileCart(){ showMobileCart.value = !showMobileCart.value }
+function toggleCart(){
+  cartStore.toggleCart()
+}
+function toggleMobileCart(){
+  cartStore.toggleCart()
+}
 
 function onIncrement(idx:number){
   // prefer direct index, fallback by matching id+label
@@ -163,13 +183,13 @@ function onDocClick(e: MouseEvent){
   if(showCart.value) {
     if(cartLi.value && cartLi.value.contains(target)) return
     if(dropdownEl.value && dropdownEl.value.contains(target)) return
-    showCart.value = false
+    cartStore.closeCart()
   }
   // Handle mobile cart
   if(showMobileCart.value) {
     if(e.target === document.querySelector('.mobile-link.cart-btn')) return
     if(mobileDropdownEl.value && mobileDropdownEl.value.contains(target)) return
-    showMobileCart.value = false
+    cartStore.closeCart()
   }
 }
 

@@ -264,7 +264,11 @@ async function loadMenu(){
     })
     const categories: Category[] = filteredCats.map((c: { id:number; title:string }) => ({ id: c.id, title: c.title, items: [] }))
     for (const raw of foods) {
-      const f = raw as UnknownRecord & { id: number; title: string; description?: string; category_id?: number; image?: string }
+      const f = raw as UnknownRecord & { id: number; title: string; description?: string; category_id?: number; image?: string; active?: number }
+
+      // Filter out inactive items (0 or 2 are inactive)
+      if (f.active === 0 || f.active === 2) continue
+
       const cat = categories.find((c) => c.id === f.category_id)
       const priceOptions = derivePrices(f)
       const item: Item = {

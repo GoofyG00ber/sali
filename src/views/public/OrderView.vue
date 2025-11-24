@@ -281,7 +281,7 @@ const handleSubmitOrder = async () => {
   try {
     // Prepare order items
     const items: OrderItem[] = cartStore.items.map(item => ({
-      foodId: item.food.id,
+      itemId: item.food.id,
       foodTitle: item.food.title,
       priceLabel: item.selectedPrice.label,
       price: item.selectedPrice.price,

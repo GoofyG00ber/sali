@@ -1,14 +1,49 @@
 <!-- src/components/TopPizzaCard.vue -->
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
+import type { Food, FoodPrice } from '@/stores/foods'
+import { useCartStore } from '@/stores/cart'
 
+const props = defineProps<{
+  pizza: Food
+}>()
 
+const cartStore = useCartStore()
 
-const sizes = [26, 32, 50]
-const selectedSize = ref(32)
+const sortedPrices = computed(() => {
+  return [...props.pizza.prices].sort((a, b) => a.price - b.price)
+})
 
-const selectSize = (size: number) => {
-  selectedSize.value = size
+const selectedPrice = ref<FoodPrice | null>(null)
+
+watch(() => props.pizza, () => {
+  if (sortedPrices.value.length > 0) {
+    // Default to middle size if 3, else first
+    if (sortedPrices.value.length === 3) {
+      selectedPrice.value = sortedPrices.value[1]!
+    } else {
+      selectedPrice.value = sortedPrices.value[0]!
+    }
+  }
+}, { immediate: true })
+
+const selectPrice = (price: FoodPrice) => {
+  selectedPrice.value = price
+}
+
+const getSizeLabel = (label: string) => {
+  return label.replace(/\s*cm/i, '')
+}
+
+const addToCart = () => {
+  if (selectedPrice.value) {
+    cartStore.addItem(props.pizza, selectedPrice.value)
+  }
+}
+
+const toggleCart = (event: Event) => {
+  event.stopPropagation()
+  cartStore.toggleCart()
 }
 </script>
 
@@ -31,45 +66,46 @@ const selectSize = (size: number) => {
 
     <div class="bg-[#7A231D] pt-8 flex justify-center relative z-5 rounded-t-xl">
       <div class="w-full h-40 overflow-hidden">
-        <img src="/static_images/top-view-delicious-pizza.png"
+        <img :src="pizza.image || '/static_images/top-view-delicious-pizza.png'"
           class="w-full object-cover object-top" />
     </div>
     </div>
 
     <div class="pt-10 pb-6 px-6 work-sans-regular z-10 relative bg-gray-50 rounded-b-xl">
       <h3 class="text-xl font-semibold text-slate-900 mb-1">
-        Nagyon finom pizza
+        {{ pizza.title }}
       </h3>
       <p class="text-sm text-slate-500 leading-snug mb-4">
-        paradicsomszósz, mozzarella, sonka, olivabogyó, koktélparadicsom
+        {{ pizza.description }}
       </p>
 
       <div class="flex gap-3 mb-4">
         <button
-          v-for="size in sizes"
-          :key="size"
+          v-for="price in sortedPrices"
+          :key="price.label"
           type="button"
-          @click="selectSize(size)"
-          class="flex-1 rounded-lg border px-3 py-1 text-sm font-medium transition"
+          @click="selectPrice(price)"
+          class="flex-1 rounded-lg border px-3 py-1 text-sm font-medium transition cursor-pointer"
           :class="
-            selectedSize === size
+            selectedPrice === price
               ? 'border-orange-500 text-orange-600 bg-orange-50'
               : 'border-gray-300 text-gray-600 bg-white hover:border-orange-400 hover:text-orange-500'
           "
         >
-          {{ size }} cm
+          {{ getSizeLabel(price.label) }} cm
         </button>
       </div>
 
       <div class="flex items-center justify-between">
         <div class="text-lg work-sans-medium text-slate-900">
-          3290,00 Ft
+          {{ selectedPrice?.price }} Ft
         </div>
         <div class="flex gap-2">
           <button
             type="button"
-            class="rounded-lg border-2 border-orange-600 bg-white px-3 py-2 text-sm work-sans-semibold text-orange-600 shadow hover:bg-orange-50 transition flex items-center justify-center"
+            class="rounded-lg border-2 border-orange-600 bg-white px-3 py-2 text-sm work-sans-semibold text-orange-600 shadow hover:bg-orange-50 transition flex items-center justify-center cursor-pointer"
             title="Add extras"
+            @click="addToCart"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <line x1="12" y1="5" x2="12" y2="19" />
@@ -78,8 +114,9 @@ const selectSize = (size: number) => {
           </button>
           <button
             type="button"
-            class="rounded-lg bg-orange-600 px-4 py-2 text-sm work-sans-semibold text-white shadow hover:bg-orange-700 transition flex items-center justify-center"
+            class="rounded-lg bg-orange-600 px-4 py-2 text-sm work-sans-semibold text-white shadow hover:bg-orange-700 transition flex items-center justify-center cursor-pointer"
             title="Add to cart"
+            @click="toggleCart"
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="9" cy="21" r="1" />

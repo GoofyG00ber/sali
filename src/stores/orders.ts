@@ -4,7 +4,7 @@ import { ref } from 'vue'
 const API_BASE = 'http://localhost:3001/api'
 
 export interface OrderItem {
-  foodId: number
+  itemId: number
   foodTitle: string
   priceLabel: string
   price: number

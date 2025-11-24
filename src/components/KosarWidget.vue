@@ -130,7 +130,7 @@ function formatPrice(n: number) {
 .extra-name { flex: 1; min-width: 0; word-break: break-word; }
 .extra-price { font-weight: 600; color: #666; font-size: 11px; flex-shrink: 0; white-space: nowrap; }
 .qty { display: flex; align-items: center; gap: 6px; }
-.qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: #fff; }
+.qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 .lineprice { font-weight: 700; }
 .bottom { display: block; padding-top: 12px; border-top: 1px dashed #eee; }
 .total { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
