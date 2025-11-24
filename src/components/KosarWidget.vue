@@ -6,7 +6,7 @@
       <div v-else class="items">
         <div
           v-for="item in cartStore.items"
-          :key="`${item.food?.id ?? 'x'}-${item.selectedPrice?.label ?? 'default'}`"
+          :key="`${item.food?.id ?? 'x'}-${item.selectedPrice?.label ?? 'default'}-${item.extras?.map(e => `${e.id}:${e.quantity}`).join('|') || ''}`"
           class="ci"
         >
           <div class="left">
@@ -14,6 +14,13 @@
             <div class="meta">
               {{ item.selectedPrice?.label ?? 'Alap' }} —
               {{ formatPrice(item.selectedPrice?.price ?? 0) }} Ft
+            </div>
+            <div v-if="item.extras && item.extras.length > 0" class="extras-summary">
+              <div v-for="extra in item.extras" :key="extra.id" class="extra-line">
+                <span class="extra-qty">{{ extra.quantity }}x</span>
+                <span class="extra-name">{{ extra.title || 'Feltételek' }}</span>
+                <span class="extra-price">{{ formatPrice(extra.price * extra.quantity) }} Ft</span>
+              </div>
             </div>
           </div>
           <div class="right">
@@ -31,7 +38,7 @@
               </button>
             </div>
             <div class="lineprice">
-              {{ formatPrice((item.selectedPrice?.price ?? 0) * item.quantity) }} Ft
+              {{ getItemTotal(item) }} Ft
             </div>
           </div>
         </div>
@@ -51,7 +58,7 @@
 </template>
 
 <script setup lang="ts">
-import { useCartStore } from '@/stores/cart'
+import { useCartStore, type CartItem } from '@/stores/cart'
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -64,8 +71,17 @@ const props = defineProps<{
 
 const isInMenu = computed(() => !props.isInSidebar && route.path === '/menu')
 
+function getItemTotal(item: CartItem): string {
+  let total = (item.selectedPrice?.price ?? 0) * item.quantity
+  if (item.extras && item.extras.length > 0) {
+    const extrasPrice = item.extras.reduce((sum: number, extra) => sum + (extra.price * extra.quantity), 0)
+    total += extrasPrice * item.quantity
+  }
+  return formatPrice(total)
+}
+
 function formatPrice(n: number) {
-  return n.toLocaleString()
+  return n.toLocaleString('hu-HU')
 }
 </script>
 
@@ -102,11 +118,17 @@ function formatPrice(n: number) {
   margin-top: 0;
 }
 
-.kosar .items { overflow: visible; }
+.kosar .items { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 300px); }
 .kosar .empty { color: #999; }
-.ci { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px dashed #eee; }
-.ci .left .title { font-weight: 600; }
-.ci .meta { color: #888; font-size: 13px; }
+.ci { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px dashed #eee; min-width: 0; }
+.ci .left { min-width: 0; flex: 1; }
+.ci .left .title { font-weight: 600; word-break: break-word; }
+.ci .meta { color: #888; font-size: 13px; margin-bottom: 4px; }
+.extras-summary { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; padding-top: 4px; border-top: 1px solid #f0f0f0; min-width: 0; }
+.extra-line { display: flex; align-items: center; gap: 4px; font-size: 12px; color: #888; line-height: 1; min-width: 0; }
+.extra-qty { font-weight: 600; color: #ff6106; min-width: 20px; flex-shrink: 0; }
+.extra-name { flex: 1; min-width: 0; word-break: break-word; }
+.extra-price { font-weight: 600; color: #666; font-size: 11px; flex-shrink: 0; white-space: nowrap; }
 .qty { display: flex; align-items: center; gap: 6px; }
 .qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 .lineprice { font-weight: 700; }
@@ -114,6 +136,11 @@ function formatPrice(n: number) {
 .total { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
 .checkout { display: block; width: 100%; background: #FF6106; color: #fff; border: 1px solid #FF6106; padding: 12px 16px; border-radius: 8px; text-decoration: none; text-align: center; cursor: pointer; font-weight: 600; font-size: 16px; font-family: "Work Sans", sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease; }
 .checkout:hover { background: #E55A00; border-color: #E55A00; }
+
+/* Hide kosar on medium screens and below (1000px to 769px) */
+@media (max-width: 1000px) {
+  .kosar-wrapper { display: none; }
+}
 
 @media (max-width: 768px) {
   .kosar-wrapper { display: flex; flex-direction: column; height: 100%; }

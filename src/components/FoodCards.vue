@@ -28,7 +28,7 @@
             </div>
 
             <div class="actions">
-              <button class="btn-outline" type="button" title="Add extras">
+              <button v-if="item.category_id === 1" class="btn-outline" type="button" title="Add extras" @click="openExtrasModal(item)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
@@ -57,10 +57,13 @@ import { reactive, watch } from 'vue'
 import type { PropType } from 'vue'
 
 type Price = { label: string; price: number }
-type Item = { id: number; title: string; description?: string; prices?: Price[]; image?: string }
+type Item = { id: number; title: string; description?: string; prices?: Price[]; image?: string; category_id?: number }
 
 const props = defineProps({ items: { type: Array as PropType<Item[]>, required: true } })
-const emit = defineEmits<{ (e: 'add', payload: { item: Item; price: Price }): void }>()
+const emit = defineEmits<{
+  (e: 'add', payload: { item: Item; price: Price }): void
+  (e: 'openExtras', payload: { item: Item }): void
+}>()
 
 const selectedPrices = reactive<Record<number, Price>>({})
 
@@ -93,7 +96,11 @@ function getDefaultPrice(it: Item): Price | undefined {
 
 function selectPrice(itemId: number, price: Price){ selectedPrices[itemId] = price }
 
-function formatPrice(n:number){ return n.toLocaleString() }
+function formatPrice(n:number){ return n.toLocaleString('hu-HU') }
+
+function openExtrasModal(item: Item) {
+  emit('openExtras', { item })
+}
 
 function addToCart(item: Item){
   const price = selectedPrices[item.id] ?? getDefaultPrice(item)
