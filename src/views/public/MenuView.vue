@@ -535,17 +535,7 @@ onBeforeUnmount(() => {
 
   /* Right (cart) spans both columns and is centered below */
   .right {
-    grid-column: 1 / -1;
-    grid-row: 2;
-    justify-self: center;
-    position: static;
-    width: 320px;
-    max-height: none;
-    display: block;
-    margin-top: 18px;
-    z-index: 10;
-    right: auto;
-    top: auto;
+    display: none !important; /* hide cart in this breakpoint, show in navbar dropdown instead */
   }
 
   .pizza-builder-card {

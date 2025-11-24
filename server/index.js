@@ -501,8 +501,8 @@ app.get('/api/orders', async (req, res) => {
         id: order.id.toString(),
         items: orderItems.map(item => ({
           itemId: item.item_id,
-          foodTitle: item.foodTitle || item.item_title || 'Unknown Item',
-          priceLabel: item.price_label || '',
+          foodTitle: item.item_title || 'Unknown Item',
+          priceLabel: '',
           price: item.price,
           quantity: item.quantity
         })),
@@ -551,7 +551,7 @@ app.get('/api/orders/:id', async (req, res) => {
       id: order.id.toString(),
       items: items.map(item => ({
         itemId: item.item_id,
-        foodTitle: item.foodTitle || item.item_title || 'Unknown Item',
+        foodTitle: item.item_title || item.food_title || 'Unknown Item',
         priceLabel: item.price_label || '',
         price: item.price,
         quantity: item.quantity
@@ -762,14 +762,13 @@ app.put('/api/orders/:id/status', async (req, res) => {
     if (items && Array.isArray(items) && items.length > 0) {
       for (const item of items) {
         await pool.query(
-          'INSERT INTO order_items (order_id, item_id, item_title, price_label, price, quantity) VALUES (?, ?, ?, ?, ?, ?)',
+          'INSERT INTO order_items (order_id, item_id, item_title, quantity, price) VALUES (?, ?, ?, ?, ?)',
           [
             orderId,
             item.itemId ?? item.foodId ?? null,
-            item.foodTitle ?? item.name ?? '',
-            item.priceLabel ?? '',
-            item.price ?? 0,
-            item.quantity ?? 1
+            item.item_title ?? item.title ?? 'Unknown Item',
+            item.quantity ?? 1,
+            item.price ?? 0
           ]
         )
       }
@@ -793,8 +792,8 @@ app.put('/api/orders/:id/status', async (req, res) => {
       id: orderId.toString(),
       items: orderItems.map(item => ({
         itemId: item.item_id,
-        foodTitle: item.foodTitle || item.item_title || 'Unknown Item',
-        priceLabel: item.price_label || '',
+        foodTitle: item.item_title || 'Unknown Item',
+        priceLabel: '',
         price: item.price,
         quantity: item.quantity
       })),
@@ -875,8 +874,8 @@ app.patch('/api/orders/:id', async (req, res) => {
       id: order.id.toString(),
       items: items.map(item => ({
         itemId: item.item_id,
-        foodTitle: item.foodTitle || item.item_title || 'Unknown Item',
-        priceLabel: item.price_label || '',
+        foodTitle: item.item_title || 'Unknown Item',
+        priceLabel: '',
         price: item.price,
         quantity: item.quantity
       })),
