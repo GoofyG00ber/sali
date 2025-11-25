@@ -83,7 +83,7 @@ import CheckeredPanel from '@/components/CheckeredPanel.vue'
 .hero-image{ position:absolute; inset:0; background-image:url('/static_images/footer-img.png'); background-size:cover; background-position:center; filter:brightness(0.6); height: 300px;}
 .container{ max-width:1100px; margin:0 auto; padding:28px 16px; }
 .cards{ display:flex; gap:28px; align-items:stretch; justify-content:center; }
-.card{ background:var(--card-bg); color:var(--card-fg); border-radius:18px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index: 10; background-color: #000; margin-bottom: 24px; height: 100%; display:flex; flex-direction:column; flex:1; }
+.card{ background:var(--card-bg); color:var(--card-fg); border-radius:18px; overflow:hidden; box-shadow:0 8px 20px rgba(0,0,0,0.5); z-index: 10; background-color: #000; margin-bottom: 24px; display:flex; flex-direction:column; flex:1; }
 .card.contact{ display:flex; flex-direction:column; }
 .card.hours{ padding:22px; display:flex; flex-direction:column; }
 .card-top{ padding:22px; flex-shrink:0; }
