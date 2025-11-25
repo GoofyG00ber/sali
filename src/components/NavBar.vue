@@ -21,7 +21,7 @@
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            <span v-if="itemCount" class="cart-badge">{{ itemCount }}</span>
+            <span v-if="itemCount" :key="itemCount" class="cart-badge">{{ itemCount }}</span>
           </button>
         </li>
       </ul>
@@ -64,7 +64,7 @@
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            <span v-if="itemCount" class="mobile-cart-badge">{{ itemCount }}</span>
+            <span v-if="itemCount" :key="itemCount" class="mobile-cart-badge">{{ itemCount }}</span>
           </div>
         </button>
       </li>
@@ -308,6 +308,29 @@ watchEffect(async ()=>{
   border-top: 3px solid #FF6106;
 }
 
+@keyframes badge-pop {
+  0% {
+    transform: scale(1);
+    background: #FF6106;
+    color: #fff;
+  }
+  25% {
+    transform: scale(1.4);
+    background: #fff;
+    color: #FF6106;
+  }
+  75% {
+    transform: scale(1.4);
+    background: #fff;
+    color: #FF6106;
+  }
+  100% {
+    transform: scale(1);
+    background: #FF6106;
+    color: #fff;
+  }
+}
+
 .mobile-cart-badge {
   position: absolute;
   top: -8px;
@@ -324,6 +347,7 @@ watchEffect(async ()=>{
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: badge-pop 0.6s ease-in-out;
 }
 
 .mobile-cart-dropdown {
@@ -378,7 +402,7 @@ watchEffect(async ()=>{
 
 /* cart styles */
 .cart-btn{ background: transparent; border: none; color: inherit; cursor: pointer; position: relative; }
-.cart-badge{ position: absolute; top: -5px; right: -5px; background:#FF6106; color:#fff; font-weight:700; border-radius:999px; padding:0 6px; font-size:12px; min-width: 20px; text-align: center; }
+.cart-badge{ position: absolute; top: -5px; right: -5px; background:#FF6106; color:#fff; font-weight:700; border-radius:999px; padding:0 6px; font-size:12px; min-width: 20px; text-align: center; animation: badge-pop 0.6s ease-in-out; }
 .cart-dropdown{ width:300px; background:#fff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.08); padding:0; margin-right: 20px; }
 .cart-dropdown::before{ /* outer arrow / border */
   content: '';
