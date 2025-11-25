@@ -10,6 +10,8 @@ const showStatusModal = ref(false)
 const statusMessage = ref('')
 const todaySchedule = ref(null)
 const showScrollTop = ref(false)
+const isRestaurantOpen = ref(true)
+let statusCheckInterval: ReturnType<typeof setInterval> | null = null
 
 const handleScroll = () => {
   showScrollTop.value = window.scrollY > 0
@@ -17,6 +19,21 @@ const handleScroll = () => {
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
+const checkRestaurantStatus = async () => {
+  try {
+    const response = await fetch('/api/restaurant-status')
+    const data = await response.json()
+    isRestaurantOpen.value = data.isOpen
+
+    if (!data.isOpen) {
+      statusMessage.value = data.message
+      todaySchedule.value = data.schedule
+    }
+  } catch (error) {
+    console.error('Error checking restaurant status:', error)
+  }
 }
 
 // Scroll to top when route changes
@@ -28,28 +45,25 @@ onMounted(async () => {
   // Check if we already showed the modal in this session
   const hasSeenModal = sessionStorage.getItem('hasSeenStatusModal')
 
-  try {
-    const response = await fetch('/api/restaurant-status')
-    const data = await response.json()
+  // Initial status check
+  await checkRestaurantStatus()
 
-    if (!data.isOpen) {
-      statusMessage.value = data.message
-      todaySchedule.value = data.schedule
-      // Show modal if not seen yet
-      if (!hasSeenModal) {
-        showStatusModal.value = true
-        sessionStorage.setItem('hasSeenStatusModal', 'true')
-      }
-    }
-  } catch (error) {
-    console.error('Error checking restaurant status:', error)
+  if (!isRestaurantOpen.value && !hasSeenModal) {
+    showStatusModal.value = true
+    sessionStorage.setItem('hasSeenStatusModal', 'true')
   }
+
+  // Check status every 10 seconds
+  statusCheckInterval = setInterval(checkRestaurantStatus, 10000)
 
   window.addEventListener('scroll', handleScroll)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('scroll', handleScroll)
+  if (statusCheckInterval) {
+    clearInterval(statusCheckInterval)
+  }
 })
 </script>
 
@@ -59,7 +73,7 @@ onBeforeUnmount(() => {
 <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
 
   <div id="app" class="work-sans-regular">
-    <NavBar />
+    <NavBar :is-open="isRestaurantOpen" />
     <main class="md:pt-[80px]">
       <router-view />
     </main>

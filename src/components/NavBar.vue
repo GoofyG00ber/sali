@@ -2,9 +2,17 @@
   <!-- Desktop NavBar (top) -->
   <nav class="nav hidden md:flex fixed top-0 right-0 left-0 z-50 h-[80px] shadow-md items-center">
     <div class="container worker-sans-regular text-white flex justify-between">
-      <router-link to="/" class="logo">
-        <img src="/static_images/logo.png" class="h-[60px]" />
-      </router-link>
+      <div class="flex items-center gap-6">
+        <router-link to="/" class="logo">
+          <img src="/static_images/logo.png" class="h-[60px]" />
+        </router-link>
+
+        <!-- Status Indicator next to logo -->
+        <div class="flex items-center gap-2">
+          <div :class="['status-dot', props.isOpen ? 'open' : 'closed']"></div>
+          <span class="text-sm">{{ props.isOpen ? 'Nyitva' : 'Zárva' }}</span>
+        </div>
+      </div>
 
       <ul class="links h-full flex items-center">
         <li><router-link to="/" class="flex items-center h-full px-3">Főoldal</router-link></li>
@@ -38,6 +46,14 @@
   <!-- Mobile NavBar (bottom with icons) -->
   <nav class="mobile-nav md:hidden fixed bottom-0 right-0 left-0 z-50 bg-white shadow-lg">
     <ul class="mobile-links flex justify-around items-stretch h-20">
+      <li class="flex-1">
+        <div class="mobile-link status-link" :class="{ active: false }">
+          <div class="flex flex-col items-center justify-center gap-1">
+            <div :class="['status-dot', 'mobile', props.isOpen ? 'open' : 'closed']"></div>
+            <span class="text-xs">{{ props.isOpen ? 'Nyitva' : 'Zárva' }}</span>
+          </div>
+        </div>
+      </li>
       <li class="flex-1">
         <router-link to="/" class="mobile-link" :class="{ active: route.path === '/' }" aria-label="Főoldal">
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -108,6 +124,10 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick, watchEffect } from
 import { useRoute } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import KosarWidget from './KosarWidget.vue'
+
+const props = defineProps<{
+  isOpen: boolean
+}>()
 
 const route = useRoute()
 const cartStore = useCartStore()
@@ -259,6 +279,33 @@ watchEffect(async ()=>{
   color: white;
 }
 
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.open {
+  background: #4ade80;
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(74, 222, 128, 0.9);
+}
+
+.status-dot.closed {
+  background: #dc2626;
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(220, 38, 38, 0.9);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 /* Mobile navbar styles */
 .mobile-nav {
   height: 80px;
@@ -289,6 +336,15 @@ watchEffect(async ()=>{
   height: 100%;
   width: 100%;
   border-top: 3px solid transparent;
+}
+
+.mobile-link.status-link {
+  cursor: default;
+}
+
+.status-dot.mobile {
+  width: 6px;
+  height: 6px;
 }
 
 .mobile-link.cart-btn {
