@@ -68,6 +68,17 @@ const emit = defineEmits<{
 
 const selectedPrices = reactive<Record<number, Price>>({})
 
+// For pizza category, prefer 32cm as default, otherwise use first price
+function getDefaultPrice(it: Item): Price | undefined {
+  if (!Array.isArray(it.prices) || it.prices.length === 0) return undefined
+  if (it.category_id === 1) {
+    // Try to find 32cm size first for pizza category
+    const size32 = it.prices.find((p) => p.label.includes('32'))
+    if (size32) return size32
+  }
+  return it.prices[0]
+}
+
 function ensureSelections(list: Item[]) {
   const seenIds = new Set<number>()
   list.forEach((item) => {
@@ -76,7 +87,10 @@ function ensureSelections(list: Item[]) {
       const current = selectedPrices[item.id]
       const stillValid = current && item.prices.some((p) => p.label === current.label)
       if (!stillValid) {
-        selectedPrices[item.id] = item.prices[0]!
+        const defaultPrice = getDefaultPrice(item)
+        if (defaultPrice) {
+          selectedPrices[item.id] = defaultPrice
+        }
       }
     } else if (selectedPrices[item.id]) {
       delete selectedPrices[item.id]
@@ -89,10 +103,6 @@ function ensureSelections(list: Item[]) {
       delete selectedPrices[numericId]
     }
   })
-}
-
-function getDefaultPrice(it: Item): Price | undefined {
-  return Array.isArray(it.prices) && it.prices.length ? it.prices[0] : undefined
 }
 
 function selectPrice(itemId: number, price: Price){ selectedPrices[itemId] = price }

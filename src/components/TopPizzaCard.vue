@@ -18,8 +18,11 @@ const selectedPrice = ref<FoodPrice | null>(null)
 
 watch(() => props.pizza, () => {
   if (sortedPrices.value.length > 0) {
-    // Default to middle size if 3, else first
-    if (sortedPrices.value.length === 3) {
+    // For pizza category, try to select 32cm first, otherwise middle size if 3 options, else first
+    const size32 = sortedPrices.value.find((p) => p.label.includes('32'))
+    if (size32) {
+      selectedPrice.value = size32
+    } else if (sortedPrices.value.length === 3) {
       selectedPrice.value = sortedPrices.value[1]!
     } else {
       selectedPrice.value = sortedPrices.value[0]!
