@@ -33,7 +33,7 @@
             <div v-if="extras.length === 0" class="no-extras">
               Nincs elérhető feltételek
             </div>
-            <div v-for="extra in extras" :key="extra.id" class="extra-item">
+            <div v-for="extra in extras" :key="extra.id" :class="{ 'extra-item': true, 'extra-selected': (selectedExtras[extra.id] || 0) > 0 }">
               <div class="extra-info">
                 <h4>{{ extra.title }}</h4>
                 <p v-if="getPriceForSize(extra) > 0" class="extra-price">
@@ -129,9 +129,9 @@ watch(
   () => props.item,
   (newItem) => {
     if (newItem?.prices && newItem.prices.length > 0) {
-      // Try to find 26cm size, otherwise use first price
-      const size26 = newItem.prices.find((p) => p.label.includes('26'))
-      const price = size26 || newItem.prices[0]
+      // Try to find 32cm size, otherwise use first price
+      const size32 = newItem.prices.find((p) => p.label.includes('32'))
+      const price = size32 || newItem.prices[0]
       if (price) {
         selectedSize.value = { label: price.label, price: price.price }
       }
@@ -353,9 +353,21 @@ function addToCart() {
 }
 
 .extras-list {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+}
+
+@media (max-width: 768px) {
+  .extras-list {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .extras-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 .no-extras {
@@ -369,16 +381,25 @@ function addToCart() {
 
 .extra-item {
   display: flex;
+  flex-direction: column;
   justify-content: space-between;
   align-items: center;
+  text-align: center;
   padding: 12px;
   background: #f9f9f9;
   border-radius: 8px;
-  gap: 12px;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.extra-item.extra-selected {
+  background: #fff3e0;
+  border: 2px solid #ff6106;
 }
 
 .extra-info {
   flex: 1;
+  width: 100%;
 }
 
 .extra-info h4 {
@@ -405,11 +426,14 @@ function addToCart() {
 .extra-controls {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   background: white;
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 4px;
+  align-self: flex-end;
+  width: 100%;
 }
 
 .control-btn {

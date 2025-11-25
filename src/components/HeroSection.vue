@@ -12,13 +12,13 @@
       <div class="mt-5 flex flex-col gap-4 md:flex-row">
         <router-link
           to="/contact"
-          class="text-gray-50 rounded-lg px-6 py-2 text-md md:text-xl work-sans-semibold shadow transition mr-5 border-1 border-gray-50 bg-gray-50 hover:bg-gray-200 text-orange-600 hover:border-orange-600 hover:text-orange-700 w-full md:w-auto h-[80px] md:h-auto flex items-center justify-center"
+          class="hero-btn-outline"
         >
           Asztalfoglalás >
         </router-link>
         <router-link
           to="/menu"
-          class="text-gray-50 rounded-lg bg-orange-600 px-6 py-2 text-md md:text-xl border-1 border-orange-600 work-sans-semibold shadow hover:bg-orange-700 transition w-full md:w-auto h-[80px] md:h-auto flex items-center justify-center hover:border-gray-50"
+          class="hero-btn-primary"
         >
           Étlap megtekintése >
         </router-link>
@@ -65,5 +65,69 @@
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
+}
+
+.hero-btn-outline {
+  background: #f5f5f5;
+  color: #ff6106;
+  border: 1px solid #f5f5f5;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Work Sans", sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+  height: 80px;
+  margin-right: 20px;
+}
+
+@media (min-width: 768px) {
+  .hero-btn-outline {
+    width: auto;
+    height: auto;
+    margin-right: 20px;
+  }
+}
+
+.hero-btn-outline:hover {
+  background: #fff;
+  border-color: #ff6106;
+}
+
+.hero-btn-primary {
+  background: #ff6106;
+  color: #fff;
+  border: 1px solid #ff6106;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Work Sans", sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+  height: 80px;
+}
+
+@media (min-width: 768px) {
+  .hero-btn-primary {
+    width: auto;
+    height: auto;
+  }
+}
+
+.hero-btn-primary:hover {
+  background: #e55a00;
+  border-color: #e55a00;
 }
 </style>

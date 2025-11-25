@@ -49,8 +49,21 @@
           <div>Végösszeg:</div>
           <div class="sum">{{ formatPrice(cartStore.totalPrice) }} Ft</div>
         </div>
-        <div>
+        <div class="checkout-container">
           <router-link to="/order" class="checkout" @click="cartStore.closeCart()">Rendelés leadása</router-link>
+          <button 
+            class="trash-btn" 
+            title="Kosár ürítése"
+            @click="clearCart"
+            aria-label="Kosár ürítése"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"></polyline>
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+              <line x1="10" y1="11" x2="10" y2="17"></line>
+              <line x1="14" y1="11" x2="14" y2="17"></line>
+            </svg>
+          </button>
         </div>
       </div>
     </aside>
@@ -82,6 +95,12 @@ function getItemTotal(item: CartItem): string {
 
 function formatPrice(n: number) {
   return n.toLocaleString('hu-HU')
+}
+
+function clearCart() {
+  if (confirm('Biztos, hogy szeretnéd üríteni a kosarat?')) {
+    cartStore.clearCart()
+  }
 }
 </script>
 
@@ -119,7 +138,7 @@ function formatPrice(n: number) {
 }
 
 .kosar .items { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 300px); }
-.kosar .empty { color: #999; }
+.kosar .empty { color: #999; padding: 16px; text-align: center; }
 .ci { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px dashed #eee; min-width: 0; }
 .ci .left { min-width: 0; flex: 1; }
 .ci .left .title { font-weight: 600; word-break: break-word; }
@@ -134,8 +153,11 @@ function formatPrice(n: number) {
 .lineprice { font-weight: 700; }
 .bottom { display: block; padding-top: 12px; border-top: 1px dashed #eee; }
 .total { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
-.checkout { display: block; width: 100%; background: #FF6106; color: #fff; border: 1px solid #FF6106; padding: 12px 16px; border-radius: 8px; text-decoration: none; text-align: center; cursor: pointer; font-weight: 600; font-size: 16px; font-family: "Work Sans", sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease; }
+.checkout-container { display: flex; gap: 8px; align-items: stretch; }
+.checkout { display: block; flex: 1; background: #FF6106; color: #fff; border: 1px solid #FF6106; padding: 12px 16px; border-radius: 8px; text-decoration: none; text-align: center; cursor: pointer; font-weight: 600; font-size: 16px; font-family: "Work Sans", sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease; display: flex; align-items: center; justify-content: center; }
 .checkout:hover { background: #E55A00; border-color: #E55A00; }
+.trash-btn { background: #fff; border: 1px solid #ddd; color: #ff6106; aspect-ratio: 1; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; flex-shrink: 0; padding: 0 12px; }
+.trash-btn:hover { background: #ffebee; border-color: #ff6106; color: #e55a00; }
 
 @media (max-width: 768px) {
   .kosar-wrapper { display: flex; flex-direction: column; height: 100%; }

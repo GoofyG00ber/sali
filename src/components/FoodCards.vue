@@ -28,13 +28,14 @@
             </div>
 
             <div class="actions">
-              <button v-if="item.category_id === 1" class="btn-outline" type="button" title="Add extras" @click="openExtrasModal(item)">
+              <button v-if="item.category_id === 1" class="btn-outline" type="button" title="További feltétek hozzáadása" @click="openExtrasModal(item)">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <line x1="12" y1="5" x2="12" y2="19" />
                   <line x1="5" y1="12" x2="19" y2="12" />
                 </svg>
+                 Feltétek
               </button>
-              <button class="btn-primary" type="button" :disabled="!(item.prices && item.prices.length)" @click="addToCart(item)" title="Add to cart">
+              <button class="btn-primary" type="button" :disabled="!(item.prices && item.prices.length)" @click="addToCart(item)" title="Kosárba helyezés">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                   <circle cx="9" cy="21" r="1" />
                   <circle cx="20" cy="21" r="1" />
@@ -67,6 +68,17 @@ const emit = defineEmits<{
 
 const selectedPrices = reactive<Record<number, Price>>({})
 
+// For pizza category, prefer 32cm as default, otherwise use first price
+function getDefaultPrice(it: Item): Price | undefined {
+  if (!Array.isArray(it.prices) || it.prices.length === 0) return undefined
+  if (it.category_id === 1) {
+    // Try to find 32cm size first for pizza category
+    const size32 = it.prices.find((p) => p.label.includes('32'))
+    if (size32) return size32
+  }
+  return it.prices[0]
+}
+
 function ensureSelections(list: Item[]) {
   const seenIds = new Set<number>()
   list.forEach((item) => {
@@ -75,7 +87,10 @@ function ensureSelections(list: Item[]) {
       const current = selectedPrices[item.id]
       const stillValid = current && item.prices.some((p) => p.label === current.label)
       if (!stillValid) {
-        selectedPrices[item.id] = item.prices[0]!
+        const defaultPrice = getDefaultPrice(item)
+        if (defaultPrice) {
+          selectedPrices[item.id] = defaultPrice
+        }
       }
     } else if (selectedPrices[item.id]) {
       delete selectedPrices[item.id]
@@ -88,10 +103,6 @@ function ensureSelections(list: Item[]) {
       delete selectedPrices[numericId]
     }
   })
-}
-
-function getDefaultPrice(it: Item): Price | undefined {
-  return Array.isArray(it.prices) && it.prices.length ? it.prices[0] : undefined
 }
 
 function selectPrice(itemId: number, price: Price){ selectedPrices[itemId] = price }

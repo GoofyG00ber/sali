@@ -2,9 +2,17 @@
   <!-- Desktop NavBar (top) -->
   <nav class="nav hidden md:flex fixed top-0 right-0 left-0 z-50 h-[80px] shadow-md items-center">
     <div class="container worker-sans-regular text-white flex justify-between">
-      <router-link to="/" class="logo">
-        <img src="/static_images/logo.png" class="h-[60px]" />
-      </router-link>
+      <div class="flex items-center gap-6">
+        <router-link to="/" class="logo">
+          <img src="/static_images/logo.png" class="h-[60px]" />
+        </router-link>
+
+        <!-- Status Indicator next to logo -->
+        <div class="flex items-center gap-2">
+          <div :class="['status-dot', props.isOpen ? 'open' : 'closed']"></div>
+          <span class="text-sm">{{ props.isOpen ? 'Nyitva' : 'Zárva' }}</span>
+        </div>
+      </div>
 
       <ul class="links h-full flex items-center">
         <li><router-link to="/" class="flex items-center h-full px-3">Főoldal</router-link></li>
@@ -21,7 +29,7 @@
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            <span v-if="itemCount" class="cart-badge">{{ itemCount }}</span>
+            <span v-if="itemCount" :key="itemCount" class="cart-badge">{{ itemCount }}</span>
           </button>
         </li>
       </ul>
@@ -38,6 +46,14 @@
   <!-- Mobile NavBar (bottom with icons) -->
   <nav class="mobile-nav md:hidden fixed bottom-0 right-0 left-0 z-50 bg-white shadow-lg">
     <ul class="mobile-links flex justify-around items-stretch h-20">
+      <li class="flex-1">
+        <div class="mobile-link status-link" :class="{ active: false }">
+          <div class="flex flex-col items-center justify-center gap-1">
+            <div :class="['status-dot', 'mobile', props.isOpen ? 'open' : 'closed']"></div>
+            <span class="text-xs">{{ props.isOpen ? 'Nyitva' : 'Zárva' }}</span>
+          </div>
+        </div>
+      </li>
       <li class="flex-1">
         <router-link to="/" class="mobile-link" :class="{ active: route.path === '/' }" aria-label="Főoldal">
           <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -64,7 +80,7 @@
               <circle cx="20" cy="21" r="1"></circle>
               <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
             </svg>
-            <span v-if="itemCount" class="mobile-cart-badge">{{ itemCount }}</span>
+            <span v-if="itemCount" :key="itemCount" class="mobile-cart-badge">{{ itemCount }}</span>
           </div>
         </button>
       </li>
@@ -108,6 +124,10 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick, watchEffect } from
 import { useRoute } from 'vue-router'
 import { useCartStore } from '@/stores/cart'
 import KosarWidget from './KosarWidget.vue'
+
+const props = defineProps<{
+  isOpen: boolean
+}>()
 
 const route = useRoute()
 const cartStore = useCartStore()
@@ -259,6 +279,33 @@ watchEffect(async ()=>{
   color: white;
 }
 
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  animation: pulse 2s infinite;
+}
+
+.status-dot.open {
+  background: #4ade80;
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(74, 222, 128, 0.9);
+}
+
+.status-dot.closed {
+  background: #dc2626;
+  box-shadow: 0 0 0 2px #fff, 0 0 12px rgba(220, 38, 38, 0.9);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
 /* Mobile navbar styles */
 .mobile-nav {
   height: 80px;
@@ -291,6 +338,15 @@ watchEffect(async ()=>{
   border-top: 3px solid transparent;
 }
 
+.mobile-link.status-link {
+  cursor: default;
+}
+
+.status-dot.mobile {
+  width: 6px;
+  height: 6px;
+}
+
 .mobile-link.cart-btn {
   position: relative;
   display: flex;
@@ -306,6 +362,29 @@ watchEffect(async ()=>{
 .mobile-link.router-link-active {
   color: #FF6106;
   border-top: 3px solid #FF6106;
+}
+
+@keyframes badge-pop {
+  0% {
+    transform: scale(1);
+    background: #FF6106;
+    color: #fff;
+  }
+  25% {
+    transform: scale(1.4);
+    background: #fff;
+    color: #FF6106;
+  }
+  75% {
+    transform: scale(1.4);
+    background: #fff;
+    color: #FF6106;
+  }
+  100% {
+    transform: scale(1);
+    background: #FF6106;
+    color: #fff;
+  }
 }
 
 .mobile-cart-badge {
@@ -324,6 +403,7 @@ watchEffect(async ()=>{
   display: flex;
   align-items: center;
   justify-content: center;
+  animation: badge-pop 0.6s ease-in-out;
 }
 
 .mobile-cart-dropdown {
@@ -378,7 +458,7 @@ watchEffect(async ()=>{
 
 /* cart styles */
 .cart-btn{ background: transparent; border: none; color: inherit; cursor: pointer; position: relative; }
-.cart-badge{ position: absolute; top: -5px; right: -5px; background:#FF6106; color:#fff; font-weight:700; border-radius:999px; padding:0 6px; font-size:12px; min-width: 20px; text-align: center; }
+.cart-badge{ position: absolute; top: -5px; right: -5px; background:#FF6106; color:#fff; font-weight:700; border-radius:999px; padding:0 6px; font-size:12px; min-width: 20px; text-align: center; animation: badge-pop 0.6s ease-in-out; }
 .cart-dropdown{ width:300px; background:#fff; border:1px solid rgba(0,0,0,0.08); border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.08); padding:0; margin-right: 20px; }
 .cart-dropdown::before{ /* outer arrow / border */
   content: '';

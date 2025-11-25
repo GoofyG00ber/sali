@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import CategoryList from '@/components/CategoryList.vue'
 import FoodCards from '@/components/FoodCards.vue'
@@ -211,7 +211,13 @@ function selectCategory(id:number){
   if (selectedCategoryId.value === id) return
   selectedCategoryId.value = id
   page.value = 1
+  window.scrollTo({ top: 0, behavior: 'auto' })
 }
+
+// Scroll to top when page changes
+watch(() => page.value, () => {
+  window.scrollTo({ top: 0, behavior: 'auto' })
+})
 
 const currentCategory = computed(() => menu.value.categories.find((c) => c.id === selectedCategoryId.value))
 
