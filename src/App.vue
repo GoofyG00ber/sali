@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { ref, onMounted, onBeforeUnmount, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import NavBar from './components/NavBar.vue'
 import Footer from './components/Footer.vue'
 import RestaurantStatusModal from './components/RestaurantStatusModal.vue'
 
+const route = useRoute()
 const showStatusModal = ref(false)
 const statusMessage = ref('')
 const todaySchedule = ref(null)
@@ -16,6 +18,11 @@ const handleScroll = () => {
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
 }
+
+// Scroll to top when route changes
+watch(() => route.path, () => {
+  window.scrollTo({ top: 0, behavior: 'auto' })
+})
 
 onMounted(async () => {
   // Check if we already showed the modal in this session
@@ -158,7 +165,7 @@ main {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999999;
+  z-index: 40;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   opacity: 1;
