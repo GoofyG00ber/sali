@@ -35,13 +35,24 @@
           <h3 class="absolute text-gray-50 pacifico-regular text-4xl -mt-10 ">Nyitvatartás</h3>
           <div class="hours-content">
             <div class="hours-grid mt-10 mb-19 px-10">
-              <div class="day">HÉTFŐ</div><div class="time">10:00 - 21:00</div>
-              <div class="day">KEDD</div><div class="time">10:00 - 21:00</div>
-              <div class="day">SZERDA</div><div class="time">10:00 - 21:00</div>
-              <div class="day">CSÜTÖRTÖK</div><div class="time">10:00 - 21:00</div>
-              <div class="day">PÉNTEK</div><div class="time">10:00 - 22:00</div>
-              <div class="day">SZOMBAT</div><div class="time">10:00 - 22:00</div>
-              <div class="day">VASÁRNAP</div><div class="time">14:00 - 21:00</div>
+              <template v-if="settingsStore.openingHours.length > 0">
+                <template v-for="day in settingsStore.openingHours" :key="day.id">
+                  <div class="day">{{ day.name_of_day.toUpperCase() }}</div>
+                  <div class="time">
+                    {{ day.is_open ? `${day.open_time} - ${day.close_time}` : 'ZÁRVA' }}
+                  </div>
+                </template>
+              </template>
+              <template v-else>
+                <!-- Fallback/Loading state (matches original design) -->
+                <div class="day">HÉTFŐ</div><div class="time">10:00 - 21:00</div>
+                <div class="day">KEDD</div><div class="time">10:00 - 21:00</div>
+                <div class="day">SZERDA</div><div class="time">10:00 - 21:00</div>
+                <div class="day">CSÜTÖRTÖK</div><div class="time">10:00 - 21:00</div>
+                <div class="day">PÉNTEK</div><div class="time">10:00 - 22:00</div>
+                <div class="day">SZOMBAT</div><div class="time">10:00 - 22:00</div>
+                <div class="day">VASÁRNAP</div><div class="time">14:00 - 21:00</div>
+              </template>
             </div>
 
             <div class="card-footer">
@@ -74,6 +85,14 @@
 import MapView from '@/components/MapView.vue'
 import DottedPanel from '@/components/DottedPanel.vue'
 import CheckeredPanel from '@/components/CheckeredPanel.vue'
+import { useSettingsStore } from '@/stores/settings'
+import { onMounted } from 'vue'
+
+const settingsStore = useSettingsStore()
+
+onMounted(() => {
+  settingsStore.fetchOpeningHours()
+})
 </script>
 
 <style scoped>

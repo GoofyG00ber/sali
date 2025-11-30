@@ -6,6 +6,7 @@ import MenuView from '@/views/public/MenuView.vue'
 import OrderView from '@/views/public/OrderView.vue'
 import OrderSuccessView from '@/views/public/OrderSuccessView.vue'
 import PizzaBuilderView from '@/views/public/PizzaBuilderView.vue'
+import PolicyView from '@/views/public/PolicyView.vue'
 import AdminView from '@/views/admin/AdminView.vue'
 
 const routes = [
@@ -16,6 +17,18 @@ const routes = [
   { path: '/pizza-builder', name: 'PizzaBuilder', component: PizzaBuilderView },
   { path: '/order', name: 'Order', component: OrderView },
   { path: '/order-success', name: 'OrderSuccess', component: OrderSuccessView },
+  {
+    path: '/aszf',
+    name: 'ASZF',
+    component: PolicyView,
+    meta: { type: 'aszf' }
+  },
+  {
+    path: '/adatvedelem',
+    name: 'Privacy',
+    component: PolicyView,
+    meta: { type: 'privacy' }
+  },
   {
     path: '/admin',
     name: 'Admin',

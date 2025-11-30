@@ -182,6 +182,58 @@
               </div>
             </div>
 
+            <!-- Opening Hours Editor -->
+            <div class="bg-white p-6 rounded-lg shadow mb-6">
+              <div class="flex justify-between items-center mb-4">
+                <h2 class="text-xl font-bold">Nyitvatartás beállítása</h2>
+                <button
+                  @click="saveOpeningHours"
+                  class="bg-green-600 text-white px-6 py-2 rounded-md hover:bg-green-700 transition inline-flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  :disabled="settingsStore.loading"
+                >
+                  <svg v-if="!settingsStore.loading" class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M5 5h14v14H5z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1" />
+                    <path d="M9 5v6h6V5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  {{ settingsStore.loading ? 'Mentés...' : 'Mentés' }}
+                </button>
+              </div>
+
+              <div v-if="settingsStore.loading && settingsStore.openingHours.length === 0" class="text-center py-4">
+                Betöltés...
+              </div>
+
+              <div v-else class="space-y-4">
+                <div v-for="day in settingsStore.openingHours" :key="day.id" class="flex items-center gap-4 p-3 bg-gray-50 rounded-md">
+                  <div class="w-24 font-medium">{{ day.name_of_day }}</div>
+
+                  <label class="flex items-center cursor-pointer">
+                    <input type="checkbox" v-model="day.is_open" class="sr-only peer">
+                    <div class="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    <span class="ms-3 text-sm font-medium text-gray-900">{{ day.is_open ? 'Nyitva' : 'Zárva' }}</span>
+                  </label>
+
+                  <div class="flex items-center gap-2 ml-auto" :class="{ 'opacity-50 pointer-events-none': !day.is_open }">
+                    <input
+                      type="time"
+                      v-model="day.open_time"
+                      class="px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    >
+                    <span class="text-gray-500">-</span>
+                    <input
+                      type="time"
+                      v-model="day.close_time"
+                      class="px-3 py-1 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    >
+                  </div>
+                </div>
+              </div>
+
+              <div v-if="saveHoursSuccess" class="mt-4 bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded">
+                Nyitvatartás sikeresen mentve!
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div class="stat-card bg-white p-6 rounded-lg shadow">
                 <h3 class="text-gray-600 text-sm font-medium mb-2">Összes étel</h3>
@@ -537,6 +589,7 @@
                 v-model="foodForm.title"
                 type="text"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                placeholder="Étel neve..."
                 required
               />
             </div>
@@ -547,6 +600,7 @@
                 v-model="foodForm.description"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 rows="3"
+                placeholder="Hozzávalók és leírás..."
                 required
               ></textarea>
             </div>
@@ -566,26 +620,32 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Árak</label>
-              <div v-for="(price, index) in foodForm.prices" :key="index" class="flex gap-2 mb-2">
-                <input
-                  v-model="price.label"
-                  type="text"
-                  placeholder="Méret (pl. 26 cm)"
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <input
-                  v-model.number="price.price"
-                  type="number"
-                  placeholder="Ár (Ft)"
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  required
-                />
+              <div v-for="(price, index) in foodForm.prices" :key="index" class="flex gap-2 mb-2 items-end">
+                <div class="flex-1">
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Mennyiség(pl. 26 cm, 10dkg, 1 adag)</label>
+                  <input
+                    v-model="price.label"
+                    type="text"
+                    placeholder="Méret (pl. 26 cm)"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div class="flex-1">
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Ár (Ft)</label>
+                  <input
+                    v-model.number="price.price"
+                    type="number"
+                    placeholder="Ár (Ft)"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
                 <button
                   type="button"
                   @click="removePrice(index)"
                   v-if="foodForm.prices.length > 1"
-                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 inline-flex items-center justify-center"
+                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 inline-flex items-center justify-center h-[42px]"
                   aria-label="Ár sor törlése"
                 >
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -603,12 +663,16 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Kép URL</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Kép feltöltése</label>
               <input
-                v-model="foodForm.image"
-                type="text"
+                type="file"
+                @change="handleFileUpload"
+                accept="image/*"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
               />
+              <p v-if="foodForm.image && !foodForm.imageFile" class="text-sm text-gray-500 mt-1">
+                Jelenlegi kép: {{ foodForm.image }}
+              </p>
             </div>
 
             <div class="flex gap-4 pt-4">
@@ -639,6 +703,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useFoodsStore, type Food } from '@/stores/foods'
 import { usePoliciesStore } from '@/stores/policies'
 import { useOrdersStore, type Order } from '@/stores/orders'
+import { useSettingsStore } from '@/stores/settings'
 import { QuillEditor } from '@vueup/vue-quill'
 import '@vueup/vue-quill/dist/vue-quill.snow.css'
 
@@ -646,6 +711,7 @@ const authStore = useAuthStore()
 const foodsStore = useFoodsStore()
 const policiesStore = usePoliciesStore()
 const ordersStore = useOrdersStore()
+const settingsStore = useSettingsStore()
 
 // Restaurant Status
 const manualOpen = ref(true)
@@ -690,8 +756,16 @@ const foodForm = ref({
   description: '',
   categoryId: 1,
   prices: [{ label: '26 cm', price: 0 }],
-  image: '/placeholder.png'
+  image: '/placeholder.png',
+  imageFile: null as File | null
 })
+
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    foodForm.value.imageFile = target.files[0]
+  }
+}
 
 // Password change state
 const passwordForm = ref({
@@ -706,6 +780,7 @@ const passwordSuccess = ref('')
 const aszfContent = ref('')
 const privacyContent = ref('')
 const saveSuccess = ref(false)
+const saveHoursSuccess = ref(false)
 
 // Computed property for active foods count
 const activeFoodsCount = computed(() => {
@@ -736,7 +811,8 @@ const handleLogin = async () => {
       foodsStore.fetchCategories(),
       foodsStore.fetchTopPizzas(),
       ordersStore.fetchOrders(),
-      fetchRestaurantStatus()
+      fetchRestaurantStatus(),
+      settingsStore.fetchOpeningHours()
     ])
   } else {
     loginError.value = 'Érvénytelen jelszó'
@@ -823,8 +899,9 @@ const openAddFoodModal = () => {
     title: '',
     description: '',
     categoryId: foodsStore.categories[0]?.id || 1,
-    prices: [{ label: '26 cm', price: 0 }],
-    image: '/placeholder.png'
+    prices: [{ label: '', price: 0 }],
+    image: '/placeholder.png',
+    imageFile: null
   }
   showFoodModal.value = true
 }
@@ -836,7 +913,8 @@ const editFood = (food: Food) => {
     description: food.description,
     categoryId: food.categoryId || 1,
     prices: [...food.prices],
-    image: food.image
+    image: food.image,
+    imageFile: null
   }
   showFoodModal.value = true
 }
@@ -856,18 +934,20 @@ const removePrice = (index: number) => {
 
 const saveFoodItem = async () => {
   try {
-    const foodData = {
-      title: foodForm.value.title,
-      description: foodForm.value.description,
-      categoryId: foodForm.value.categoryId,
-      prices: foodForm.value.prices,
-      image: foodForm.value.image
+    const formData = new FormData()
+    formData.append('title', foodForm.value.title)
+    formData.append('description', foodForm.value.description)
+    formData.append('categoryId', String(foodForm.value.categoryId))
+    formData.append('prices', JSON.stringify(foodForm.value.prices))
+
+    if (foodForm.value.imageFile) {
+      formData.append('image', foodForm.value.imageFile)
     }
 
     if (editingFood.value) {
-      await foodsStore.updateFood(editingFood.value.id, foodData)
+      await foodsStore.updateFood(editingFood.value.id, formData)
     } else {
-      await foodsStore.createFood(foodData)
+      await foodsStore.createFood(formData)
     }
 
     closeFoodModal()
@@ -913,6 +993,15 @@ const savePrivacy = async () => {
   }
 }
 
+const saveOpeningHours = async () => {
+  saveHoursSuccess.value = false
+  const success = await settingsStore.updateOpeningHours(settingsStore.openingHours)
+  if (success) {
+    saveHoursSuccess.value = true
+    setTimeout(() => { saveHoursSuccess.value = false }, 3000)
+  }
+}
+
 // Orders methods
 /*
 const updateOrder = async (orderId: string, status: Order['status'] | undefined, paymentStatus: Order['paymentStatus'] | undefined) => {
@@ -936,6 +1025,7 @@ onMounted(() => {
     foodsStore.fetchCategories()
     foodsStore.fetchTopPizzas()
     fetchRestaurantStatus()
+    settingsStore.fetchOpeningHours()
     policiesStore.fetchAszf().then(() => {
       if (policiesStore.aszf) {
         aszfContent.value = policiesStore.aszf.content

@@ -2,7 +2,9 @@
 import { ref, computed } from 'vue'
 import MapView from '@/components/MapView.vue'
 import CheckeredPanel from '@/components/CheckeredPanel.vue'
+import { useSettingsStore } from '@/stores/settings'
 
+const settingsStore = useSettingsStore()
 const scrollY = ref(0)
 
 const parallaxOffset = computed(() => {
@@ -23,6 +25,7 @@ const handleScroll = () => {
 import { onMounted, onUnmounted } from 'vue'
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
+  settingsStore.fetchOpeningHours()
 })
 
 onUnmounted(() => {
@@ -196,18 +199,17 @@ onUnmounted(() => {
             <div class="mt-8 pt-8 border-t border-gray-200">
               <h3 class="font-semibold text-gray-900 mb-4">Nyitvatartás</h3>
               <div class="space-y-2 text-gray-700">
-                <div class="flex justify-between">
-                  <span>Hétfő - Péntek:</span>
-                  <span>10:00 - 21:00</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Szombat:</span>
-                  <span>10:00 - 22:00</span>
-                </div>
-                <div class="flex justify-between">
-                  <span>Vasárnap:</span>
-                  <span>14:00 - 21:00</span>
-                </div>
+                <template v-if="settingsStore.openingHours.length > 0">
+                  <div v-for="day in settingsStore.openingHours" :key="day.id" class="flex justify-between">
+                    <span>{{ day.name_of_day }}:</span>
+                    <span>{{ day.is_open ? `${day.open_time} - ${day.close_time}` : 'ZÁRVA' }}</span>
+                  </div>
+                </template>
+                <template v-else>
+                  <div class="flex justify-between">
+                    <span>Betöltés...</span>
+                  </div>
+                </template>
               </div>
             </div>
           </div>

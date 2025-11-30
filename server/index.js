@@ -1,11 +1,35 @@
 import express from 'express'
 import cors from 'cors'
 import nodemailer from 'nodemailer'
+import multer from 'multer'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
 import { pool } from './db.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../public/static_images')
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true })
+    }
+    cb(null, uploadDir)
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + path.extname(file.originalname))
+  }
+})
+
+const upload = multer({ storage: storage })
 
 function sanitizePriceEntry(entry) {
   if (!entry) return null
@@ -104,8 +128,40 @@ async function ensureSettingsTable() {
   }
 }
 
+async function ensureOpeningHoursTable() {
+  try {
+    // The table already exists with from_time and til_time columns as timestamps
+    // We just need to ensure it has data if empty
+    const [rows] = await pool.query('SELECT * FROM open_hours')
+    if (rows.length === 0) {
+      const defaults = [
+        { day: 'Hétfő', open: '10:00', close: '21:00' },
+        { day: 'Kedd', open: '10:00', close: '21:00' },
+        { day: 'Szerda', open: '10:00', close: '21:00' },
+        { day: 'Csütörtök', open: '10:00', close: '21:00' },
+        { day: 'Péntek', open: '10:00', close: '22:00' },
+        { day: 'Szombat', open: '10:00', close: '22:00' },
+        { day: 'Vasárnap', open: '14:00', close: '21:00' }
+      ]
+
+      // Use a dummy date for the timestamp
+      const baseDate = '2000-01-01'
+
+      for (const d of defaults) {
+        await pool.query(
+          'INSERT INTO open_hours (name_of_day, from_time, til_time) VALUES (?, ?, ?)',
+          [d.day, `${baseDate} ${d.open}:00`, `${baseDate} ${d.close}:00`]
+        )
+      }
+    }
+  } catch (err) {
+    console.error('Failed to ensure open_hours table exists:', err)
+  }
+}
+
 await ensureMenuMetaTables()
 await ensureSettingsTable()
+await ensureOpeningHoursTable()
 
 // Restaurant Status & Opening Hours
 app.get('/api/restaurant-status', async (req, res) => {
@@ -134,31 +190,28 @@ app.get('/api/restaurant-status', async (req, res) => {
 
     if (hours.length > 0) {
       const todayHours = hours[0]
-      // Parse DB times (assuming they are stored as Date objects or strings)
-      // We only care about the time part.
-      // The DB returns dates like 2025-11-17T09:00:00.000Z.
-      // We need to convert these to Hungary time to get the intended opening hour.
 
+      // Parse DB times (timestamps)
       const fromDate = new Date(todayHours.from_time)
       const tilDate = new Date(todayHours.til_time)
 
       // Convert DB times to Hungary time components
-      // Note: The date part in DB is arbitrary, we just want the time.
-      // But we must ensure we interpret the stored time correctly.
-      // If stored as UTC 09:00, it means 10:00 CET.
-
       const fromHungary = new Date(fromDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
       const tilHungary = new Date(tilDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
 
       const fromValue = fromHungary.getHours() * 60 + fromHungary.getMinutes()
       const tilValue = tilHungary.getHours() * 60 + tilHungary.getMinutes()
 
-      isOpenBySchedule = currentTimeValue >= fromValue && currentTimeValue < tilValue
+      // If fromValue == tilValue, it's considered closed
+      if (fromValue !== tilValue) {
+        isOpenBySchedule = currentTimeValue >= fromValue && currentTimeValue < tilValue
+      }
 
       schedule = {
         day: todayName,
         from: `${fromHungary.getHours().toString().padStart(2, '0')}:${fromHungary.getMinutes().toString().padStart(2, '0')}`,
-        to: `${tilHungary.getHours().toString().padStart(2, '0')}:${tilHungary.getMinutes().toString().padStart(2, '0')}`
+        to: `${tilHungary.getHours().toString().padStart(2, '0')}:${tilHungary.getMinutes().toString().padStart(2, '0')}`,
+        isOpen: fromValue !== tilValue
       }
     }
 
@@ -178,6 +231,46 @@ app.get('/api/restaurant-status', async (req, res) => {
   } catch (err) {
     console.error('Error checking restaurant status:', err)
     res.status(500).json({ error: 'Failed to check status' })
+  }
+})
+
+app.get('/api/opening-hours', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM open_hours')
+    // Sort by day index to ensure correct order (Monday first)
+    const dayOrder = ['Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat', 'Vasárnap']
+    rows.sort((a, b) => dayOrder.indexOf(a.name_of_day) - dayOrder.indexOf(b.name_of_day))
+    res.json(rows)
+  } catch (err) {
+    console.error('Error fetching opening hours:', err)
+    res.status(500).json({ error: 'Failed to fetch opening hours' })
+  }
+})
+
+app.put('/api/opening-hours', async (req, res) => {
+  const { hours } = req.body
+  if (!Array.isArray(hours)) {
+    return res.status(400).json({ error: 'Invalid data format' })
+  }
+
+  try {
+    // Use a dummy date for the timestamp construction
+    const baseDate = '2000-01-01'
+
+    for (const h of hours) {
+      // h.open_time and h.close_time are expected to be "HH:mm" strings
+      const fromTime = `${baseDate} ${h.open_time}:00`
+      const tilTime = `${baseDate} ${h.close_time}:00`
+
+      await pool.query(
+        'UPDATE open_hours SET from_time = ?, til_time = ? WHERE name_of_day = ?',
+        [fromTime, tilTime, h.name_of_day]
+      )
+    }
+    res.json({ success: true })
+  } catch (err) {
+    console.error('Error updating opening hours:', err)
+    res.status(500).json({ error: 'Failed to update opening hours' })
   }
 })
 
@@ -380,12 +473,29 @@ app.get('/api/foods/:id', async (req, res) => {
   }
 })
 
-app.post('/api/foods', async (req, res) => {
-  const { title, description, image, categoryId, active, prices } = req.body
+app.post('/api/foods', upload.single('image'), async (req, res) => {
+  const { title, description, categoryId, active } = req.body
+  let prices = req.body.prices
+
+  // Parse prices if it's a string (from FormData)
+  if (typeof prices === 'string') {
+    try {
+      prices = JSON.parse(prices)
+    } catch (e) {
+      prices = []
+    }
+  }
+
+  // Handle image path
+  let imagePath = req.body.image || '/placeholder.png' // Fallback
+  if (req.file) {
+    imagePath = '/static_images/' + req.file.filename
+  }
+
   try {
     const [result] = await pool.query(
       'INSERT INTO menu_items (title, description, image, category_id, active) VALUES (?, ?, ?, ?, ?)',
-      [title, description, image, categoryId, active ?? 1]
+      [title, description, imagePath, categoryId, active ?? 1]
     )
 
     const foodId = result.insertId
@@ -400,21 +510,37 @@ app.post('/api/foods', async (req, res) => {
       }
     }
 
-    res.json({ id: foodId, title, description, image, categoryId, active, prices, badges: [] })
+    res.json({ id: foodId, title, description, image: imagePath, categoryId, active, prices, badges: [] })
   } catch (err) {
     console.error('Error creating food:', err)
     res.status(500).json({ error: 'Failed to create food' })
   }
 })
 
-app.put('/api/foods/:id', async (req, res) => {
-  const { title, description, image, categoryId, active, prices } = req.body
+app.put('/api/foods/:id', upload.single('image'), async (req, res) => {
+  const { title, description, categoryId, active } = req.body
+  let prices = req.body.prices
   const foodId = req.params.id
+
+  // Parse prices
+  if (typeof prices === 'string') {
+    try {
+      prices = JSON.parse(prices)
+    } catch (e) {
+      prices = []
+    }
+  }
+
+  // Handle image path
+  let imagePath = req.body.image
+  if (req.file) {
+    imagePath = '/static_images/' + req.file.filename
+  }
 
   try {
     await pool.query(
       'UPDATE menu_items SET title=?, description=?, image=?, category_id=?, active=? WHERE id=?',
-      [title, description, image, categoryId, active, foodId]
+      [title, description, imagePath, categoryId, active, foodId]
     )
 
     // Update prices - delete old and insert new
@@ -428,7 +554,7 @@ app.put('/api/foods/:id', async (req, res) => {
       }
     }
 
-    res.json({ id: foodId, title, description, image, categoryId, active, prices, badges: [] })
+    res.json({ id: foodId, title, description, image: imagePath, categoryId, active, prices, badges: [] })
   } catch (err) {
     console.error('Error updating food:', err)
     res.status(500).json({ error: 'Failed to update food' })
@@ -662,13 +788,17 @@ app.put('/api/orders/:id/status', async (req, res) => {
     let isOpenBySchedule = false
     if (hours.length > 0) {
       const todayHours = hours[0]
+
       const fromDate = new Date(todayHours.from_time)
       const tilDate = new Date(todayHours.til_time)
       const fromHungary = new Date(fromDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
       const tilHungary = new Date(tilDate.toLocaleString('en-US', { timeZone: 'Europe/Budapest' }))
       const fromValue = fromHungary.getHours() * 60 + fromHungary.getMinutes()
       const tilValue = tilHungary.getHours() * 60 + tilHungary.getMinutes()
-      isOpenBySchedule = currentTimeValue >= fromValue && currentTimeValue < tilValue
+
+      if (fromValue !== tilValue) {
+        isOpenBySchedule = currentTimeValue >= fromValue && currentTimeValue < tilValue
+      }
     }
 
     const isOpen = manualOpen && isOpenBySchedule
@@ -938,11 +1068,41 @@ app.get('/api/policies', async (req, res) => {
   }
 })
 
+app.get('/api/policies/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM policies WHERE id = ?', [req.params.id])
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Policy not found' })
+    }
+    // Map snake_case to camelCase for frontend
+    const policy = rows[0]
+    res.json({
+      id: policy.id,
+      title: policy.title,
+      content: policy.content,
+      lastUpdated: policy.last_updated
+    })
+  } catch (err) {
+    console.error('Error fetching policy:', err)
+    res.status(500).json({ error: 'Failed to fetch policy' })
+  }
+})
+
 app.put('/api/policies/:id', async (req, res) => {
   const { content } = req.body
   try {
-    await pool.query('UPDATE policies SET content=? WHERE id=?', [content, req.params.id])
-    res.json({ id: req.params.id, content })
+    await pool.query('UPDATE policies SET content=?, last_updated=NOW() WHERE id=?', [content, req.params.id])
+
+    // Fetch updated policy to return
+    const [rows] = await pool.query('SELECT * FROM policies WHERE id = ?', [req.params.id])
+    const policy = rows[0]
+
+    res.json({
+      id: policy.id,
+      title: policy.title,
+      content: policy.content,
+      lastUpdated: policy.last_updated
+    })
   } catch (err) {
     console.error('Error updating policy:', err)
     res.status(500).json({ error: 'Failed to update policy' })

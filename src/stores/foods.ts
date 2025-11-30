@@ -131,14 +131,18 @@ export const useFoodsStore = defineStore('foods', () => {
   }
 
   // Create new food
-  const createFood = async (foodData: Partial<Food>) => {
+  const createFood = async (foodData: Partial<Food> | FormData) => {
     loading.value = true
     error.value = null
     try {
+      const isFormData = foodData instanceof FormData
+      const headers: HeadersInit = isFormData ? {} : { 'Content-Type': 'application/json' }
+      const body = isFormData ? foodData : JSON.stringify(foodData)
+
       const response = await fetch(`${API_BASE}/foods`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(foodData)
+        headers,
+        body
       })
       if (!response.ok) throw new Error('Failed to create food')
       const newFood = await response.json()
@@ -154,14 +158,18 @@ export const useFoodsStore = defineStore('foods', () => {
   }
 
   // Update food
-  const updateFood = async (id: number, foodData: Partial<Food>) => {
+  const updateFood = async (id: number, foodData: Partial<Food> | FormData) => {
     loading.value = true
     error.value = null
     try {
+      const isFormData = foodData instanceof FormData
+      const headers: HeadersInit = isFormData ? {} : { 'Content-Type': 'application/json' }
+      const body = isFormData ? foodData : JSON.stringify(foodData)
+
       const response = await fetch(`${API_BASE}/foods/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(foodData)
+        headers,
+        body
       })
       if (!response.ok) throw new Error('Failed to update food')
       const updatedFood = await response.json()
