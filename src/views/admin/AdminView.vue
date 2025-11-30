@@ -589,6 +589,7 @@
                 v-model="foodForm.title"
                 type="text"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                placeholder="Étel neve..."
                 required
               />
             </div>
@@ -599,6 +600,7 @@
                 v-model="foodForm.description"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 rows="3"
+                placeholder="Hozzávalók és leírás..."
                 required
               ></textarea>
             </div>
@@ -618,26 +620,32 @@
 
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-2">Árak</label>
-              <div v-for="(price, index) in foodForm.prices" :key="index" class="flex gap-2 mb-2">
-                <input
-                  v-model="price.label"
-                  type="text"
-                  placeholder="Méret (pl. 26 cm)"
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  required
-                />
-                <input
-                  v-model.number="price.price"
-                  type="number"
-                  placeholder="Ár (Ft)"
-                  class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                  required
-                />
+              <div v-for="(price, index) in foodForm.prices" :key="index" class="flex gap-2 mb-2 items-end">
+                <div class="flex-1">
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Mennyiség(pl. 26 cm, 10dkg, 1 adag)</label>
+                  <input
+                    v-model="price.label"
+                    type="text"
+                    placeholder="Méret (pl. 26 cm)"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
+                <div class="flex-1">
+                  <label class="block text-sm font-medium text-gray-400 mb-1">Ár (Ft)</label>
+                  <input
+                    v-model.number="price.price"
+                    type="number"
+                    placeholder="Ár (Ft)"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                    required
+                  />
+                </div>
                 <button
                   type="button"
                   @click="removePrice(index)"
                   v-if="foodForm.prices.length > 1"
-                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 inline-flex items-center justify-center"
+                  class="px-3 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 inline-flex items-center justify-center h-[42px]"
                   aria-label="Ár sor törlése"
                 >
                   <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
@@ -879,7 +887,7 @@ const openAddFoodModal = () => {
     title: '',
     description: '',
     categoryId: foodsStore.categories[0]?.id || 1,
-    prices: [{ label: '26 cm', price: 0 }],
+    prices: [{ label: '', price: 0 }],
     image: '/placeholder.png'
   }
   showFoodModal.value = true
