@@ -1,11 +1,35 @@
 import express from 'express'
 import cors from 'cors'
 import nodemailer from 'nodemailer'
+import multer from 'multer'
+import path from 'path'
+import fs from 'fs'
+import { fileURLToPath } from 'url'
 import { pool } from './db.js'
+
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
 
 const app = express()
 app.use(cors())
 app.use(express.json())
+
+// Configure Multer for file uploads
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    const uploadDir = path.join(__dirname, '../public/static_images')
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true })
+    }
+    cb(null, uploadDir)
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+    cb(null, uniqueSuffix + path.extname(file.originalname))
+  }
+})
+
+const upload = multer({ storage: storage })
 
 function sanitizePriceEntry(entry) {
   if (!entry) return null
@@ -449,12 +473,29 @@ app.get('/api/foods/:id', async (req, res) => {
   }
 })
 
-app.post('/api/foods', async (req, res) => {
-  const { title, description, image, categoryId, active, prices } = req.body
+app.post('/api/foods', upload.single('image'), async (req, res) => {
+  const { title, description, categoryId, active } = req.body
+  let prices = req.body.prices
+
+  // Parse prices if it's a string (from FormData)
+  if (typeof prices === 'string') {
+    try {
+      prices = JSON.parse(prices)
+    } catch (e) {
+      prices = []
+    }
+  }
+
+  // Handle image path
+  let imagePath = req.body.image || '/placeholder.png' // Fallback
+  if (req.file) {
+    imagePath = '/static_images/' + req.file.filename
+  }
+
   try {
     const [result] = await pool.query(
       'INSERT INTO menu_items (title, description, image, category_id, active) VALUES (?, ?, ?, ?, ?)',
-      [title, description, image, categoryId, active ?? 1]
+      [title, description, imagePath, categoryId, active ?? 1]
     )
 
     const foodId = result.insertId
@@ -469,21 +510,37 @@ app.post('/api/foods', async (req, res) => {
       }
     }
 
-    res.json({ id: foodId, title, description, image, categoryId, active, prices, badges: [] })
+    res.json({ id: foodId, title, description, image: imagePath, categoryId, active, prices, badges: [] })
   } catch (err) {
     console.error('Error creating food:', err)
     res.status(500).json({ error: 'Failed to create food' })
   }
 })
 
-app.put('/api/foods/:id', async (req, res) => {
-  const { title, description, image, categoryId, active, prices } = req.body
+app.put('/api/foods/:id', upload.single('image'), async (req, res) => {
+  const { title, description, categoryId, active } = req.body
+  let prices = req.body.prices
   const foodId = req.params.id
+
+  // Parse prices
+  if (typeof prices === 'string') {
+    try {
+      prices = JSON.parse(prices)
+    } catch (e) {
+      prices = []
+    }
+  }
+
+  // Handle image path
+  let imagePath = req.body.image
+  if (req.file) {
+    imagePath = '/static_images/' + req.file.filename
+  }
 
   try {
     await pool.query(
       'UPDATE menu_items SET title=?, description=?, image=?, category_id=?, active=? WHERE id=?',
-      [title, description, image, categoryId, active, foodId]
+      [title, description, imagePath, categoryId, active, foodId]
     )
 
     // Update prices - delete old and insert new
@@ -497,7 +554,7 @@ app.put('/api/foods/:id', async (req, res) => {
       }
     }
 
-    res.json({ id: foodId, title, description, image, categoryId, active, prices, badges: [] })
+    res.json({ id: foodId, title, description, image: imagePath, categoryId, active, prices, badges: [] })
   } catch (err) {
     console.error('Error updating food:', err)
     res.status(500).json({ error: 'Failed to update food' })

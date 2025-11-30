@@ -663,12 +663,16 @@
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Kép URL</label>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Kép feltöltése</label>
               <input
-                v-model="foodForm.image"
-                type="text"
+                type="file"
+                @change="handleFileUpload"
+                accept="image/*"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
               />
+              <p v-if="foodForm.image && !foodForm.imageFile" class="text-sm text-gray-500 mt-1">
+                Jelenlegi kép: {{ foodForm.image }}
+              </p>
             </div>
 
             <div class="flex gap-4 pt-4">
@@ -752,8 +756,16 @@ const foodForm = ref({
   description: '',
   categoryId: 1,
   prices: [{ label: '26 cm', price: 0 }],
-  image: '/placeholder.png'
+  image: '/placeholder.png',
+  imageFile: null as File | null
 })
+
+const handleFileUpload = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (target.files && target.files[0]) {
+    foodForm.value.imageFile = target.files[0]
+  }
+}
 
 // Password change state
 const passwordForm = ref({
@@ -888,7 +900,8 @@ const openAddFoodModal = () => {
     description: '',
     categoryId: foodsStore.categories[0]?.id || 1,
     prices: [{ label: '', price: 0 }],
-    image: '/placeholder.png'
+    image: '/placeholder.png',
+    imageFile: null
   }
   showFoodModal.value = true
 }
@@ -900,7 +913,8 @@ const editFood = (food: Food) => {
     description: food.description,
     categoryId: food.categoryId || 1,
     prices: [...food.prices],
-    image: food.image
+    image: food.image,
+    imageFile: null
   }
   showFoodModal.value = true
 }
@@ -920,18 +934,20 @@ const removePrice = (index: number) => {
 
 const saveFoodItem = async () => {
   try {
-    const foodData = {
-      title: foodForm.value.title,
-      description: foodForm.value.description,
-      categoryId: foodForm.value.categoryId,
-      prices: foodForm.value.prices,
-      image: foodForm.value.image
+    const formData = new FormData()
+    formData.append('title', foodForm.value.title)
+    formData.append('description', foodForm.value.description)
+    formData.append('categoryId', String(foodForm.value.categoryId))
+    formData.append('prices', JSON.stringify(foodForm.value.prices))
+
+    if (foodForm.value.imageFile) {
+      formData.append('image', foodForm.value.imageFile)
     }
 
     if (editingFood.value) {
-      await foodsStore.updateFood(editingFood.value.id, foodData)
+      await foodsStore.updateFood(editingFood.value.id, formData)
     } else {
-      await foodsStore.createFood(foodData)
+      await foodsStore.createFood(formData)
     }
 
     closeFoodModal()
