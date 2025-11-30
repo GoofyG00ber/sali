@@ -173,7 +173,7 @@
                   class="mr-3"
                 />
                 <div class="flex-1">
-                  <div class="font-medium">💳 Online fizetés (Barion)</div>
+                  <div class="font-medium">Online fizetés (Barion)</div>
                   <div class="text-sm text-gray-500">Biztonságos bankkártyás fizetés</div>
                 </div>
               </label>
@@ -186,8 +186,8 @@
                   class="mr-3"
                 />
                 <div class="flex-1">
-                  <div class="font-medium">💵 Készpénz átvételkor ({{ deliveryType === 'delivery' ? 'szállítás' : 'elvitel' }})</div>
-                  <div class="text-sm text-gray-500">Fizetés átvételkor</div>
+                  <div class="font-medium">Fizetés átvételnél ({{ deliveryType === 'delivery' ? 'szállítás' : 'elvitel' }})</div>
+                  <div class="text-sm text-gray-500">Készpénz, bankkártya, szép kártya</div>
                 </div>
               </label>
             </div>
