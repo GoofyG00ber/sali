@@ -1068,11 +1068,41 @@ app.get('/api/policies', async (req, res) => {
   }
 })
 
+app.get('/api/policies/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM policies WHERE id = ?', [req.params.id])
+    if (rows.length === 0) {
+      return res.status(404).json({ error: 'Policy not found' })
+    }
+    // Map snake_case to camelCase for frontend
+    const policy = rows[0]
+    res.json({
+      id: policy.id,
+      title: policy.title,
+      content: policy.content,
+      lastUpdated: policy.last_updated
+    })
+  } catch (err) {
+    console.error('Error fetching policy:', err)
+    res.status(500).json({ error: 'Failed to fetch policy' })
+  }
+})
+
 app.put('/api/policies/:id', async (req, res) => {
   const { content } = req.body
   try {
-    await pool.query('UPDATE policies SET content=? WHERE id=?', [content, req.params.id])
-    res.json({ id: req.params.id, content })
+    await pool.query('UPDATE policies SET content=?, last_updated=NOW() WHERE id=?', [content, req.params.id])
+
+    // Fetch updated policy to return
+    const [rows] = await pool.query('SELECT * FROM policies WHERE id = ?', [req.params.id])
+    const policy = rows[0]
+
+    res.json({
+      id: policy.id,
+      title: policy.title,
+      content: policy.content,
+      lastUpdated: policy.last_updated
+    })
   } catch (err) {
     console.error('Error updating policy:', err)
     res.status(500).json({ error: 'Failed to update policy' })
