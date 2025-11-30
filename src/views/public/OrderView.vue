@@ -209,6 +209,20 @@
             </div>
           </div>
 
+          <!-- Policy Acceptance -->
+          <div class="mb-6">
+            <label class="flex items-start cursor-pointer">
+              <input
+                type="checkbox"
+                v-model="acceptedPolicies"
+                class="mt-1 mr-3 h-5 w-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              />
+              <span class="text-sm text-gray-700">
+                Elolvastam és elfogadom az <router-link to="/aszf" target="_blank" class="text-blue-600 hover:underline">Általános Szerződési Feltételeket</router-link> és az <router-link to="/adatvedelem" target="_blank" class="text-blue-600 hover:underline">Adatvédelmi Nyilatkozatot</router-link>.
+              </span>
+            </label>
+          </div>
+
           <!-- Submit -->
           <div v-if="errorMessage" class="mb-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
             {{ errorMessage }}
@@ -255,6 +269,7 @@ const deliveryType = ref<'pickup' | 'delivery'>('pickup')
 const paymentMethod = ref<'barion' | 'cash'>('cash')
 const submitting = ref(false)
 const errorMessage = ref('')
+const acceptedPolicies = ref(false)
 
 // City delivery configuration
 const deliveryCities = [
@@ -347,6 +362,12 @@ function handleAddDrink(payload: { drink: Food; price: { label: string; price: n
 
 const handleSubmitOrder = async () => {
   errorMessage.value = ''
+
+  if (!acceptedPolicies.value) {
+    errorMessage.value = 'A rendelés leadásához el kell fogadnod az ÁSZF-et és az Adatvédelmi Nyilatkozatot.'
+    return
+  }
+
   submitting.value = true
 
   try {
