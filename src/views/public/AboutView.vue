@@ -179,7 +179,7 @@ onUnmounted(() => {
                 </svg>
                 <div>
                   <p class="font-semibold text-gray-900">Telefon</p>
-                  <p class="text-gray-700">+36 2 843 7484</p>
+                  <p class="text-gray-700">+36 20 8437 484</p>
                 </div>
               </div>
               <div class="flex gap-4">
@@ -188,7 +188,7 @@ onUnmounted(() => {
                 </svg>
                 <div>
                   <p class="font-semibold text-gray-900">Email</p>
-                  <p class="text-gray-700">salipizzeria@gmail.com</p>
+                  <p class="text-gray-700">baross92@gmail.com</p>
                 </div>
               </div>
             </div>

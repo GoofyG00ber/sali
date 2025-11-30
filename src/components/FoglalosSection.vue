@@ -43,8 +43,8 @@ import SendMessage from '@/components/SendMessage.vue'
 
 // These can be customized where the component is used or replaced with real contact details.
 const props = defineProps({
-  email: { type: String, default: 'orders@example.com' },
-  phone: { type: String, default: '+36 30 123 4567' }
+  email: { type: String, default: 'baross92@gmail.com' },
+  phone: { type: String, default: '+36 20 8437 484' }
 })
 
 const emailDisplay = computed(() => props.email)
