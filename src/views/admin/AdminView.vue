@@ -1024,7 +1024,7 @@ const viewOrderDetails = (order: Order) => {
 onMounted(() => {
   if (route.query.view) {
     const view = route.query.view as string
-    if (['dashboard', 'foods', 'top-pizzas', 'password', 'aszf', 'privacy', 'orders'].includes(view)) {
+    if (['dashboard', 'foods', 'top-pizzas', 'aszf', 'privacy', 'orders'].includes(view)) {
       currentView.value = view as typeof currentView.value
     }
   }
