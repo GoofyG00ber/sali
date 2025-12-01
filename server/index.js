@@ -6,6 +6,7 @@ import path from 'path'
 import fs from 'fs'
 import { fileURLToPath } from 'url'
 import { pool } from './db.js'
+import { printOrder } from './printer.js'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -159,9 +160,33 @@ async function ensureOpeningHoursTable() {
   }
 }
 
+async function ensureOrderItemsExtras() {
+  try {
+    const [cols] = await pool.query("SHOW COLUMNS FROM order_items LIKE 'extras'")
+    if (cols.length === 0) {
+      await pool.query('ALTER TABLE order_items ADD COLUMN extras JSON DEFAULT NULL')
+    }
+  } catch (err) {
+    console.error('Failed to ensure extras column in order_items:', err)
+  }
+}
+
+async function ensureOrderItemsPriceLabel() {
+  try {
+    const [cols] = await pool.query("SHOW COLUMNS FROM order_items LIKE 'price_label'")
+    if (cols.length === 0) {
+      await pool.query('ALTER TABLE order_items ADD COLUMN price_label VARCHAR(64) DEFAULT NULL')
+    }
+  } catch (err) {
+    console.error('Failed to ensure price_label column in order_items:', err)
+  }
+}
+
 await ensureMenuMetaTables()
 await ensureSettingsTable()
 await ensureOpeningHoursTable()
+await ensureOrderItemsExtras()
+await ensureOrderItemsPriceLabel()
 
 // Restaurant Status & Opening Hours
 app.get('/api/restaurant-status', async (req, res) => {
@@ -628,9 +653,10 @@ app.get('/api/orders', async (req, res) => {
         items: orderItems.map(item => ({
           itemId: item.item_id,
           foodTitle: item.item_title || 'Unknown Item',
-          priceLabel: '',
+          priceLabel: item.price_label || '',
           price: item.price,
-          quantity: item.quantity
+          quantity: item.quantity,
+          extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
         })),
         deliveryType: order.delivery_type || 'pickup',
         deliveryInfo: {
@@ -680,7 +706,8 @@ app.get('/api/orders/:id', async (req, res) => {
         foodTitle: item.item_title || item.food_title || 'Unknown Item',
         priceLabel: item.price_label || '',
         price: item.price,
-        quantity: item.quantity
+        quantity: item.quantity,
+        extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
       })),
       deliveryType: order.delivery_type || 'pickup',
       deliveryInfo: {
@@ -724,6 +751,55 @@ app.put('/api/orders/:id/status', async (req, res) => {
   } catch (err) {
     console.error('Error updating order status:', err)
     res.status(500).json({ error: 'Failed to update order status' })
+  }
+})
+
+// Print order manually
+app.post('/api/orders/:id/print', async (req, res) => {
+  try {
+    const orderId = req.params.id
+    const [orders] = await pool.query('SELECT * FROM orders WHERE id=?', [orderId])
+
+    if (orders.length === 0) {
+      return res.status(404).json({ error: 'Order not found' })
+    }
+
+    const order = orders[0]
+    const [items] = await pool.query(`
+      SELECT oi.*, mi.title as foodTitle
+      FROM order_items oi
+      LEFT JOIN menu_items mi ON oi.item_id = mi.id
+      WHERE oi.order_id = ?
+    `, [order.id])
+
+    const fullOrder = {
+      id: order.id.toString(),
+      items: items.map(item => ({
+        foodTitle: item.item_title || item.foodTitle || 'Unknown Item',
+        priceLabel: item.price_label || '',
+        price: item.price,
+        quantity: item.quantity,
+        extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
+      })),
+      deliveryType: order.delivery_type || 'pickup',
+      deliveryInfo: {
+        name: order.name || '',
+        phone: order.phone || '',
+        address: order.address || '',
+        city: order.city || '',
+        zip: order.zip || '',
+        note: order.note || ''
+      },
+      totalPrice: order.total_price,
+      paymentMethod: order.payment_method || 'cash',
+      createdAt: order.created_at
+    }
+
+    await printOrder(fullOrder)
+    res.json({ success: true, message: 'Print command sent' })
+  } catch (err) {
+    console.error('Error printing order:', err)
+    res.status(500).json({ error: 'Failed to print order' })
   }
 })
 
@@ -891,14 +967,17 @@ app.put('/api/orders/:id/status', async (req, res) => {
     // Insert order items — fill all available columns (use item_id to match schema)
     if (items && Array.isArray(items) && items.length > 0) {
       for (const item of items) {
+        const extrasJson = item.extras ? JSON.stringify(item.extras) : null
         await pool.query(
-          'INSERT INTO order_items (order_id, item_id, item_title, quantity, price) VALUES (?, ?, ?, ?, ?)',
+          'INSERT INTO order_items (order_id, item_id, item_title, quantity, price, extras, price_label) VALUES (?, ?, ?, ?, ?, ?, ?)',
           [
             orderId,
             item.itemId ?? item.foodId ?? null,
-            item.item_title ?? item.title ?? 'Unknown Item',
+            item.foodTitle ?? item.item_title ?? item.title ?? 'Unknown Item',
             item.quantity ?? 1,
-            item.price ?? 0
+            item.price ?? 0,
+            extrasJson,
+            item.priceLabel ?? item.price_label ?? null
           ]
         )
       }
@@ -918,14 +997,15 @@ app.put('/api/orders/:id/status', async (req, res) => {
       WHERE oi.order_id = ?
     `, [orderId])
 
-    res.json({
+    const responseOrder = {
       id: orderId.toString(),
       items: orderItems.map(item => ({
         itemId: item.item_id,
         foodTitle: item.item_title || 'Unknown Item',
-        priceLabel: '',
+        priceLabel: item.price_label || '',
         price: item.price,
-        quantity: item.quantity
+        quantity: item.quantity,
+        extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
       })),
       deliveryType: order.delivery_type || 'pickup',
       deliveryInfo: {
@@ -945,7 +1025,14 @@ app.put('/api/orders/:id/status', async (req, res) => {
       paymentMethod: order.payment_method || 'cash',
       createdAt: order.created_at,
       updatedAt: order.updated_at
-    })
+    }
+
+    res.json(responseOrder)
+
+    // Auto-print cash orders
+    if (responseOrder.paymentMethod === 'cash') {
+      printOrder(responseOrder).catch(err => console.error('Auto-print failed:', err))
+    }
   } catch (err) {
     console.error('Error creating order:', err && err.stack ? err.stack : err)
     // In development return the error message for easier debugging. In production avoid leaking internals.
@@ -1007,7 +1094,8 @@ app.patch('/api/orders/:id', async (req, res) => {
         foodTitle: item.item_title || 'Unknown Item',
         priceLabel: '',
         price: item.price,
-        quantity: item.quantity
+        quantity: item.quantity,
+        extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
       })),
       deliveryType: order.delivery_type || 'pickup',
       deliveryInfo: {
@@ -1150,6 +1238,70 @@ app.post('/api/barion/check-payment', async (req, res) => {
       return res.status(400).json({ error: 'Barion API error', details: result.Errors })
     }
 
+    // If payment is successful, update order status and print
+    if (result.Status === 'Succeeded') {
+      const PaymentRequestId = result.PaymentRequestId
+
+      // Check if order is already confirmed to avoid double printing
+      const [existing] = await pool.query('SELECT status FROM orders WHERE id = ?', [PaymentRequestId])
+      if (existing.length > 0 && existing[0].status !== 'confirmed') {
+        console.log(`Payment ${PaymentRequestId} verified as Succeeded via check-payment, updating and printing`)
+
+        await pool.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?', ['confirmed', PaymentRequestId])
+
+        // Store Barion Payment ID if possible
+        try {
+          const [cols] = await pool.query("SHOW COLUMNS FROM orders LIKE 'barion_payment_id'")
+          if (cols && cols.length) {
+            await pool.query('UPDATE orders SET barion_payment_id = ? WHERE id = ?', [paymentId, PaymentRequestId])
+          }
+        } catch {
+          // ignore
+        }
+
+        // Auto-print
+        try {
+          const [orders] = await pool.query('SELECT * FROM orders WHERE id=?', [PaymentRequestId])
+          if (orders.length > 0) {
+            const order = orders[0]
+            const [items] = await pool.query(`
+              SELECT oi.*, mi.title as foodTitle
+              FROM order_items oi
+              LEFT JOIN menu_items mi ON oi.item_id = mi.id
+              WHERE oi.order_id = ?
+            `, [order.id])
+
+            const fullOrder = {
+              id: order.id.toString(),
+              items: items.map(item => ({
+                foodTitle: item.item_title || item.foodTitle || 'Unknown Item',
+                priceLabel: item.price_label || '',
+                price: item.price,
+                quantity: item.quantity,
+                extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
+              })),
+              deliveryType: order.delivery_type || 'pickup',
+              deliveryInfo: {
+                name: order.name || '',
+                phone: order.phone || '',
+                address: order.address || '',
+                city: order.city || '',
+                zip: order.zip || '',
+                note: order.note || ''
+              },
+              totalPrice: order.total_price,
+              paymentMethod: 'barion',
+              createdAt: order.created_at
+            }
+
+            printOrder(fullOrder).catch(err => console.error('Auto-print failed:', err))
+          }
+        } catch (err) {
+          console.error('Error preparing print for Barion order:', err)
+        }
+      }
+    }
+
     res.json(result)
   } catch (err) {
     console.error('Error checking Barion payment:', err)
@@ -1175,17 +1327,66 @@ app.post('/api/barion/callback', async (req, res) => {
     const stateStr = (State || '').toString()
 
     if (stateStr === 'Succeeded') {
-      // Only Succeeded payments are marked as confirmed and will appear in admin
-      console.log(`Payment ${PaymentRequestId} succeeded, marking as confirmed`)
-      await pool.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?', ['confirmed', PaymentRequestId])
-      // if orders table has barion_payment_id column, store PaymentId
-      try {
-        const [cols] = await pool.query("SHOW COLUMNS FROM orders LIKE 'barion_payment_id'")
-        if (cols && cols.length) {
-          await pool.query('UPDATE orders SET barion_payment_id = ? WHERE id = ?', [PaymentId, PaymentRequestId])
+      // Check if already confirmed to avoid double printing
+      const [existing] = await pool.query('SELECT status FROM orders WHERE id = ?', [PaymentRequestId])
+
+      if (existing.length > 0 && existing[0].status !== 'confirmed') {
+        // Only Succeeded payments are marked as confirmed and will appear in admin
+        console.log(`Payment ${PaymentRequestId} succeeded (callback), marking as confirmed`)
+        await pool.query('UPDATE orders SET status = ?, updated_at = NOW() WHERE id = ?', ['confirmed', PaymentRequestId])
+
+        // if orders table has barion_payment_id column, store PaymentId
+        try {
+          const [cols] = await pool.query("SHOW COLUMNS FROM orders LIKE 'barion_payment_id'")
+          if (cols && cols.length) {
+            await pool.query('UPDATE orders SET barion_payment_id = ? WHERE id = ?', [PaymentId, PaymentRequestId])
+          }
+        } catch {
+          // ignore if column doesn't exist
         }
-      } catch {
-        // ignore if column doesn't exist
+
+        // Auto-print confirmed Barion orders
+        try {
+          const [orders] = await pool.query('SELECT * FROM orders WHERE id=?', [PaymentRequestId])
+          if (orders.length > 0) {
+            const order = orders[0]
+            const [items] = await pool.query(`
+              SELECT oi.*, mi.title as foodTitle
+              FROM order_items oi
+              LEFT JOIN menu_items mi ON oi.item_id = mi.id
+              WHERE oi.order_id = ?
+            `, [order.id])
+
+            const fullOrder = {
+              id: order.id.toString(),
+              items: items.map(item => ({
+                foodTitle: item.item_title || item.foodTitle || 'Unknown Item',
+                priceLabel: item.price_label || '',
+                price: item.price,
+                quantity: item.quantity,
+                extras: typeof item.extras === 'string' ? JSON.parse(item.extras) : item.extras
+              })),
+              deliveryType: order.delivery_type || 'pickup',
+              deliveryInfo: {
+                name: order.name || '',
+                phone: order.phone || '',
+                address: order.address || '',
+                city: order.city || '',
+                zip: order.zip || '',
+                note: order.note || ''
+              },
+              totalPrice: order.total_price,
+              paymentMethod: 'barion',
+              createdAt: order.created_at
+            }
+
+            printOrder(fullOrder).catch(err => console.error('Auto-print failed:', err))
+          }
+        } catch (err) {
+          console.error('Error preparing print for Barion order:', err)
+        }
+      } else {
+        console.log(`Payment ${PaymentRequestId} already confirmed, skipping update/print in callback`)
       }
     } else if (['Canceled', 'Expired', 'Failed'].includes(stateStr)) {
       // Failed/canceled payments are marked as cancelled and won't appear in admin

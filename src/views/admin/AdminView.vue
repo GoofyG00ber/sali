@@ -699,6 +699,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 import { useFoodsStore, type Food } from '@/stores/foods'
 import { usePoliciesStore } from '@/stores/policies'
@@ -712,6 +713,8 @@ const foodsStore = useFoodsStore()
 const policiesStore = usePoliciesStore()
 const ordersStore = useOrdersStore()
 const settingsStore = useSettingsStore()
+const router = useRouter()
+const route = useRoute()
 
 // Restaurant Status
 const manualOpen = ref(true)
@@ -1014,12 +1017,18 @@ const updateOrder = async (orderId: string, status: Order['status'] | undefined,
 */
 
 const viewOrderDetails = (order: Order) => {
-  const itemsList = order.items.map(item => `- ${item.foodTitle} (${item.priceLabel}) x${item.quantity}`).join('\n')
-  alert(`Order Details:\n\nID: ${order.id}\nCustomer: ${order.deliveryInfo.name}\nEmail: ${order.deliveryInfo.email}\nPhone: ${order.deliveryInfo.phone}\nType: ${order.deliveryType}\nTotal: ${order.totalPrice} Ft\n\nItems:\n${itemsList}`)
+  router.push({ name: 'AdminOrderDetails', params: { id: order.id } })
 }
 
 // Load data on mount if authenticated
 onMounted(() => {
+  if (route.query.view) {
+    const view = route.query.view as string
+    if (['dashboard', 'foods', 'top-pizzas', 'password', 'aszf', 'privacy', 'orders'].includes(view)) {
+      currentView.value = view as typeof currentView.value
+    }
+  }
+
   if (authStore.isAuthenticated) {
     foodsStore.fetchFoods()
     foodsStore.fetchCategories()
