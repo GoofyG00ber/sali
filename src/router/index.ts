@@ -8,6 +8,7 @@ import OrderSuccessView from '@/views/public/OrderSuccessView.vue'
 import PizzaBuilderView from '@/views/public/PizzaBuilderView.vue'
 import PolicyView from '@/views/public/PolicyView.vue'
 import AdminView from '@/views/admin/AdminView.vue'
+import AdminOrderDetailsView from '@/views/admin/AdminOrderDetailsView.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -33,6 +34,12 @@ const routes = [
     path: '/admin',
     name: 'Admin',
     component: AdminView,
+    meta: { requiresAuth: false } // Auth is handled within the component
+  },
+  {
+    path: '/admin/orders/:id',
+    name: 'AdminOrderDetails',
+    component: AdminOrderDetailsView,
     meta: { requiresAuth: false } // Auth is handled within the component
   },
 ]
