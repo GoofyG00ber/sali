@@ -74,10 +74,10 @@ function openExtrasModal(item: Food) {
       </div>
     </div>
 
-    <div class="bg-[#7A231D] pt-8 flex justify-center relative z-5 rounded-t-xl">
+    <div class="bg-[#7A231D] flex justify-center relative z-5 rounded-t-xl">
       <div class="w-full h-40 overflow-hidden">
         <img :src="pizza.image || '/static_images/top-view-delicious-pizza.png'"
-          class="w-full object-cover object-top" />
+          class="w-full object-cover object-top rounded-t-xl" />
     </div>
     </div>
 
