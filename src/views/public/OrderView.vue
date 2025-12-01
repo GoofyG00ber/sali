@@ -39,6 +39,15 @@
       <!-- Order Form -->
       <div v-if="!cartStore.isEmpty" class="bg-white rounded-lg shadow p-6">
         <form @submit.prevent="handleSubmitOrder">
+          <!-- Barion Banner (top right) -->
+          <div class="mb-6 flex justify-end">
+            <img
+              src="/static_images/barion/svg/barion-smart-banner-light.svg"
+              alt="Barion Smart Payment"
+              class="h-12 md:h-16"
+            />
+          </div>
+
           <!-- Delivery Type -->
           <div class="mb-6">
             <label class="block text-lg font-medium mb-3">Szállítás típusa</label>
@@ -172,8 +181,11 @@
                   value="barion"
                   class="mr-3"
                 />
-                <div class="flex-1">
-                  <div class="font-medium">Online fizetés (Barion)</div>
+                <div class="flex-1 flex flex-col">
+                  <div class="font-medium">Online fizetés</div>
+                  <div class="flex justify-start">
+                    <img src="/static_images/barion/svg/barion-smart-banner-light.svg" alt="Barion" class="h-8 md:h-10 w-auto" />
+                  </div>
                   <div class="text-sm text-gray-500">Biztonságos bankkártyás fizetés</div>
                 </div>
               </label>

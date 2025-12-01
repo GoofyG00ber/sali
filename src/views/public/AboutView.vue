@@ -1,10 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import MapView from '@/components/MapView.vue'
 import CheckeredPanel from '@/components/CheckeredPanel.vue'
-import { useSettingsStore } from '@/stores/settings'
 
-const settingsStore = useSettingsStore()
 const scrollY = ref(0)
 
 const parallaxOffset = computed(() => {
@@ -25,7 +22,6 @@ const handleScroll = () => {
 import { onMounted, onUnmounted } from 'vue'
 onMounted(() => {
   window.addEventListener('scroll', handleScroll)
-  settingsStore.fetchOpeningHours()
 })
 
 onUnmounted(() => {
@@ -63,8 +59,8 @@ onUnmounted(() => {
     <div class="container mx-auto px-4 max-w-5xl py-12">
       <!-- Story Section -->
       <section class="mb-16">
+        <h2 class="text-4xl font-bold mb-6 text-gray-900 pacifico-regular">Történetünk</h2>
         <div class="prose prose-lg max-w-none">
-          <h2 class="text-4xl font-bold mb-6 text-gray-900 pacifico-regular">Történetünk</h2>
           <p class="text-gray-700 leading-relaxed mb-4">
             A Sali pizzéria Kartal szívében működik, ahol már évek óta a legfinomabb pizzákat készítjük.
             Szeretünk pizzát sütni, vendégeinket megmosolyogtatni, és élményt nyújtani.
@@ -160,77 +156,18 @@ onUnmounted(() => {
         </div>
       </section>
 
-      <!-- Contact & Hours -->
+      <!-- CTA -->
       <section class="mb-16">
-        <h2 class="text-4xl font-bold mb-8 text-gray-900 pacifico-regular">Hol és hogyan érj el minket</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[auto_auto] gap-0 rounded-lg overflow-hidden shadow-md">
-          <!-- Contact Details -->
-          <div class="bg-gray-50 p-8 flex flex-col justify-between md:row-span-1">
-            <div class="space-y-6">
-              <div class="flex gap-4">
-                <svg class="w-6 h-6 text-red-700 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 7 7 13 7 13s7-6 7-13c0-3.87-3.13-7-7-7zM12 11.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                </svg>
-                <div>
-                  <p class="font-semibold text-gray-900">Cím</p>
-                  <p class="text-gray-700">Kartal, Baross u. 92, 2173</p>
-                </div>
-              </div>
-              <div class="flex gap-4">
-                <svg class="w-6 h-6 text-red-700 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 01.95-.27c1.05.27 2.2.42 3.4.42a1 1 0 011 1V20a1 1 0 01-1 1C10.07 21 3 13.93 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.2.15 2.35.42 3.4a1 1 0 01-.28.95l-2.02 2.44z"/>
-                </svg>
-                <div>
-                  <p class="font-semibold text-gray-900">Telefon</p>
-                  <p class="text-gray-700">+36 20 8437 484</p>
-                </div>
-              </div>
-              <div class="flex gap-4">
-                <svg class="w-6 h-6 text-red-700 flex-shrink-0 mt-1" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                </svg>
-                <div>
-                  <p class="font-semibold text-gray-900">Email</p>
-                  <p class="text-gray-700">baross92@gmail.com</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="mt-8 pt-8 border-t border-gray-200">
-              <h3 class="font-semibold text-gray-900 mb-4">Nyitvatartás</h3>
-              <div class="space-y-2 text-gray-700">
-                <template v-if="settingsStore.openingHours.length > 0">
-                  <div v-for="day in settingsStore.openingHours" :key="day.id" class="flex justify-between">
-                    <span>{{ day.name_of_day }}:</span>
-                    <span>{{ day.is_open ? `${day.open_time} - ${day.close_time}` : 'ZÁRVA' }}</span>
-                  </div>
-                </template>
-                <template v-else>
-                  <div class="flex justify-between">
-                    <span>Betöltés...</span>
-                  </div>
-                </template>
-              </div>
-            </div>
-          </div>
-
-          <!-- Map -->
-          <div class="overflow-hidden">
-            <MapView class="w-full h-full" />
-          </div>
-
-          <!-- CTA -->
-          <div class="col-span-1 md:col-span-2 h-auto bg-red-700 text-white p-12 text-center">
-            <h2 class="text-3xl font-bold mb-4 pacifico-regular">Éhes vagy?</h2>
-            <p class="mb-8 text-lg opacity-90">Nézd meg az étlapunkat és rendelj most, vagy keress minket személyesen!</p>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-              <router-link to="/menu" class="bg-white text-red-700 px-8 py-3 rounded font-semibold hover:bg-gray-100 transition">
-                Az étlapunk
-              </router-link>
-              <router-link to="/contact" class="border-2 border-white text-white px-8 py-3 rounded font-semibold hover:bg-white/10 transition">
-                Írj nekünk
-              </router-link>
-            </div>
+        <div class="bg-red-700 text-white p-12 text-center rounded-lg">
+          <h2 class="text-3xl font-bold mb-4 pacifico-regular">Éhes vagy?</h2>
+          <p class="mb-8 text-lg opacity-90">Nézd meg az étlapunkat és rendelj most, vagy keress minket személyesen!</p>
+          <div class="flex flex-col sm:flex-row justify-center gap-4">
+            <router-link to="/menu" class="bg-white text-red-700 px-8 py-3 rounded font-semibold hover:bg-gray-100 transition">
+              Az étlapunk
+            </router-link>
+            <router-link to="/contact" class="border-2 border-white text-white px-8 py-3 rounded font-semibold hover:bg-white/10 transition">
+              Írj nekünk
+            </router-link>
           </div>
         </div>
       </section>

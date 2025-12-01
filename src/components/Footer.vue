@@ -57,7 +57,7 @@
 
             <div class="card-footer">
               <img src="/static_images/logo.png" alt="Sali Pizzéria" class="logo" />
-              <a href="https://www.facebook.com/salatabar.kartal" target="_blank" rel="noopener noreferrer" class="facebook-icon">
+              <a href="https://www.facebook.com/profile.php?id=61554827411269" target="_blank" rel="noopener noreferrer" class="facebook-icon">
                 <svg viewBox="0 0 24 24" fill="currentColor">
                   <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                 </svg>
@@ -70,9 +70,11 @@
 
     <div class="bottom-bar">
       <div class="container bottom-inner">
-        <div class="spacer" />
+        <img src="/static_images/barion/svg/barion-smart-banner-light.svg" alt="Barion" class="h-8" />
         <div class="links">
-          <a href="/privacy-policy">ADATVÉDELEM</a>
+          <a href="/aszf">ÁSZF</a>
+          <span class="sep">|</span>
+          <a href="/adatvedelem">ADATVÉDELEM</a>
           <span class="sep">|</span>
           <span>Sali Pizzéria</span>
         </div>
@@ -112,9 +114,10 @@ onMounted(() => {
 .contact-list{ list-style:none; padding:0; margin:0; color:#fff; margin-top:24px }
 .contact-list li{ display:flex; align-items:center; gap:12px; padding:8px 0; color:#eee }
 .icon{ width:20px; height:20px; opacity:0.95 }
-.hours-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; align-items:center }
-.day{ font-weight:700; color:#fff }
-.time{ color:#ddd; text-align:right }
+.hours-grid{ display:grid; grid-template-columns:1fr auto; gap:8px 8px; align-items:center }
+.day{ font-weight:700; color:#fff; display:flex; gap:8px; align-items:center }
+.day::after{ content:''; flex:1; border-bottom:1px dotted rgba(255,255,255,0.3); }
+.time{ color:#ddd; text-align:right; white-space:nowrap; }
 
 .card-footer{ display:flex; align-items:center; justify-content:flex-end; gap:16px; margin-top:auto; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1) }
 .logo{ height:48px; object-fit:contain }
@@ -122,15 +125,22 @@ onMounted(() => {
 .facebook-icon:hover{ opacity:0.7 }
 
 .bottom-bar{ background:#111; margin-top:22px; padding-top: 20px;}
-.bottom-inner{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#111; border-top:1px solid rgba(255,255,255,0.06); padding-top: 22px; }
+.bottom-inner{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 16px; background:#111; border-top:1px solid rgba(255,255,255,0.06); }
 .links{ color:#ccc; font-size:13px; display:flex; gap:12px; align-items:center }
 .links a{ color:#ccc; text-decoration:none }
 .sep{ opacity:0.3 }
+
+@media (max-width: 768px){
+  .bottom-inner{ flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+  .links{ justify-content:center; }
+  .hours-grid{ padding:0 4px; }
+}
 
 @media (max-width: 980px){
   .cards{ flex-direction:column; align-items:center }
   .card.contact, .card.hours{ width:92%; }
   .card-map > *{ height:180px }
+  .hours-grid{ padding:0 16px; }
 }
 .pacifico-regular {
   font-family: "Pacifico", cursive;
