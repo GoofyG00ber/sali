@@ -71,7 +71,13 @@
                 @click="currentView = 'foods'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'foods' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                Ételek kezelése
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="9" />
+                    <path d="M12 7v10M7 12h10" />
+                  </svg>
+                  Ételek kezelése
+                </span>
               </button>
             </li>
             <li>
@@ -79,7 +85,12 @@
                 @click="currentView = 'top-pizzas'"
                 :class="['w-full text-left px-4 py-3 rounded-md transition', currentView === 'top-pizzas' ? 'bg-blue-600' : 'hover:bg-gray-700']"
               >
-                Kiemelt pizzák
+                <span class="inline-flex items-center">
+                  <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                  </svg>
+                  Kiemelt pizzák
+                </span>
               </button>
             </li>
             <li>
@@ -103,8 +114,8 @@
               >
                 <span class="inline-flex items-center">
                   <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="5" y="11" width="14" height="10" rx="2" />
-                    <path d="M8 11V8a4 4 0 018 0v3" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
+                    <rect x="4" y="3" width="13" height="18" rx="2" />
+                    <path d="M8 7h5M8 11h8M8 15h5" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
                   </svg>
                   Adatvédelmi Nyilatkozat
                 </span>
@@ -117,7 +128,9 @@
               >
                 <span class="inline-flex items-center">
                   <svg class="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    <circle cx="5" cy="17" r="2" stroke-width="1.5" />
+                    <circle cx="19" cy="17" r="2" stroke-width="1.5" />
+                    <path d="M7 17h12M3 11h18v3H3zM3 14h4v-6h14v6" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" />
                   </svg>
                   Rendelések
                 </span>
