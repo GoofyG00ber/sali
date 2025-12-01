@@ -70,9 +70,11 @@
 
     <div class="bottom-bar">
       <div class="container bottom-inner">
-        <div class="spacer" />
+        <img src="/static_images/barion/svg/barion-smart-banner-light.svg" alt="Barion" class="h-8" />
         <div class="links">
-          <a href="/privacy-policy">ADATVÉDELEM</a>
+          <a href="/aszf">ÁSZF</a>
+          <span class="sep">|</span>
+          <a href="/adatvedelem">ADATVÉDELEM</a>
           <span class="sep">|</span>
           <span>Sali Pizzéria</span>
         </div>
@@ -112,9 +114,10 @@ onMounted(() => {
 .contact-list{ list-style:none; padding:0; margin:0; color:#fff; margin-top:24px }
 .contact-list li{ display:flex; align-items:center; gap:12px; padding:8px 0; color:#eee }
 .icon{ width:20px; height:20px; opacity:0.95 }
-.hours-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px 16px; align-items:center }
-.day{ font-weight:700; color:#fff }
-.time{ color:#ddd; text-align:right }
+.hours-grid{ display:grid; grid-template-columns:1fr auto; gap:8px 8px; align-items:center }
+.day{ font-weight:700; color:#fff; display:flex; gap:8px; align-items:center }
+.day::after{ content:''; flex:1; border-bottom:1px dotted rgba(255,255,255,0.3); }
+.time{ color:#ddd; text-align:right; white-space:nowrap; }
 
 .card-footer{ display:flex; align-items:center; justify-content:flex-end; gap:16px; margin-top:auto; padding-top:16px; border-top:1px solid rgba(255,255,255,0.1) }
 .logo{ height:48px; object-fit:contain }
@@ -122,15 +125,22 @@ onMounted(() => {
 .facebook-icon:hover{ opacity:0.7 }
 
 .bottom-bar{ background:#111; margin-top:22px; padding-top: 20px;}
-.bottom-inner{ display:flex; align-items:center; justify-content:space-between; padding:12px 16px; background:#111; border-top:1px solid rgba(255,255,255,0.06); padding-top: 22px; }
+.bottom-inner{ display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 16px; background:#111; border-top:1px solid rgba(255,255,255,0.06); }
 .links{ color:#ccc; font-size:13px; display:flex; gap:12px; align-items:center }
 .links a{ color:#ccc; text-decoration:none }
 .sep{ opacity:0.3 }
+
+@media (max-width: 768px){
+  .bottom-inner{ flex-direction:column; align-items:center; justify-content:center; gap:12px; }
+  .links{ justify-content:center; }
+  .hours-grid{ padding:0 4px; }
+}
 
 @media (max-width: 980px){
   .cards{ flex-direction:column; align-items:center }
   .card.contact, .card.hours{ width:92%; }
   .card-map > *{ height:180px }
+  .hours-grid{ padding:0 16px; }
 }
 .pacifico-regular {
   font-family: "Pacifico", cursive;
