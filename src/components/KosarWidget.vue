@@ -51,8 +51,8 @@
         </div>
         <div class="checkout-container">
           <router-link to="/order" class="checkout" @click="cartStore.closeCart()">Rendelés leadása</router-link>
-          <button 
-            class="trash-btn" 
+          <button
+            class="trash-btn"
             title="Kosár ürítése"
             @click="clearCart"
             aria-label="Kosár ürítése"
@@ -125,6 +125,8 @@ function clearCart() {
   left: 16px;
   line-height: 1.2;
   margin: 0;
+  white-space: nowrap;
+  overflow: visible;
 }
 
 .kosar-wrapper.in-menu .kosar h3 .count {
@@ -137,7 +139,7 @@ function clearCart() {
   margin-top: 0;
 }
 
-.kosar .items { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 300px); }
+.kosar .items { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 300px); padding-right: 8px; }
 .kosar .empty { color: #999; padding: 16px; text-align: center; }
 .ci { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px dashed #eee; min-width: 0; }
 .ci .left { min-width: 0; flex: 1; }
@@ -162,7 +164,8 @@ function clearCart() {
 @media (max-width: 768px) {
   .kosar-wrapper { display: flex; flex-direction: column; height: 100%; }
   .kosar h3 { display: none; }
-  .kosar { width: 100%; padding: 0; display: flex; flex-direction: column; overflow: hidden; flex: 1; }
+  .kosar { width: 100%; padding: 0; display: flex; flex-direction: column; overflow: hidden; flex: 1; border-radius: 0; }
+  .kosar-wrapper.in-menu .kosar { margin-top: 0; }
   .kosar .items { flex: 1; overflow-y: auto; padding: 16px; padding-top: 16px; margin-top: 0; }
   .bottom { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px dashed #eee; }
 }
