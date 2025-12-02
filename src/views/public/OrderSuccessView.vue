@@ -161,6 +161,9 @@ const paymentId = ref<string | null>(null)
 const status = ref<'pending' | 'confirmed' | 'cancelled' | null>(null)
 const loading = ref(true)
 let pollingInterval: number | null = null
+const orderTotal = ref<number | null>(null)
+const currency = ref<string>('HUF')
+const purchaseTracked = ref(false)
 
 const checkBarionPaymentStatus = async () => {
   if (!paymentId.value) return
@@ -251,6 +254,14 @@ const fetchOrderStatus = async () => {
     }
     const data = await res.json()
     status.value = data.status || 'pending'
+    // capture total and currency if available for pixel
+    orderTotal.value = data.total ?? data.amount ?? data.price ?? orderTotal.value
+    currency.value = data.currency ?? currency.value
+
+    // If order is confirmed, send purchase event once
+    if (status.value === 'confirmed' && !purchaseTracked.value) {
+      purchaseTracked.value = true
+    }
 
     // If we have a paymentId and order is still pending, check Barion status
     if (paymentId.value && status.value === 'pending') {

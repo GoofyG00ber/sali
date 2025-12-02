@@ -55,7 +55,10 @@ export const useAuthStore = defineStore('auth', () => {
     if (isValid) {
       // Persist password locally (development only). In production update backend.
       try {
-        await ADMIN_CONFIG.setPassword(newPassword)
+        // pass both old and new to allow server-side update when available
+        // setPassword will fall back to localStorage if server is not reachable
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await (ADMIN_CONFIG as any).setPassword(oldPassword, newPassword)
         return true
       } catch (e) {
         console.error('Failed to set new admin password', e)

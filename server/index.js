@@ -398,6 +398,65 @@ app.post('/api/top-pizzas', async (req, res) => {
   }
 })
 
+// Admin password endpoints - allow frontend to verify and update the admin password
+// Note: this stores the admin password in the .env file under ADMIN_PASSWORD.
+// The password can be changed via the admin panel, which updates the .env file.
+const getCurrentAdminPassword = () => {
+  return process.env.ADMIN_PASSWORD || null
+}
+
+app.post('/api/admin/verify', async (req, res) => {
+  const { password } = req.body || {}
+  if (typeof password !== 'string') return res.status(400).json({ valid: false, error: 'Missing password' })
+  try {
+    const current = await getCurrentAdminPassword()
+    const valid = current !== null && password === current
+    return res.json({ valid })
+  } catch (e) {
+    console.error('Error verifying admin password', e)
+    return res.status(500).json({ valid: false, error: 'Server error' })
+  }
+})
+
+app.put('/api/admin/password', async (req, res) => {
+  const { oldPassword, newPassword } = req.body || {}
+  if (typeof newPassword !== 'string' || newPassword.length === 0) return res.status(400).json({ success: false, error: 'Invalid newPassword' })
+  try {
+    const current = getCurrentAdminPassword()
+    // If current exists, require oldPassword to match. If current is null, allow setting new password.
+    if (current && current !== null) {
+      if (typeof oldPassword !== 'string' || oldPassword !== current) {
+        return res.status(403).json({ success: false, error: 'Old password mismatch' })
+      }
+    }
+
+    // Update .env file
+    const envPath = path.join(__dirname, '.env')
+    let envContent = fs.readFileSync(envPath, 'utf8')
+    const lines = envContent.split('\n')
+    let found = false
+    const newLines = lines.map(line => {
+      if (line.startsWith('ADMIN_PASSWORD=')) {
+        found = true
+        return `ADMIN_PASSWORD=${newPassword}`
+      }
+      return line
+    })
+    if (!found) {
+      newLines.push(`ADMIN_PASSWORD=${newPassword}`)
+    }
+    fs.writeFileSync(envPath, newLines.join('\n'))
+
+    // Update process.env for immediate effect
+    process.env.ADMIN_PASSWORD = newPassword
+
+    return res.json({ success: true })
+  } catch (e) {
+    console.error('Failed to update admin password', e)
+    return res.status(500).json({ success: false, error: 'Server error' })
+  }
+})
+
 app.delete('/api/top-pizzas/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM top_pizzas WHERE id=?', [req.params.id])
