@@ -70,7 +70,7 @@
 
     <div class="bottom-bar">
       <div class="container bottom-inner">
-        <img src="/static_images/barion/svg/barion-smart-banner-light.svg" alt="Barion" class="h-8" />
+        <img src="/static_images/barion/svg/barion-smart-banner-dark.svg" alt="Barion" class="h-8" />
         <div class="links">
           <a href="/aszf">ÁSZF</a>
           <span class="sep">|</span>
