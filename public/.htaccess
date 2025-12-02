@@ -1,0 +1,46 @@
+# Enable rewrite engine
+RewriteEngine On
+
+# Route API requests to PHP files
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Admin endpoints
+RewriteRule ^api/admin/verify$ api/admin.php [L]
+RewriteRule ^api/admin/password$ api/admin.php [L]
+
+# Restaurant status and hours
+RewriteRule ^api/restaurant-status$ api/restaurant-status.php [L]
+RewriteRule ^api/opening-hours$ api/opening-hours.php [L]
+
+# Categories
+RewriteRule ^api/categories(/.*)?$ api/categories.php [L]
+
+# Foods
+RewriteRule ^api/foods(/.*)?$ api/foods.php [L]
+
+# Top pizzas
+RewriteRule ^api/top-pizzas(/.*)?$ api/top-pizzas.php [L]
+
+# Orders
+RewriteRule ^api/orders(/.*)?$ api/orders.php [L]
+
+# Policies
+RewriteRule ^api/policies(/.*)?$ api/policies.php [L]
+
+# Barion endpoints
+RewriteRule ^api/barion/check-payment$ api/barion.php [L]
+RewriteRule ^api/barion/callback$ api/barion.php [L]
+
+# Test endpoint
+RewriteRule ^api/test$ api/test.php [L]
+
+# Send email endpoint
+RewriteRule ^send-email$ send-email.php [L]
+
+# Enable CORS for all API requests
+<IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+    Header set Access-Control-Allow-Methods "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+</IfModule>

@@ -170,7 +170,7 @@ const checkBarionPaymentStatus = async () => {
 
   try {
     console.log('Checking Barion payment status for:', paymentId.value)
-    const res = await fetch('http://localhost:3001/api/barion/check-payment', {
+    const res = await fetch('/api/barion/check-payment', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ paymentId: paymentId.value })
@@ -205,7 +205,7 @@ const checkBarionPaymentStatus = async () => {
     if (paymentStatus === 'Succeeded') {
       // Update our database
       if (orderId.value) {
-        await fetch(`http://localhost:3001/api/orders/${orderId.value}/status`, {
+        await fetch(`/api/orders/${orderId.value}/status`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'confirmed' })
@@ -220,7 +220,7 @@ const checkBarionPaymentStatus = async () => {
     } else if (['Canceled', 'Expired', 'Failed', 'Cancelled'].includes(paymentStatus)) {
       // Update our database
       if (orderId.value) {
-        await fetch(`http://localhost:3001/api/orders/${orderId.value}/status`, {
+        await fetch(`/api/orders/${orderId.value}/status`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ status: 'cancelled' })
@@ -246,7 +246,7 @@ const fetchOrderStatus = async () => {
 
   try {
     loading.value = true
-    const res = await fetch(`http://localhost:3001/api/orders/${orderId.value}`)
+    const res = await fetch(`/api/orders/${orderId.value}`)
     if (!res.ok) {
       console.error('Failed to fetch order')
       loading.value = false
