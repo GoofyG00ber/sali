@@ -399,16 +399,10 @@ app.post('/api/top-pizzas', async (req, res) => {
 })
 
 // Admin password endpoints - allow frontend to verify and update the admin password
-// Note: this stores the admin password in the `settings` table under key 'admin_password'.
-// If a DB value exists it is preferred; otherwise the server reads from process.env (ADMIN_PASSWORD or VITE_ADMIN_PASSWORD).
-const getCurrentAdminPassword = async () => {
-  try {
-    const [rows] = await pool.query('SELECT setting_value FROM settings WHERE setting_key = ?', ['admin_password'])
-    if (rows.length > 0) return rows[0].setting_value
-  } catch (e) {
-    console.error('Failed to read admin_password from settings table', e)
-  }
-  return process.env.ADMIN_PASSWORD || process.env.VITE_ADMIN_PASSWORD || null
+// Note: this stores the admin password in the .env file under ADMIN_PASSWORD.
+// The password can be changed via the admin panel, which updates the .env file.
+const getCurrentAdminPassword = () => {
+  return process.env.ADMIN_PASSWORD || null
 }
 
 app.post('/api/admin/verify', async (req, res) => {
@@ -428,7 +422,7 @@ app.put('/api/admin/password', async (req, res) => {
   const { oldPassword, newPassword } = req.body || {}
   if (typeof newPassword !== 'string' || newPassword.length === 0) return res.status(400).json({ success: false, error: 'Invalid newPassword' })
   try {
-    const current = await getCurrentAdminPassword()
+    const current = getCurrentAdminPassword()
     // If current exists, require oldPassword to match. If current is null, allow setting new password.
     if (current && current !== null) {
       if (typeof oldPassword !== 'string' || oldPassword !== current) {
@@ -436,8 +430,26 @@ app.put('/api/admin/password', async (req, res) => {
       }
     }
 
-    // Upsert into settings table
-    await pool.query('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?', ['admin_password', newPassword, newPassword])
+    // Update .env file
+    const envPath = path.join(__dirname, '.env')
+    let envContent = fs.readFileSync(envPath, 'utf8')
+    const lines = envContent.split('\n')
+    let found = false
+    const newLines = lines.map(line => {
+      if (line.startsWith('ADMIN_PASSWORD=')) {
+        found = true
+        return `ADMIN_PASSWORD=${newPassword}`
+      }
+      return line
+    })
+    if (!found) {
+      newLines.push(`ADMIN_PASSWORD=${newPassword}`)
+    }
+    fs.writeFileSync(envPath, newLines.join('\n'))
+
+    // Update process.env for immediate effect
+    process.env.ADMIN_PASSWORD = newPassword
+
     return res.json({ success: true })
   } catch (e) {
     console.error('Failed to update admin password', e)

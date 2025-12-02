@@ -154,7 +154,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { trackPurchase } from '@/lib/barion'
 
 const route = useRoute()
 const orderId = ref<string | null>(null)
@@ -213,15 +212,6 @@ const checkBarionPaymentStatus = async () => {
         })
       }
       status.value = 'confirmed'
-      // Track conversion (once)
-      try {
-        if (!purchaseTracked.value) {
-          trackPurchase({ orderId: orderId.value || undefined, value: orderTotal.value ?? undefined, currency: currency.value })
-          purchaseTracked.value = true
-        }
-      } catch (e) {
-        console.error('Failed to send Barion pixel purchase event', e)
-      }
       // Stop polling once payment is successful
       if (pollingInterval) {
         clearInterval(pollingInterval)
@@ -270,12 +260,7 @@ const fetchOrderStatus = async () => {
 
     // If order is confirmed, send purchase event once
     if (status.value === 'confirmed' && !purchaseTracked.value) {
-      try {
-        trackPurchase({ orderId: orderId.value || undefined, value: orderTotal.value ?? undefined, currency: currency.value })
-        purchaseTracked.value = true
-      } catch (e) {
-        console.error('Failed to send Barion pixel purchase event', e)
-      }
+      purchaseTracked.value = true
     }
 
     // If we have a paymentId and order is still pending, check Barion status
