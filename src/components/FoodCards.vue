@@ -22,7 +22,7 @@
           <div class="bottom-row">
             <div class="price-display">
               <span v-if="selectedPrices[item.id]?.price" class="price-amount">
-                {{ formatPrice(selectedPrices[item.id]!.price) }},00 Ft
+                {{ formatPrice(selectedPrices[item.id]!.price) }} Ft
               </span>
               <span v-else class="price-amount">-</span>
             </div>
