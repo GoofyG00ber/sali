@@ -36,12 +36,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { PropType } from 'vue'
+import type { PropType } from 'vue'
 
 interface Extra {
   id: number
   quantity: number
   price: number
+  title?: string
 }
 
 interface CartItem {

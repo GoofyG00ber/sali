@@ -75,6 +75,17 @@
                   />
                 </div>
 
+                <div>
+                  <label for="email" class="block text-xs font-medium text-gray-700 mb-1">E-mail cím *</label>
+                  <input
+                    id="email"
+                    v-model="orderForm.email"
+                    type="email"
+                    required
+                    class="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+
                 <!-- Additional Notes -->
                 <div class="flex flex-col flex-1">
                   <label for="note" class="block text-xs font-medium text-gray-700 mb-1">Megjegyzés (opcionális)</label>
@@ -292,6 +303,7 @@ const deliveryCities = [
 const orderForm = ref({
   name: '',
   phone: '',
+  email: '',
   address: '',
   city: '',
   zip: '',
@@ -398,18 +410,18 @@ const handleSubmitOrder = async () => {
       price: item.selectedPrice.price,
       quantity: item.quantity,
       extras: item.extras && item.extras.length > 0 ? item.extras.map(e => ({
-        id: e.id,
-        title: e.title,
+        title: e.title ?? '',
         quantity: e.quantity,
         price: e.price
       })) : undefined
     }))
 
-    const orderData = {
+      const orderData = {
       items,
       deliveryType: deliveryType.value,
       deliveryInfo: {
         name: orderForm.value.name,
+        email: orderForm.value.email,
         phone: orderForm.value.phone,
         address: orderForm.value.address,
         city: orderForm.value.city,

@@ -9,6 +9,7 @@ import PizzaBuilderView from '@/views/public/PizzaBuilderView.vue'
 import PolicyView from '@/views/public/PolicyView.vue'
 import AdminView from '@/views/admin/AdminView.vue'
 import AdminOrderDetailsView from '@/views/admin/AdminOrderDetailsView.vue'
+import LoginView from '@/views/LoginView.vue'
 
 const routes = [
   { path: '/', name: 'Home', component: HomeView },
@@ -30,6 +31,7 @@ const routes = [
     component: PolicyView,
     meta: { type: 'privacy' }
   },
+  { path: '/login', name: 'Login', component: LoginView, meta: { requiresAuth: false } },
   {
     path: '/admin',
     name: 'Admin',
@@ -49,22 +51,27 @@ const router = createRouter({
   routes,
 })
 
-// Optional: Add a navigation guard if you want to protect the route itself
-// Uncomment if you prefer route-level protection instead of component-level
-/*
 import { useAuthStore } from '@/stores/auth'
 
+// Global guard: require login for all routes except the Login page
 router.beforeEach((to, from, next) => {
   const authStore = useAuthStore()
 
-  if (to.meta.requiresAuth && !authStore.isAuthenticated) {
-    // Redirect to home or show access denied
-    next({ name: 'Home' })
-  } else {
+  // Ensure auth state initialized (reads sessionStorage)
+  authStore.checkAuth()
+
+  if (to.name === 'Login') {
     next()
+    return
   }
+
+  if (!authStore.isAuthenticated) {
+    next({ name: 'Login', query: { redirect: to.fullPath } })
+    return
+  }
+
+  next()
 })
-*/
 
 export default router
 
