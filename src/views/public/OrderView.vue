@@ -1,7 +1,15 @@
 <template>
   <div class="order-page min-h-screen bg-gray-50 py-8">
     <div class="container mx-auto px-4 max-w-4xl">
-  <h1 class="text-4xl font-bold mb-8">Rendelés leadása</h1>
+      <!-- Title with Barion Banner -->
+      <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-4 mb-8 text-center md:text-left">
+        <h1 class="text-4xl font-bold">Rendelés leadása</h1>
+        <img
+          src="/static_images/barion/svg/barion-smart-banner-light.svg"
+          alt="Barion Smart Payment"
+          class="h-12 md:h-16"
+        />
+      </div>
 
       <!-- Cart Summary -->
       <div class="bg-white rounded-lg shadow p-6 mb-6">
@@ -39,15 +47,6 @@
       <!-- Order Form -->
       <div v-if="!cartStore.isEmpty" class="bg-white rounded-lg shadow p-6">
         <form @submit.prevent="handleSubmitOrder">
-          <!-- Barion Banner (top right) -->
-          <div class="mb-6 flex justify-end">
-            <img
-              src="/static_images/barion/svg/barion-smart-banner-light.svg"
-              alt="Barion Smart Payment"
-              class="h-12 md:h-16"
-            />
-          </div>
-
           <!-- Delivery Type -->
           <div class="mb-6">
             <label class="block text-lg font-medium mb-3">Szállítás típusa</label>
@@ -83,17 +82,6 @@
                 id="name"
                 v-model="orderForm.name"
                 type="text"
-                required
-                class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <div>
-              <label for="email" class="block text-sm font-medium text-gray-700 mb-2">E-mail *</label>
-              <input
-                id="email"
-                v-model="orderForm.email"
-                type="email"
                 required
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
               />
@@ -293,7 +281,6 @@ const deliveryCities = [
 
 const orderForm = ref({
   name: '',
-  email: '',
   phone: '',
   address: '',
   city: '',
@@ -413,7 +400,6 @@ const handleSubmitOrder = async () => {
       deliveryType: deliveryType.value,
       deliveryInfo: {
         name: orderForm.value.name,
-        email: orderForm.value.email,
         phone: orderForm.value.phone,
         address: orderForm.value.address,
         city: orderForm.value.city,

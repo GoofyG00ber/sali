@@ -10,7 +10,7 @@
         <!-- Status Indicator next to logo -->
         <div class="flex items-center gap-2">
           <div :class="['status-dot', props.isOpen ? 'open' : 'closed']"></div>
-          <span class="text-sm">{{ props.isOpen ? 'Nyitva' : 'Zárva' }}</span>
+          <span class="text-sm">{{ props.isOpen ? 'Rendelést fogadunk' : 'Jelenleg zárva vagyunk' }}</span>
         </div>
       </div>
 
@@ -50,7 +50,7 @@
         <div class="mobile-link status-link" :class="{ active: false }">
           <div class="flex flex-col items-center justify-center gap-1">
             <div :class="['status-dot', 'mobile', props.isOpen ? 'open' : 'closed']"></div>
-            <span class="text-xs">{{ props.isOpen ? 'Nyitva' : 'Zárva' }}</span>
+            <span class="text-xs">{{ props.isOpen ? 'NYITVA' : 'ZÁRVA' }}</span>
           </div>
         </div>
       </li>
