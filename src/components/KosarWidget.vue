@@ -150,6 +150,7 @@ function clearCart() {
 .extra-qty { font-weight: 600; color: #ff6106; min-width: 20px; flex-shrink: 0; }
 .extra-name { flex: 1; min-width: 0; word-break: break-word; }
 .extra-price { font-weight: 600; color: #666; font-size: 11px; flex-shrink: 0; white-space: nowrap; }
+.ci .right { display: flex; flex-direction: column; gap: 6px; }
 .qty { display: flex; align-items: center; gap: 6px; }
 .qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 .lineprice { font-weight: 700; }
@@ -166,7 +167,9 @@ function clearCart() {
   .kosar h3 { display: none; }
   .kosar { width: 100%; padding: 0; display: flex; flex-direction: column; overflow: hidden; flex: 1; border-radius: 0; }
   .kosar-wrapper.in-menu .kosar { margin-top: 0; }
-  .kosar .items { flex: 1; overflow-y: auto; padding: 16px; padding-top: 16px; margin-top: 0; }
+  .kosar .items { flex: 1; overflow-y: auto; padding: 16px; padding-top: 16px; margin-top: 0; display: flex; flex-direction: column; gap: 8px; }
+  .ci { display: flex; justify-content: space-between; gap: 8px; padding: 8px; border: 1px solid #eee; border-radius: 6px; }
+  .ci .right { display: flex; flex-direction: column; gap: 6px; }
   .bottom { display: flex; flex-direction: column; gap: 12px; padding: 16px; border-top: 1px dashed #eee; }
 }
 </style>
