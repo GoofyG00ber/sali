@@ -398,6 +398,53 @@ app.post('/api/top-pizzas', async (req, res) => {
   }
 })
 
+// Admin password endpoints - allow frontend to verify and update the admin password
+// Note: this stores the admin password in the `settings` table under key 'admin_password'.
+// If a DB value exists it is preferred; otherwise the server reads from process.env (ADMIN_PASSWORD or VITE_ADMIN_PASSWORD).
+const getCurrentAdminPassword = async () => {
+  try {
+    const [rows] = await pool.query('SELECT setting_value FROM settings WHERE setting_key = ?', ['admin_password'])
+    if (rows.length > 0) return rows[0].setting_value
+  } catch (e) {
+    console.error('Failed to read admin_password from settings table', e)
+  }
+  return process.env.ADMIN_PASSWORD || process.env.VITE_ADMIN_PASSWORD || null
+}
+
+app.post('/api/admin/verify', async (req, res) => {
+  const { password } = req.body || {}
+  if (typeof password !== 'string') return res.status(400).json({ valid: false, error: 'Missing password' })
+  try {
+    const current = await getCurrentAdminPassword()
+    const valid = current !== null && password === current
+    return res.json({ valid })
+  } catch (e) {
+    console.error('Error verifying admin password', e)
+    return res.status(500).json({ valid: false, error: 'Server error' })
+  }
+})
+
+app.put('/api/admin/password', async (req, res) => {
+  const { oldPassword, newPassword } = req.body || {}
+  if (typeof newPassword !== 'string' || newPassword.length === 0) return res.status(400).json({ success: false, error: 'Invalid newPassword' })
+  try {
+    const current = await getCurrentAdminPassword()
+    // If current exists, require oldPassword to match. If current is null, allow setting new password.
+    if (current && current !== null) {
+      if (typeof oldPassword !== 'string' || oldPassword !== current) {
+        return res.status(403).json({ success: false, error: 'Old password mismatch' })
+      }
+    }
+
+    // Upsert into settings table
+    await pool.query('INSERT INTO settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?', ['admin_password', newPassword, newPassword])
+    return res.json({ success: true })
+  } catch (e) {
+    console.error('Failed to update admin password', e)
+    return res.status(500).json({ success: false, error: 'Server error' })
+  }
+})
+
 app.delete('/api/top-pizzas/:id', async (req, res) => {
   try {
     await pool.query('DELETE FROM top_pizzas WHERE id=?', [req.params.id])

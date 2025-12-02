@@ -154,6 +154,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { trackPurchase } from '@/lib/barion'
 
 const route = useRoute()
 const orderId = ref<string | null>(null)
@@ -161,6 +162,9 @@ const paymentId = ref<string | null>(null)
 const status = ref<'pending' | 'confirmed' | 'cancelled' | null>(null)
 const loading = ref(true)
 let pollingInterval: number | null = null
+const orderTotal = ref<number | null>(null)
+const currency = ref<string>('HUF')
+const purchaseTracked = ref(false)
 
 const checkBarionPaymentStatus = async () => {
   if (!paymentId.value) return
@@ -209,6 +213,15 @@ const checkBarionPaymentStatus = async () => {
         })
       }
       status.value = 'confirmed'
+      // Track conversion (once)
+      try {
+        if (!purchaseTracked.value) {
+          trackPurchase({ orderId: orderId.value || undefined, value: orderTotal.value ?? undefined, currency: currency.value })
+          purchaseTracked.value = true
+        }
+      } catch (e) {
+        console.error('Failed to send Barion pixel purchase event', e)
+      }
       // Stop polling once payment is successful
       if (pollingInterval) {
         clearInterval(pollingInterval)
@@ -251,6 +264,19 @@ const fetchOrderStatus = async () => {
     }
     const data = await res.json()
     status.value = data.status || 'pending'
+    // capture total and currency if available for pixel
+    orderTotal.value = data.total ?? data.amount ?? data.price ?? orderTotal.value
+    currency.value = data.currency ?? currency.value
+
+    // If order is confirmed, send purchase event once
+    if (status.value === 'confirmed' && !purchaseTracked.value) {
+      try {
+        trackPurchase({ orderId: orderId.value || undefined, value: orderTotal.value ?? undefined, currency: currency.value })
+        purchaseTracked.value = true
+      } catch (e) {
+        console.error('Failed to send Barion pixel purchase event', e)
+      }
+    }
 
     // If we have a paymentId and order is still pending, check Barion status
     if (paymentId.value && status.value === 'pending') {
