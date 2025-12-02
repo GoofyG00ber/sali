@@ -74,6 +74,16 @@
                     class="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
+                <div>
+                  <label for="email" class="block text-xs font-medium text-gray-700 mb-1">E-mail cím *</label>
+                  <input
+                    id="email"
+                    v-model="orderForm.email"
+                    type="email"
+                    required
+                    class="w-full px-3 py-1 text-sm border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
 
                 <!-- Additional Notes -->
                 <div class="flex flex-col flex-1">
@@ -292,6 +302,7 @@ const deliveryCities = [
 const orderForm = ref({
   name: '',
   phone: '',
+  email: '',
   address: '',
   city: '',
   zip: '',
@@ -411,6 +422,7 @@ const handleSubmitOrder = async () => {
       deliveryInfo: {
         name: orderForm.value.name,
         phone: orderForm.value.phone,
+        email: orderForm.value.email,
         address: orderForm.value.address,
         city: orderForm.value.city,
         zip: orderForm.value.zip,

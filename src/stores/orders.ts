@@ -9,7 +9,7 @@ export interface OrderItem {
   priceLabel: string
   price: number
   quantity: number
-  extras?: { title: string; price: number; quantity: number }[]
+  extras?: { title?: string; price: number; quantity: number }[]
 }
 
 export interface DeliveryInfo {
