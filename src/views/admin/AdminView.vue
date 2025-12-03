@@ -614,7 +614,6 @@
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
                 rows="3"
                 placeholder="Hozzávalók és leírás..."
-                required
               ></textarea>
             </div>
 
@@ -683,8 +682,20 @@
                 accept="image/*"
                 class="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
               />
-              <p v-if="foodForm.image && !foodForm.imageFile" class="text-sm text-gray-500 mt-1">
-                Jelenlegi kép: {{ foodForm.image }}
+              <div v-if="foodForm.image && !foodForm.imageFile" class="mt-2 flex items-center justify-between">
+                <p class="text-sm text-gray-500">
+                  Jelenlegi kép: {{ foodForm.image }}
+                </p>
+                <button
+                  type="button"
+                  @click="deleteImage"
+                  class="text-sm text-red-600 hover:text-red-800 font-medium"
+                >
+                  Kép törlése
+                </button>
+              </div>
+              <p v-if="foodForm.imageDeleted" class="text-sm text-orange-600 mt-1">
+                A kép törlésre kerül mentéskor
               </p>
             </div>
 
@@ -773,14 +784,23 @@ const foodForm = ref({
   categoryId: 1,
   prices: [{ label: '26 cm', price: 0 }],
   image: '/placeholder.png',
-  imageFile: null as File | null
+  imageFile: null as File | null,
+  imageDeleted: false,
+  active: true
 })
 
 const handleFileUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   if (target.files && target.files[0]) {
     foodForm.value.imageFile = target.files[0]
+    foodForm.value.imageDeleted = false
   }
+}
+
+const deleteImage = () => {
+  foodForm.value.imageDeleted = true
+  foodForm.value.image = ''
+  foodForm.value.imageFile = null
 }
 
 // Password change state
@@ -917,7 +937,9 @@ const openAddFoodModal = () => {
     categoryId: foodsStore.categories[0]?.id || 1,
     prices: [{ label: '', price: 0 }],
     image: '/placeholder.png',
-    imageFile: null
+    imageFile: null,
+    imageDeleted: false,
+    active: true
   }
   showFoodModal.value = true
 }
@@ -930,7 +952,9 @@ const editFood = (food: Food) => {
     categoryId: food.categoryId || 1,
     prices: [...food.prices],
     image: food.image,
-    imageFile: null
+    imageFile: null,
+    imageDeleted: false,
+    active: food.active === 1 || food.active === true
   }
   showFoodModal.value = true
 }
@@ -955,9 +979,12 @@ const saveFoodItem = async () => {
     formData.append('description', foodForm.value.description)
     formData.append('categoryId', String(foodForm.value.categoryId))
     formData.append('prices', JSON.stringify(foodForm.value.prices))
+    formData.append('active', foodForm.value.active ? '1' : '0')
 
     if (foodForm.value.imageFile) {
       formData.append('image', foodForm.value.imageFile)
+    } else if (foodForm.value.imageDeleted) {
+      formData.append('deleteImage', 'true')
     }
 
     if (editingFood.value) {

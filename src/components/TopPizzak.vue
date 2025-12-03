@@ -233,13 +233,19 @@ function derivePrices(food: UnknownRecord): { label: string; price: number }[] {
       </div>
     </div>
     <img src="/static_images/toppizzak_dots.svg?url" class="absolute top-3/5 right-0 z-2 rotate-90 " />
-    <div class="w-full text-center mt-10">
+    <div class="w-full text-center mt-6">
       <router-link
         to="/menu"
         class="text-amber-300 text-xl work-sans-semibold hover:underline"
       >
         Tovább az étlapra >
       </router-link>
+    </div>
+
+    <!-- Info disclaimer -->
+    <div class="info-disclaimer">
+      <div class="info-icon">i</div>
+      <span class="info-text">A képek között illusztrációk is szerepelnek, és eltérhetnek a valós étel kinézetétől.</span>
     </div>
 
     <PizzaExtrasModal
@@ -294,6 +300,53 @@ function derivePrices(food: UnknownRecord): { label: string; price: number }[] {
   font-optical-sizing: auto;
   font-weight: 700;
   font-style: normal;
+}
+
+/* Info disclaimer */
+.info-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 24px;
+  padding: 0 16px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.9);
+  position: relative;
+  z-index: 10;
+}
+
+.info-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #ff0000b7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-style: italic;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .info-disclaimer {
+    font-size: 12px;
+    margin-top: 20px;
+  }
+
+  .info-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
+  }
 }
 </style>
 

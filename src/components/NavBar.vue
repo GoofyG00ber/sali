@@ -109,7 +109,12 @@
       <div v-if="showMobileCart" class="mobile-cart-dropdown fixed z-50" ref="mobileDropdownEl" role="dialog" aria-label="Kosár">
         <div class="flex justify-between items-center p-4 border-b flex-shrink-0">
           <h2 class="text-lg font-semibold">Kosár ({{ itemCount }})</h2>
-          <button @click="toggleMobileCart" class="text-gray-500 hover:text-gray-700 text-2xl leading-none" aria-label="Bezárás">×</button>
+          <button @click="toggleMobileCart" class="close-btn" aria-label="Bezárás">
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
         </div>
         <div class="flex-1 overflow-y-auto min-h-0">
           <KosarWidget :cart="kosarCart" @increment="onIncrement" @decrement="onDecrement" />
@@ -407,7 +412,7 @@ watchEffect(async ()=>{
 }
 
 .mobile-cart-dropdown {
-  top: 100px;
+  top: 12px;
   bottom: 100px;
   left: 12px;
   right: 12px;
@@ -422,7 +427,32 @@ watchEffect(async ()=>{
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  max-height: calc(100vh - 200px);
+  max-height: calc(100vh - 112px);
+  z-index: 70;
+}
+
+.close-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.close-btn:hover,
+.close-btn:active {
+  background: #f5f5f5;
+  color: #ff6106;
+}
+
+.close-btn svg {
+  display: block;
 }
 
 .work-sans-light {

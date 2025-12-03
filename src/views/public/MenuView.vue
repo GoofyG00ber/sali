@@ -5,6 +5,12 @@
     </div>
 
     <main class="center">
+      <!-- Info disclaimer -->
+      <div class="info-disclaimer">
+        <div class="info-icon">i</div>
+        <span class="info-text">A képek között illusztrációk is szerepelnek, és eltérhetnek a valós étel kinézetétől.</span>
+      </div>
+
       <!-- Pizza Builder Card (shown only in pizza category) -->
       <div v-if="isPizzaCategory" class="pizza-builder-card" @click="goToPizzaBuilder">
         <div class="builder-icon">🍕</div>
@@ -282,7 +288,7 @@ async function loadMenu(){
         title: f.title,
         description: f.description,
         prices: priceOptions,
-        image: f.image || '/placeholder.png',
+        image: f.image,
         category_id: f.category_id
       }
       if (cat) cat.items.push(item)
@@ -304,7 +310,7 @@ function handleAddToCart(payload: { item: Item; price: Price }){
     title: item.title,
     description: item.description || '',
     prices: item.prices || [],
-    image: item.image || '/placeholder.png',
+    image: item.image,
     badges: [],
     categoryId: item.category_id
   }
@@ -647,6 +653,50 @@ onBeforeUnmount(() => {
     font-size: 16px;
     padding: 5px 8px !important;
     min-width: 34px !important;
+  }
+}
+
+/* Info disclaimer */
+.info-disclaimer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #666;
+}
+
+.info-icon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #ff6106;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: italic;
+  flex-shrink: 0;
+}
+
+.info-text {
+  font-style: italic;
+  line-height: 1.4;
+}
+
+@media (max-width: 768px) {
+  .info-disclaimer {
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .info-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 11px;
   }
 }
 </style>

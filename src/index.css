@@ -2,7 +2,7 @@
 
 /* Custom scrollbar styling */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 16px;
 }
 
 ::-webkit-scrollbar-track {
@@ -21,5 +21,5 @@
 /* Firefox scrollbar */
 * {
   scrollbar-color: #ff6106 #e0e0e0;
-  scrollbar-width: thin;
+  scrollbar-width: auto;
 }

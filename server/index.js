@@ -571,7 +571,7 @@ app.post('/api/foods', upload.single('image'), async (req, res) => {
   }
 
   // Handle image path
-  let imagePath = req.body.image || '/placeholder.png' // Fallback
+  let imagePath = req.body.image
   if (req.file) {
     imagePath = '/static_images/' + req.file.filename
   }
@@ -602,7 +602,7 @@ app.post('/api/foods', upload.single('image'), async (req, res) => {
 })
 
 app.put('/api/foods/:id', upload.single('image'), async (req, res) => {
-  const { title, description, categoryId, active } = req.body
+  const { title, description, categoryId, active, deleteImage } = req.body
   let prices = req.body.prices
   const foodId = req.params.id
 
@@ -618,7 +618,17 @@ app.put('/api/foods/:id', upload.single('image'), async (req, res) => {
   // Handle image path
   let imagePath = req.body.image
   if (req.file) {
+    // New image uploaded
     imagePath = '/static_images/' + req.file.filename
+  } else if (deleteImage === 'true') {
+    // User wants to delete the image
+    imagePath = null
+  } else {
+    // Keep existing image - fetch current value from DB
+    const [rows] = await pool.query('SELECT image FROM menu_items WHERE id=?', [foodId])
+    if (rows && rows.length > 0) {
+      imagePath = rows[0].image
+    }
   }
 
   try {
