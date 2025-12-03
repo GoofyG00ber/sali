@@ -40,7 +40,9 @@ export const useFoodsStore = defineStore('foods', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${API_BASE}/foods`)
+      const response = await fetch(`${API_BASE}/foods?t=${Date.now()}`, {
+        cache: 'no-store'
+      })
       if (!response.ok) throw new Error('Failed to fetch foods')
       const data = await response.json()
       // Map category_id to categoryId if needed
@@ -61,7 +63,9 @@ export const useFoodsStore = defineStore('foods', () => {
     loading.value = true
     error.value = null
     try {
-      const response = await fetch(`${API_BASE}/top-pizzas`)
+      const response = await fetch(`${API_BASE}/top-pizzas?t=${Date.now()}`, {
+        cache: 'no-store'
+      })
       if (!response.ok) throw new Error('Failed to fetch top pizzas')
       const data = await response.json()
       topPizzas.value = data.map((item: Record<string, unknown>) => ({

@@ -1,6 +1,6 @@
 <!-- src/components/TopPizzaCard.vue -->
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, h } from 'vue'
 import type { Food, FoodPrice } from '@/stores/foods'
 import { useCartStore } from '@/stores/cart'
 
@@ -55,11 +55,16 @@ const emit = defineEmits<{
 function openExtrasModal(item: Food) {
   emit('openExtras', { item })
 }
+
+// Pizza icon component
+const PizzaIcon = () => h('svg', { xmlns: 'http://www.w3.org/2000/svg', width: '80', height: '80', viewBox: '0 0 512 512', fill: '#ff6106' }, [
+  h('path', { d: 'M158.87.15c-16.16-1.52-31.2 8.42-35.33 24.12l-14.81 56.27c187.62 5.49 314.54 130.61 322.48 317l56.94-15.78c15.72-4.36 25.49-19.68 23.62-35.9C490.89 165.08 340.78 17.32 158.87.15zm-58.47 112L.55 491.64a16.21 16.21 0 0 0 20 19.75l379-105.1c-4.27-174.89-123.08-292.14-299.15-294.1zM128 416a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm48-152a32 32 0 1 1 32-32 32 32 0 0 1-32 32zm104 104a32 32 0 1 1 32-32 32 32 0 0 1-32 32z' })
+])
 </script>
 
 <template>
   <article
-    class="relative min max-w-xs rounded-[32px] bg-gray-50 shadow-[0_20px_40px_rgba(0,0,0,0.16)]"
+    class="relative w-full max-w-xs rounded-[32px] bg-gray-50 shadow-[0_20px_40px_rgba(0,0,0,0.16)]"
   >
 
     <div class="absolute -left-4 top-4 z-20">
@@ -75,10 +80,13 @@ function openExtrasModal(item: Food) {
     </div>
 
     <div class="bg-[#7A231D] flex justify-center relative z-5 rounded-t-xl">
-      <div class="w-full h-40 overflow-hidden">
-        <img :src="pizza.image || '/static_images/top-view-delicious-pizza.png'"
+      <div v-if="!pizza.image || pizza.image === 'null'" class="w-full h-40 flex items-center justify-center">
+        <component :is="PizzaIcon()" />
+      </div>
+      <div v-else class="w-full h-40 overflow-hidden">
+        <img :src="pizza.image"
           class="w-full object-cover object-top rounded-t-xl" />
-    </div>
+      </div>
     </div>
 
     <div class="pt-10 pb-6 px-6 work-sans-regular z-10 relative bg-gray-50 rounded-b-xl">

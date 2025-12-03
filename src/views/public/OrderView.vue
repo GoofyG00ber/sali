@@ -5,7 +5,7 @@
       <div class="flex flex-col md:flex-row md:justify-between md:items-center gap-2 mb-4 text-center md:text-left">
         <h1 class="text-3xl font-bold">Rendelés leadása</h1>
         <img
-          src="/static_images/barion/svg/barion-smart-banner-light.svg"
+          :src="barionBannerLight"
           alt="Barion Smart Payment"
           class="h-10 md:h-12"
         />
@@ -201,7 +201,7 @@
                       <div class="flex-1 flex flex-col">
                         <div class="font-medium text-sm">Online fizetés</div>
                         <div class="flex justify-start">
-                          <img src="/static_images/barion/svg/barion-smart-banner-light.svg" alt="Barion" class="h-6 w-auto" />
+                          <img :src="barionBannerLight" alt="Barion" class="h-6 w-auto" />
                         </div>
                       </div>
                     </label>
@@ -276,6 +276,7 @@ import { useOrdersStore } from '@/stores/orders'
 import type { OrderItem } from '@/stores/orders'
 import DrinkOfferModal from '@/components/DrinkOfferModal.vue'
 import { useFoodsStore, type Food } from '@/stores/foods'
+import barionBannerLight from '/static_images/barion/svg/barion-smart-banner-light.svg?url'
 
 const router = useRouter()
 const cartStore = useCartStore()
