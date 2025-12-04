@@ -431,21 +431,27 @@ app.put('/api/admin/password', async (req, res) => {
     }
 
     // Update .env file
-    const envPath = path.join(__dirname, '.env')
-    let envContent = fs.readFileSync(envPath, 'utf8')
-    const lines = envContent.split('\n')
-    let found = false
-    const newLines = lines.map(line => {
-      if (line.startsWith('ADMIN_PASSWORD=')) {
-        found = true
-        return `ADMIN_PASSWORD=${newPassword}`
-      }
-      return line
-    })
-    if (!found) {
-      newLines.push(`ADMIN_PASSWORD=${newPassword}`)
+    let envPath = path.join(__dirname, '.env')
+    if (!fs.existsSync(envPath)) {
+      envPath = path.join(__dirname, '../.env')
     }
-    fs.writeFileSync(envPath, newLines.join('\n'))
+
+    if (fs.existsSync(envPath)) {
+      let envContent = fs.readFileSync(envPath, 'utf8')
+      const lines = envContent.split('\n')
+      let found = false
+      const newLines = lines.map(line => {
+        if (line.startsWith('ADMIN_PASSWORD=')) {
+          found = true
+          return `ADMIN_PASSWORD=${newPassword}`
+        }
+        return line
+      })
+      if (!found) {
+        newLines.push(`ADMIN_PASSWORD=${newPassword}`)
+      }
+      fs.writeFileSync(envPath, newLines.join('\n'))
+    }
 
     // Update process.env for immediate effect
     process.env.ADMIN_PASSWORD = newPassword
