@@ -504,7 +504,7 @@ app.get('/api/foods', async (req, res) => {
     const [foods] = await pool.query(`
       SELECT menu_items.*, categories.title AS categoryTitle
       FROM menu_items
-      LEFT JOIN categories ON menu_items.category_Id = categories.id
+      LEFT JOIN categories ON menu_items.category_id = categories.id
     `)
     const [prices] = await pool.query('SELECT * FROM item_prices')
 
