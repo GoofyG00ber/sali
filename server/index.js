@@ -1518,6 +1518,19 @@ app.post('/send-email', async (req, res) => {
   }
 })
 
+// Serve static files from the Vue app build
+const distPath = path.join(__dirname, '../dist')
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath))
+
+  // Handle SPA routing: return index.html for any unknown api routes
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(distPath, 'index.html'))
+    }
+  })
+}
+
 // start server
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
