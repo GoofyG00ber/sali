@@ -214,7 +214,7 @@ const fetchOrderDetails = async () => {
     }
 
     // Otherwise fetch from API
-    const res = await fetch(`http://localhost:3001/api/orders/${orderId}`)
+    const res = await fetch(`/api/orders/${orderId}`)
     if (!res.ok) throw new Error('Rendelés nem található')
 
     const data = await res.json()
@@ -245,7 +245,7 @@ const printOrder = async () => {
 
   printing.value = true
   try {
-    const res = await fetch(`http://localhost:3001/api/orders/${order.value.id}/print`, {
+    const res = await fetch(`/api/orders/${order.value.id}/print`, {
       method: 'POST'
     })
 

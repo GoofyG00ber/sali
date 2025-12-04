@@ -504,7 +504,7 @@ app.get('/api/foods', async (req, res) => {
     const [foods] = await pool.query(`
       SELECT menu_items.*, categories.title AS categoryTitle
       FROM menu_items
-      LEFT JOIN categories ON menu_items.category_Id = categories.id
+      LEFT JOIN categories ON menu_items.category_id = categories.id
     `)
     const [prices] = await pool.query('SELECT * FROM item_prices')
 
@@ -1517,6 +1517,19 @@ app.post('/send-email', async (req, res) => {
     res.status(500).json({ error: 'Failed to send email' })
   }
 })
+
+// Serve static files from the Vue app build
+const distPath = path.join(__dirname, '../dist')
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath))
+
+  // Handle SPA routing: return index.html for any unknown api routes
+  app.get('*', (req, res) => {
+    if (!req.path.startsWith('/api')) {
+      res.sendFile(path.join(distPath, 'index.html'))
+    }
+  })
+}
 
 // start server
 const PORT = process.env.PORT || 3001
