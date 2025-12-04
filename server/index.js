@@ -15,6 +15,11 @@ const app = express()
 app.use(cors())
 app.use(express.json())
 
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() })
+})
+
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -182,11 +187,23 @@ async function ensureOrderItemsPriceLabel() {
   }
 }
 
-await ensureMenuMetaTables()
-await ensureSettingsTable()
-await ensureOpeningHoursTable()
-await ensureOrderItemsExtras()
-await ensureOrderItemsPriceLabel()
+// Initialize DB tables
+async function initDb() {
+  try {
+    await ensureMenuMetaTables()
+    await ensureSettingsTable()
+    await ensureOpeningHoursTable()
+    await ensureOrderItemsExtras()
+    await ensureOrderItemsPriceLabel()
+    console.log('Database tables initialized successfully')
+  } catch (err) {
+    console.error('Failed to initialize database tables:', err)
+    // We don't exit here, so the server can still start and maybe serve static files or health check
+  }
+}
+
+// Start initialization
+initDb()
 
 // Restaurant Status & Opening Hours
 app.get('/api/restaurant-status', async (req, res) => {
