@@ -9,7 +9,7 @@
     </div>
     <div class="flex-1 w-[80%] mx-auto flex flex-col z-20 text-left justify-end pb-10">
       <p class="work-sans-regular text-gray-50 text-xl md:text-2xl text-center md:text-left ">Rendelj házhoz, vagy kérd elvitelre!</p>
-      <div class="mt-5 flex flex-col gap-4 md:flex-row">
+      <div class="mt-5 flex flex-col-reverse gap-4 md:flex-row">
         <router-link
           to="/contact"
           class="hero-btn-outline"

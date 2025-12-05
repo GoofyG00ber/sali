@@ -73,15 +73,13 @@ const handleOpenExtras = async (payload: { item: Food }) => {
   isExtrasModalOpen.value = true
 }
 
-function handleAddWithExtras(data: { item: Item | null; selectedSize: Price; selectedExtras: Record<number, number> }) {
+function handleAddWithExtras(data: { item: Item; selectedSize: Price; selectedExtras: Record<number, boolean> }) {
   const { item, selectedSize, selectedExtras } = data
-
-  if (!item) return
 
   // Convert extras data to store format
   const extras: Array<{ id: number; title?: string; quantity: number; price: number }> = []
-  Object.entries(selectedExtras).forEach(([extraId, qty]) => {
-    if (qty > 0) {
+  Object.entries(selectedExtras).forEach(([extraId, isSelected]) => {
+    if (isSelected) {
       const extra = feltekExtras.value.find((e) => e.id === Number(extraId))
       if (extra && extra.prices) {
         // Extract size number from selected size label
@@ -107,7 +105,7 @@ function handleAddWithExtras(data: { item: Item | null; selectedSize: Price; sel
         extras.push({
           id: Number(extraId),
           title: extra.title,
-          quantity: qty,
+          quantity: 1,
           price: price || 0
         })
       }

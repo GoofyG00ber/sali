@@ -26,13 +26,13 @@
           <div class="right">
             <div class="qty">
               <button
-                @click="cartStore.updateQuantity(item.food.id, item.selectedPrice?.label ?? '', item.quantity - 1)"
+                @click="cartStore.updateQuantity(item.food.id, item.selectedPrice?.label ?? '', item.quantity - 1, item.extras && item.extras.length > 0 ? item.extras : undefined)"
               >
                 -
               </button>
               <span>{{ item.quantity }}</span>
               <button
-                @click="cartStore.updateQuantity(item.food.id, item.selectedPrice?.label ?? '', item.quantity + 1)"
+                @click="cartStore.updateQuantity(item.food.id, item.selectedPrice?.label ?? '', item.quantity + 1, item.extras && item.extras.length > 0 ? item.extras : undefined)"
               >
                 +
               </button>
@@ -87,7 +87,7 @@ const isInMenu = computed(() => !props.isInSidebar && route.path === '/menu')
 function getItemTotal(item: CartItem): string {
   let total = (item.selectedPrice?.price ?? 0) * item.quantity
   if (item.extras && item.extras.length > 0) {
-    const extrasPrice = item.extras.reduce((sum: number, extra) => sum + (extra.price * extra.quantity), 0)
+    const extrasPrice = item.extras.reduce((sum: number, extra) => sum + extra.price, 0)
     total += extrasPrice * item.quantity
   }
   return formatPrice(total)
@@ -106,7 +106,7 @@ function clearCart() {
 
 <style scoped>
 .kosar-wrapper { display: block; position: relative; }
-.kosar { width: 300px; background: #fff; padding: 16px; border-radius: 12px; display: block; overflow: visible; position: relative; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
+.kosar { width: 300px; background: #fff; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; overflow: visible; position: relative; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); }
 .kosar h3 { display: block; margin: 0 0 12px 0; padding: 0; font-family: "Work Sans", sans-serif; font-weight: 600; font-style: normal; color: #000; font-size: 1rem; }
 
 /* In menu view - apply Pacifico style with overflow */
@@ -139,8 +139,8 @@ function clearCart() {
   margin-top: 0;
 }
 
-.kosar .items { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 300px); padding-right: 8px; }
-.kosar .empty { color: #999; padding: 16px; text-align: center; }
+.kosar .items { overflow-y: auto; overflow-x: hidden; max-height: calc(100vh - 300px); padding-right: 8px; flex: 1; min-height: 0; }
+.kosar .empty { color: #999; padding: 16px; text-align: center; flex: 1; display: flex; align-items: center; justify-content: center; }
 .ci { display: flex; justify-content: space-between; gap: 8px; padding: 8px 0; border-bottom: 1px dashed #eee; min-width: 0; }
 .ci .left { min-width: 0; flex: 1; }
 .ci .left .title { font-weight: 600; word-break: break-word; }
@@ -154,7 +154,7 @@ function clearCart() {
 .qty { display: flex; align-items: center; gap: 6px; }
 .qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 .lineprice { font-weight: 700; }
-.bottom { display: block; padding-top: 12px; border-top: 1px dashed #eee; }
+.bottom { display: block; padding-top: 12px; border-top: 1px dashed #eee; margin-top: auto; }
 .total { display: flex; justify-content: space-between; margin-bottom: 12px; font-weight: 700; }
 .checkout-container { display: flex; gap: 8px; align-items: stretch; }
 .checkout { display: block; flex: 1; background: #FF6106; color: #fff; border: 1px solid #FF6106; padding: 12px 16px; border-radius: 8px; text-decoration: none; text-align: center; cursor: pointer; font-weight: 600; font-size: 16px; font-family: "Work Sans", sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease; display: flex; align-items: center; justify-content: center; }

@@ -23,6 +23,17 @@ export const useCartStore = defineStore('cart', () => {
   const items = ref<CartItem[]>([])
   const isCartOpen = ref(false)
 
+  // Helper to generate consistent extras key
+  const getExtrasKey = (extras?: Extra[] | null): string => {
+    if (!extras || extras.length === 0) return 'NO_EXTRAS'
+    return extras.map(e => `${e.id}:${e.quantity}`).join('|')
+  }
+
+  // Helper to check if two extras arrays are equivalent
+  const extrasEqual = (a?: Extra[] | null, b?: Extra[] | null): boolean => {
+    return getExtrasKey(a) === getExtrasKey(b)
+  }
+
   // Load cart from sessionStorage on init
   const loadCart = () => {
     const saved = sessionStorage.getItem('cart')
@@ -88,17 +99,26 @@ export const useCartStore = defineStore('cart', () => {
 
   // Add item to cart
   const addItem = (food: Food, selectedPrice: { label: string; price: number }, quantity = 1, extras: Extra[] = []) => {
-    // Create a key to identify items with same pizza and extras
-    const extrasKey = extras.map(e => `${e.id}:${e.quantity}`).join('|')
-    const existingIndex = items.value.findIndex(
-      item =>
+    // Find existing item with same pizza, price, AND extras
+    let existingIndex = -1
+    for (let i = 0; i < items.value.length; i++) {
+      const item = items.value[i]
+      if (
+        item &&
         item.food.id === food.id &&
         item.selectedPrice.label === selectedPrice.label &&
-        (item.extras?.map(e => `${e.id}:${e.quantity}`).join('|') || '') === extrasKey
-    )
+        extrasEqual(item.extras, extras)
+      ) {
+        existingIndex = i
+        break
+      }
+    }
 
     if (existingIndex > -1 && items.value[existingIndex]) {
-      items.value[existingIndex].quantity += quantity
+      const existingItem = items.value[existingIndex]
+      if (existingItem) {
+        existingItem.quantity += quantity
+      }
     } else {
       items.value.push({
         food,
@@ -112,24 +132,44 @@ export const useCartStore = defineStore('cart', () => {
   }
 
   // Remove item from cart
-  const removeItem = (foodId: number, priceLabel: string) => {
+  const removeItem = (foodId: number, priceLabel: string, extras?: Extra[]) => {
+    const extrasKey = getExtrasKey(extras)
     items.value = items.value.filter(
-      item => !(item.food.id === foodId && item.selectedPrice.label === priceLabel)
+      item => !(
+        item.food.id === foodId &&
+        item.selectedPrice.label === priceLabel &&
+        getExtrasKey(item.extras) === extrasKey
+      )
     )
     saveCart()
   }
 
   // Update item quantity
-  const updateQuantity = (foodId: number, priceLabel: string, quantity: number) => {
-    const item = items.value.find(
-      item => item.food.id === foodId && item.selectedPrice.label === priceLabel
-    )
+  const updateQuantity = (foodId: number, priceLabel: string, quantity: number, extras?: Extra[]) => {
+    // Find the exact item matching food id, price, AND extras
+    let foundIndex = -1
+    for (let i = 0; i < items.value.length; i++) {
+      const item = items.value[i]
+      if (!item) continue
+      if (
+        item.food.id === foodId &&
+        item.selectedPrice.label === priceLabel &&
+        extrasEqual(item.extras, extras)
+      ) {
+        foundIndex = i
+        break
+      }
+    }
 
-    if (item) {
-      if (quantity <= 0) {
-        removeItem(foodId, priceLabel)
-      } else {
-        item.quantity = quantity
+    if (foundIndex > -1) {
+      const foundItem = items.value[foundIndex]
+      if (foundItem) {
+        if (quantity <= 0) {
+          // Remove only this specific item
+          items.value.splice(foundIndex, 1)
+        } else {
+          foundItem.quantity = quantity
+        }
         saveCart()
       }
     }
