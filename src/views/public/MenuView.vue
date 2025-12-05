@@ -96,34 +96,30 @@ const feltekExtras = ref<Extra[]>([])
 const feltekCategoryId = ref<number | null>(null)
 
 function handleScroll() {
-  if (!rightContainer.value || window.innerWidth < 1000) return
+  if (window.innerWidth < 1000) return
 
   const centerContent = document.querySelector('.center')
   if (!centerContent) return
 
-  const containerHeight = rightContainer.value.offsetHeight
   const gap = 20
-
-  // Get the bottom of the center content (where menu items end) in viewport coordinates
   const centerRect = centerContent.getBoundingClientRect()
   const centerBottomAbsolute = centerRect.bottom + window.scrollY
-
-  // Calculate the point where we should stop scrolling the Kosár
-  // This is: center bottom - container height - gap
-  const stopScrollAt = centerBottomAbsolute - containerHeight - gap
-
-  // Current scroll position
   const scrollPosition = window.scrollY
 
-  // If we've scrolled past the stop point, switch to absolute positioning
-  if (scrollPosition + 120 > stopScrollAt) {
-    rightContainer.value.style.position = 'absolute'
-    rightContainer.value.style.top = (stopScrollAt - 120) + 'px'
-  } else {
-    // Otherwise keep it fixed at the normal position
-    rightContainer.value.style.position = 'fixed'
-    rightContainer.value.style.top = '120px'
+  // Handle right (cart)
+  if (rightContainer.value) {
+    const rightHeight = rightContainer.value.offsetHeight
+    const rightStop = centerBottomAbsolute - rightHeight - gap
+    if (scrollPosition + 120 > rightStop) {
+      rightContainer.value.style.position = 'absolute'
+      rightContainer.value.style.top = (rightStop - 120) + 'px'
+    } else {
+      rightContainer.value.style.position = 'fixed'
+      rightContainer.value.style.top = '120px'
+    }
   }
+
+  // Left column stays sticky; static max-height/padding handles stop point
 }
 
 function handleResize() {
@@ -310,7 +306,7 @@ function handleAddToCart(payload: { item: Item; price: Price }){
     title: item.title,
     description: item.description || '',
     prices: item.prices || [],
-    image: item.image,
+    image: item.image || '/placeholder.png',
     badges: [],
     categoryId: item.category_id
   }
@@ -347,13 +343,13 @@ async function handleOpenExtras(payload: { item: Item }) {
   isExtrasModalOpen.value = true
 }
 
-function handleAddWithExtras(data: { item: Item; selectedSize: Price; selectedExtras: Record<number, number> }) {
+function handleAddWithExtras(data: { item: Item; selectedSize: Price; selectedExtras: Record<number, boolean> }) {
   const { item, selectedSize, selectedExtras } = data
 
   // Convert extras data to store format
   const extras: Array<{ id: number; title?: string; quantity: number; price: number }> = []
-  Object.entries(selectedExtras).forEach(([extraId, qty]) => {
-    if (qty > 0) {
+  Object.entries(selectedExtras).forEach(([extraId, isSelected]) => {
+    if (isSelected) {
       const extra = feltekExtras.value.find((e) => e.id === Number(extraId))
       if (extra && extra.prices) {
         // Extract size number from selected size label
@@ -379,7 +375,7 @@ function handleAddWithExtras(data: { item: Item; selectedSize: Price; selectedEx
         extras.push({
           id: Number(extraId),
           title: extra.title,
-          quantity: qty,
+          quantity: 1,
           price: price || 0
         })
       }
@@ -559,6 +555,8 @@ onBeforeUnmount(() => {
     font-size: 60px;
   }
 }
+
+/* Removed desktop-only bottom padding on left to avoid oversizing */
 
 /* Mobile layout: single column, left becomes fixed top bar, center content scrolls below, cart hidden */
 @media (max-width:768px) {

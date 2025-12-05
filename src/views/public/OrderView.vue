@@ -23,7 +23,7 @@
             </router-link>
           </div>
           <div v-else>
-            <div v-for="item in cartStore.items" :key="`${item.food.id}-${item.selectedPrice.label}`" class="py-2 border-b text-sm">
+            <div v-for="item in cartStore.items" :key="`${item.food.id}-${item.selectedPrice.label}-${item.extras?.map(e => `${e.id}:${e.quantity}`).join('|') || ''}`" class="py-2 border-b text-sm">
               <div class="flex justify-between items-start">
                 <div class="flex-1">
                   <h3 class="font-medium text-sm">{{ item.food.title }}</h3>

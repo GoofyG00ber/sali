@@ -113,12 +113,12 @@ watch(() => [scrollContainer.value, props.selectedId], () => {
 </script>
 
 <style scoped>
-.category-list { width: 220px; padding: 18px 12px; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: relative; }
+.category-list { width: 220px; padding: 18px 12px; padding-bottom: 24px; background: #fff; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); position: sticky; top: 120px; height: auto; max-height: calc(100vh - 140px); display: flex; flex-direction: column; margin-bottom: 16px; }
 .category-list .logo { font-family: 'Pacifico', cursive; font-weight: 400; font-style: normal; color: #682121; font-size: 2.25rem; position: absolute; top: -20px; left: 12px; margin: 0; line-height: 1.2; }
 
 /* Desktop Version */
-.category-scroll-container { display: block; margin-top: 40px; }
-.category-scroll { list-style: none; padding: 0; margin: 0; display: block; }
+.category-scroll-container { display: flex; flex-direction: column; margin-top: 40px; flex: 1; min-height: 0; }
+.category-scroll { list-style: none; padding: 0; margin: 0; display: block; height: 100%; overflow-y: auto; overflow-x: hidden; padding-right: 8px; padding-bottom: 16px; }
 .category-scroll li { padding: 10px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 6px; color: #777; border: 1px solid transparent; }
 .category-scroll li:hover { border-color: #ff6106; color: #ff6106; }
 .category-scroll li.active { background: #fff4e6; color: #ff6106; font-weight: 600; border: 1px solid #ff6106; border-radius: 6px; padding: 9px 11px; }
@@ -133,6 +133,11 @@ watch(() => [scrollContainer.value, props.selectedId], () => {
     padding: 0;
     background: transparent;
     box-shadow: none;
+    height: auto;
+    display: block;
+    position: relative;
+    top: auto;
+    margin-bottom: 0;
   }
 
   .category-list .logo {
@@ -141,6 +146,7 @@ watch(() => [scrollContainer.value, props.selectedId], () => {
 
   .category-scroll-container {
     display: flex;
+    flex-direction: row;
     align-items: center;
     gap: 8px;
     position: relative;
@@ -148,10 +154,12 @@ watch(() => [scrollContainer.value, props.selectedId], () => {
     padding: 8px 8px;
     border-bottom: 1px solid #eee;
     margin-top: 0;
+    flex: none;
+    min-height: auto;
   }
 
   .scroll-btn {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     width: 36px;
@@ -182,7 +190,7 @@ watch(() => [scrollContainer.value, props.selectedId], () => {
     overflow-y: hidden;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
-    padding: 0 120px;
+    padding: 0 42px;
     margin: 0;
     flex: 1;
     cursor: grab;

@@ -33,7 +33,7 @@
             <div v-if="extras.length === 0" class="no-extras">
               Nincs elérhető feltételek
             </div>
-            <div v-for="extra in extras" :key="extra.id" :class="{ 'extra-item': true, 'extra-selected': (selectedExtras[extra.id] || 0) > 0 }">
+            <div v-for="extra in extras" :key="extra.id" :class="{ 'extra-item': true, 'extra-selected': selectedExtras[extra.id] || false }" @click="toggleExtra(extra.id)" role="button" tabindex="0">
               <div class="extra-info">
                 <h4>{{ extra.title }}</h4>
                 <p v-if="getPriceForSize(extra) > 0" class="extra-price">
@@ -43,11 +43,7 @@
                   Ár betöltésben...
                 </p>
               </div>
-              <div class="extra-controls">
-                <button @click="decreaseExtra(extra.id)" class="control-btn">−</button>
-                <span class="control-value">{{ selectedExtras[extra.id] || 0 }}</span>
-                <button @click="increaseExtra(extra.id)" class="control-btn">+</button>
-              </div>
+              <button @click.stop="toggleExtra(extra.id)" :class="{ 'toggle-on': selectedExtras[extra.id] }" class="toggle-btn-small">{{ selectedExtras[extra.id] ? '✓' : '' }}</button>
             </div>
           </div>
         </div>
@@ -118,11 +114,11 @@ const props = defineProps({
 
 const emit = defineEmits<{
   close: []
-  addToCart: [data: { item: Item; selectedSize: Price; selectedExtras: Record<number, number> }]
+  addToCart: [data: { item: Item; selectedSize: Price; selectedExtras: Record<number, boolean> }]
 }>()
 
 const selectedSize = ref<Price>({ label: '', price: 0 })
-const selectedExtras = ref<Record<number, number>>({})
+const selectedExtras = ref<Record<number, boolean>>({})
 
 // Initialize selected size from item
 watch(
@@ -145,14 +141,8 @@ function selectSize(price: Price) {
   selectedSize.value = price
 }
 
-function increaseExtra(extraId: number) {
-  selectedExtras.value[extraId] = (selectedExtras.value[extraId] || 0) + 1
-}
-
-function decreaseExtra(extraId: number) {
-  if (selectedExtras.value[extraId] && selectedExtras.value[extraId] > 0) {
-    selectedExtras.value[extraId]--
-  }
+function toggleExtra(extraId: number) {
+  selectedExtras.value[extraId] = !selectedExtras.value[extraId]
 }
 
 function getPriceForSize(extra: Extra): number {
@@ -189,11 +179,11 @@ function getPriceForSize(extra: Extra): number {
 
 const extrasTotal = computed(() => {
   let total = 0
-  Object.entries(selectedExtras.value).forEach(([extraId, qty]) => {
-    if (qty > 0) {
+  Object.entries(selectedExtras.value).forEach(([extraId, isSelected]) => {
+    if (isSelected) {
       const extra = props.extras.find((e) => e.id === Number(extraId))
       if (extra) {
-        total += getPriceForSize(extra) * qty
+        total += getPriceForSize(extra)
       }
     }
   })
@@ -366,7 +356,7 @@ function addToCart() {
 
 @media (max-width: 480px) {
   .extras-list {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
@@ -380,16 +370,21 @@ function addToCart() {
 }
 
 .extra-item {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
   align-items: center;
-  text-align: center;
+  text-align: left;
   padding: 12px;
   background: #f9f9f9;
   border-radius: 8px;
-  gap: 8px;
   transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.extra-item:hover {
+  background: #f0f0f0;
+  transform: translateY(-2px);
 }
 
 .extra-item.extra-selected {
@@ -397,13 +392,28 @@ function addToCart() {
   border: 2px solid #ff6106;
 }
 
+.extra-item.extra-selected:hover {
+  background: #ffe6cc;
+}
+
 .extra-info {
   flex: 1;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.extra-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .extra-info h4 {
-  margin: 0 0 4px;
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
   color: #1a1a1a;
@@ -414,6 +424,7 @@ function addToCart() {
   font-size: 12px;
   color: #888;
   font-weight: 600;
+  text-align: left;
 }
 
 .extra-price-loading {
@@ -427,39 +438,66 @@ function addToCart() {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  padding: 4px;
   align-self: flex-end;
   width: 100%;
 }
 
-.control-btn {
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
+.toggle-btn-small {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 50%;
   cursor: pointer;
-  font-size: 18px;
-  color: #ff6106;
+  font-size: 12px;
+  color: #1a1a1a;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
+  flex-shrink: 0;
+  padding: 0;
+  grid-column: 2;
+  grid-row: 1 / -1;
 }
 
-.control-btn:hover {
-  background: #f0f0f0;
-  border-radius: 4px;
+.toggle-btn-small:hover {
+  border-color: #ff6106;
+  background: #fff9f0;
 }
 
-.control-value {
-  min-width: 20px;
-  text-align: center;
-  font-weight: 600;
+.toggle-btn-small.toggle-on {
+  background: #ff6106;
+  border-color: #ff6106;
+  color: white;
+}
+
+.toggle-btn {
+  width: 36px;
+  height: 36px;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 18px;
   color: #1a1a1a;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.toggle-btn:hover {
+  border-color: #ff6106;
+  background: #fff9f0;
+}
+
+.toggle-btn.toggle-on {
+  background: #ff6106;
+  border-color: #ff6106;
+  color: white;
 }
 
 .summary-section {
