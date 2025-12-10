@@ -1546,14 +1546,22 @@ const distPath = path.join(__dirname, '../dist')
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath))
 
-  // Handle SPA routing: return index.html for any unknown api routes
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api')) {
+  // Handle SPA routing: return index.html for any unknown routes (not API)
+  app.use((req, res, next) => {
+    if (!req.path.startsWith('/api') && !req.path.includes('.')) {
       res.sendFile(path.join(distPath, 'index.html'))
+    } else {
+      next()
     }
   })
 }
 
+// 404 handler for API routes
+app.use((req, res) => {
+  res.status(404).json({ error: 'Not found' })
+})
+
 // start server
 const PORT = process.env.PORT || 3001
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`))
+const HOST = process.env.HOST || '0.0.0.0'
+app.listen(PORT, HOST, () => console.log(`Server running on http://${HOST}:${PORT}`))
