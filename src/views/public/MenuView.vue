@@ -306,7 +306,11 @@ function handleAddToCart(payload: { item: Item; price: Price }){
     title: item.title,
     description: item.description || '',
     prices: item.prices || [],
+<<<<<<< HEAD
     image: item.image || '/placeholder.png',
+=======
+    image: item.image || '',
+>>>>>>> acbe23d (backend2)
     badges: [],
     categoryId: item.category_id
   }

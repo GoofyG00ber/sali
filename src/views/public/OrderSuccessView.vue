@@ -184,7 +184,6 @@ const checkBarionPaymentStatus = async () => {
     const barionResult = await res.json()
     console.log('Barion full response:', barionResult)
     console.log('Barion payment state:', barionResult.Status)
-    console.log('Available fields:', Object.keys(barionResult))
 
     // Check for errors in response
     if (barionResult.Errors && barionResult.Errors.length > 0) {
@@ -238,11 +237,28 @@ const checkBarionPaymentStatus = async () => {
   }
 }
 
-const fetchOrderDetails = async () => {
+const fetchOrderStatus = async () => {
+  if (!orderId.value) {
+    loading.value = false
+    return
+  }
+
   try {
+    loading.value = true
     const res = await fetch(`/api/orders/${orderId.value}`)
-    if (res.ok) {
-      const data = await res.json()
+    if (!res.ok) {
+      console.error('Failed to fetch order')
+      loading.value = false
+      return
+    }
+    const data = await res.json()
+    status.value = data.status
+  } catch (e) {
+    console.error('Error fetching order:', e)
+  } finally {
+    loading.value = false
+  }
+}
 
 const refreshStatus = async () => {
   await fetchOrderStatus()
@@ -250,8 +266,8 @@ const refreshStatus = async () => {
 
 onMounted(async () => {
   // Get orderId and paymentId from URL query parameters or sessionStorage
-  orderId.value = route.query.orderId as string || sessionStorage.getItem('barionOrderId') || null
-  paymentId.value = route.query.paymentId as string || sessionStorage.getItem('barionPaymentId') || null
+  orderId.value = (route.query.orderId as string) || sessionStorage.getItem('barionOrderId') || null
+  paymentId.value = (route.query.paymentId as string) || sessionStorage.getItem('barionPaymentId') || null
 
   // Clear sessionStorage after reading
   if (sessionStorage.getItem('barionPaymentId')) {
