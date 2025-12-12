@@ -489,9 +489,20 @@ const initiateBarionPayment = async (amount: number, items: OrderItem[], orderId
       }
     })
 
-    // Barion Sandbox integration
+    // Get Barion configuration from backend
+    let barionConfig
+    try {
+      const configResponse = await fetch('/api/barion-config')
+      barionConfig = await configResponse.json()
+    } catch (err) {
+      console.error('Failed to get Barion config:', err)
+      alert('Hiba történt a fizetési rendszer konfigurálása során')
+      return
+    }
+
+    // Barion integration with dynamic configuration
     const barionData = {
-      POSKey: '4926b2ca-633f-420a-b1dc-c2d03e669fdf',
+      POSKey: barionConfig.posKey,
       PaymentType: 'Immediate',
       GuestCheckOut: true,
       FundingSources: ['All'],
@@ -500,7 +511,7 @@ const initiateBarionPayment = async (amount: number, items: OrderItem[], orderId
       Currency: 'HUF',
       Transactions: [{
         POSTransactionId: `${tempOrderId}-1`,
-        Payee: 'czanik.csanad@gmail.com',
+        Payee: barionConfig.payee,
         Total: Math.round(amount), // Ensure integer for HUF
         Items: barionItems
       }],
@@ -509,11 +520,9 @@ const initiateBarionPayment = async (amount: number, items: OrderItem[], orderId
     }
 
     console.log('Barion Payment Request:', barionData)
+    console.log('Using Barion environment:', barionConfig.environment)
 
-    // For sandbox testing
-    const barionEndpoint = 'https://api.test.barion.com/v2/Payment/Start'
-
-    const response = await fetch(barionEndpoint, {
+    const response = await fetch(barionConfig.apiUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(barionData)
