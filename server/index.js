@@ -276,6 +276,19 @@ app.get('/api/restaurant-status', async (req, res) => {
   }
 })
 
+// Barion configuration endpoint
+app.get('/api/barion-config', (req, res) => {
+  const isProduction = process.env.BARION_ENV === 'production'
+  res.json({
+    posKey: process.env.BARION_POS_KEY || '4926b2ca-633f-420a-b1dc-c2d03e669fdf',
+    payee: process.env.BARION_PAYEE || 'czanik.csanad@gmail.com',
+    apiUrl: isProduction 
+      ? 'https://api.barion.com/v2/Payment/Start'
+      : 'https://api.test.barion.com/v2/Payment/Start',
+    environment: isProduction ? 'production' : 'test'
+  })
+})
+
 app.get('/api/opening-hours', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM open_hours')
@@ -1312,8 +1325,9 @@ app.post('/api/barion/check-payment', async (req, res) => {
     console.log('Checking Barion payment state for:', paymentId)
 
     // Call Barion GetPaymentState API from backend - USES GET METHOD
-    const posKey = '4926b2ca-633f-420a-b1dc-c2d03e669fdf'
-    const barionUrl = `https://api.test.barion.com/v2/Payment/GetPaymentState?POSKey=${posKey}&PaymentId=${paymentId}`
+    const posKey = process.env.BARION_POS_KEY || '4926b2ca-633f-420a-b1dc-c2d03e669fdf'
+    const barionEnv = process.env.BARION_ENV === 'production' ? '' : 'test.'
+    const barionUrl = `https://api.${barionEnv}barion.com/v2/Payment/GetPaymentState?POSKey=${posKey}&PaymentId=${paymentId}`
 
     const barionResponse = await fetch(barionUrl, {
       method: 'GET',
